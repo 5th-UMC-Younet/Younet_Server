@@ -1,4 +1,4 @@
-package com.example.younet.repository.post;
+package com.example.younet.post.repository.post;
 
 import org.springframework.stereotype.Repository;
 
