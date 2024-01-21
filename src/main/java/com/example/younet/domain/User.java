@@ -7,7 +7,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -18,9 +17,10 @@ import java.util.List;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class User extends BaseEntity implements UserDetails {
+public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(nullable = false, columnDefinition = "bigint")
     private Long id;
 
     @Column(nullable = false, length = 50)
@@ -51,7 +51,7 @@ public class User extends BaseEntity implements UserDetails {
 
     private LocalDate inactiveDate;
 
-    private String refreshToken;
+    private Long refreshToken;
 
     @Column(columnDefinition="tinyint(0) default 0")
     private boolean isDel;
@@ -72,44 +72,14 @@ public class User extends BaseEntity implements UserDetails {
     private String hostSkl;
 
     @Builder
-    public User(String userId, String password, String auth) {
+    public User(String userId, String password, String name, String nickname, String email, Role role, LoginType loginType) {
         this.userId = userId;
         this.password = password;
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("user"));
-    }
-
-    @Override
-    public String getUsername() {
-        return email;
-    }
-
-    @Override
-    public String getPassword() {
-        return password;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
+        this.name = name;
+        this.nickname = nickname;
+        this.email = email;
+        this.role = role;
+        this.loginType = loginType;
     }
 
 }
