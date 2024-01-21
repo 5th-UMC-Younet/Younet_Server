@@ -1,4 +1,4 @@
-package com.example.younet.post.repository.post;
+package com.example.younet.post.repository;
 
 import com.example.younet.domain.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
