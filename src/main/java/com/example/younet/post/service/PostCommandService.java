@@ -9,6 +9,8 @@ import com.example.younet.post.repository.CountryRepository;
 import com.example.younet.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -54,6 +56,11 @@ public class PostCommandService {
                         .categoryName(post.getCategory().getName())
                         .build()
                 ).collect(Collectors.toList());
+    }
+
+    public Slice<PostResponseDTO.postListResultDTO> getPostListWithSliceAndOrderByDate
+            (Long lastPostId, Long categoryId, Long countryId, Pageable pageable){
+        return postRepository.getBySlice(lastPostId, categoryId, countryId, pageable);
     }
 
 }

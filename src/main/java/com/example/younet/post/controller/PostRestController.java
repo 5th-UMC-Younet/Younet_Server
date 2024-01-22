@@ -3,7 +3,10 @@ package com.example.younet.post.controller;
 import com.example.younet.post.dto.PostRequestDTO;
 import com.example.younet.post.dto.PostResponseDTO;
 import com.example.younet.post.service.PostCommandService;
+import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,4 +32,11 @@ public class PostRestController {
     public List<PostResponseDTO.postListResultDTO> getPostListWithPageAndOrderByDate(@RequestParam("page")int page,@RequestParam("size") int size){
         return postCommandService.getPostListWithPageAndOrderByDate(page,size);
     }
+
+    @GetMapping("/list3")
+    public Slice<PostResponseDTO.postListResultDTO> getPostListWithSliceAndOrderByDate
+            (@Nullable @RequestParam("lastpost") Long postId, @RequestParam("category") long categoryId, @RequestParam("country") long countryId, Pageable pageable){
+        return postCommandService.getPostListWithSliceAndOrderByDate(postId,categoryId,countryId,pageable);
+    }
+
 }
