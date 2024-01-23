@@ -52,8 +52,8 @@ public class GeneralAuthService {
         if(!emailVerificationDto.getCode().equals(authCode))
             System.out.println("Invalid email verification code.");
 
-        redisService.setValueWithTTL(emailVerificationDto.getUserEmail(), "verified", 30, TimeUnit.MINUTES);
-        return false;
+        redisService.setValueWithTTL(emailVerificationDto.getUserEmail(), "verified", 10, TimeUnit.MINUTES);
+        return true;
     }
 
     // 이메일 중복 검사

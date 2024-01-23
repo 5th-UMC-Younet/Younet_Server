@@ -25,7 +25,7 @@ public class UserAuthController {
     }
 
     // 이메일 전송 API
-    @PostMapping("/signup/verification/email")
+    @PostMapping("/signup/email")
     public ResponseEntity<String> getEmailAuthCode(@RequestParam(name = "email") String email) {
         if (generalAuthService.isDuplicatedEmail(email)) {
             generalAuthService.sendEmailAuthCode(email);
@@ -35,7 +35,7 @@ public class UserAuthController {
         }
     }
 
-    @GetMapping("/signup/verification/email")
+    @PostMapping("/signup/verification/email")
     public ResponseEntity<String> verifyEmail(@RequestBody EmailVerificationDto emailVerificationDto) {
         boolean verificationResult = generalAuthService.verifyEmail(emailVerificationDto);
         if (verificationResult) {
