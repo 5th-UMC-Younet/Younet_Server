@@ -32,34 +32,10 @@ public class PostCommandService {
         postRepository.save(newPost);
         return "ok";
     }
-    public List<PostResponseDTO.postListResultDTO> getPostListByCategory(Long categoryId){
-        List<Post> posts=postRepository.getPostList(categoryId);
-        return posts.stream()
-                .map(post -> PostResponseDTO.postListResultDTO.builder()
-                        .postId(post.getId())
-                        .title(post.getTitle())
-                        .body(post.getBody())
-                        .categoryName(post.getCategory().getName())
-                        .build()
-                ).collect(Collectors.toList());
-    }
-
-    public List<PostResponseDTO.postListResultDTO> getPostListWithPageAndOrderByDate(int page, int size){
-        PageRequest pageRequest=PageRequest.of(page,size);
-
-        return postRepository.getPostListWithPageAndOrder(pageRequest.getOffset(), pageRequest.getPageSize())
-                .stream()
-                .map(post -> PostResponseDTO.postListResultDTO.builder()
-                        .postId(post.getId())
-                        .title(post.getTitle())
-                        .body(post.getBody())
-                        .categoryName(post.getCategory().getName())
-                        .build()
-                ).collect(Collectors.toList());
-    }
 
     public Slice<PostResponseDTO.postListResultDTO> getPostListWithSliceAndOrderByDate
-            (Long lastPostId, Long categoryId, Long countryId, Pageable pageable){
+            (Long lastPostId, Long categoryId, Long countryId){
+        Pageable pageable=PageRequest.of(0,10);
         return postRepository.getBySlice(lastPostId, categoryId, countryId, pageable);
     }
 

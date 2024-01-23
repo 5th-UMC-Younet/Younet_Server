@@ -21,22 +21,11 @@ public class PostRestController {
     public String post(@RequestBody PostRequestDTO.JoinDTO request){
         return postCommandService.addPost(request);
     }
-    // post 조회 #1 카테고리별. (국가, pagination x)
-    @GetMapping("/list")
-    public List<PostResponseDTO.postListResultDTO> getPostList(@RequestParam("category")Long categoryId){
-        return postCommandService.getPostListByCategory(categoryId);
-    }
 
-    // post 조회 #2 pagination, order by 최신순
-    @GetMapping("/list2")
-    public List<PostResponseDTO.postListResultDTO> getPostListWithPageAndOrderByDate(@RequestParam("page")int page,@RequestParam("size") int size){
-        return postCommandService.getPostListWithPageAndOrderByDate(page,size);
-    }
-
-    @GetMapping("/list3")
+    @GetMapping("/byDates")
     public Slice<PostResponseDTO.postListResultDTO> getPostListWithSliceAndOrderByDate
-            (@Nullable @RequestParam("lastpost") Long postId, @RequestParam("category") long categoryId, @RequestParam("country") long countryId, Pageable pageable){
-        return postCommandService.getPostListWithSliceAndOrderByDate(postId,categoryId,countryId,pageable);
+            (@Nullable @RequestParam("lastpost") Long postId, @RequestParam("category") long categoryId, @RequestParam("country") long countryId){
+        return postCommandService.getPostListWithSliceAndOrderByDate(postId,categoryId,countryId);
     }
 
 }

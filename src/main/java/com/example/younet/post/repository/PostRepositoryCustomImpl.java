@@ -25,26 +25,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom{
     private final JPAQueryFactory queryFactory;
     private final CategoryRepository categoryRepository;
     private final CountryRepository countryRepository;
-    @Override
-    public List<Post> getPostList(Long categoryId) {
-        QPost post=QPost.post;
-        Category category=categoryRepository.findById(categoryId).get();
-        return queryFactory.select(post) // select *
-                .from(post)
-                .where(post.category.eq(category)).fetch()
-                ;
-    }
-    @Override
-    public List<Post> getPostListWithPageAndOrder(Long offset, int pageSize) {
-        QPost post=QPost.post;
-        OrderSpecifier<?> orderSpecifier=new OrderSpecifier<>(Order.DESC,post.createdAt);
 
-        return queryFactory.selectFrom(post)
-                .offset(offset)
-                .limit(pageSize)
-                .orderBy(orderSpecifier)
-                .fetch();
-    }
     //slice
     QPost post= QPost.post;
     @Override
@@ -60,7 +41,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom{
                         post.country.eq(country)
                 )
                 .orderBy(post.createdAt.desc())
-                .limit(pageable.getPageSize()+1) // 하나 더 조회!
+                .limit(pageable.getPageSize()+1)
                 .fetch();
         //entity to dto
                List<PostResponseDTO.postListResultDTO> content=db.stream().map(
@@ -71,7 +52,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom{
                         .categoryName(value.getCategory().getName())
                         .build()
         ).collect(Collectors.toCollection(ArrayList::new));
-        // hasNext 값 구하기
+        // hasNext
         boolean hasNext=false;
         if (content.size()> pageable.getPageSize()){
             hasNext=true;
