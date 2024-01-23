@@ -1,6 +1,5 @@
 package com.example.younet.global.config;
 
-import com.example.younet.login.service.UserDetailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,7 +21,7 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final UserDetailService userService;
+    private final JwtSecurityConfig jwtSecurityConfig;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -31,7 +30,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeRequests()
                 // 사용자 인증되어야 하는 경로 추가
-                // .requestMatchers("/user/**").authenticated()
+                //.requestMatchers("/user/**").authenticated()
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .anyRequest().permitAll();
         http
