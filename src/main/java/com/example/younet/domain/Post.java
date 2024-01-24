@@ -23,8 +23,14 @@ public class Post extends BaseEntity {
     @Column(columnDefinition = "VARCHAR(50)")
     private String body;
 
+    @Column(nullable = false, columnDefinition = "INT default 0")
+    private int likesCount;
+
     @OneToMany(mappedBy = "post",cascade = CascadeType.ALL)
     private List<Image> imageList=new ArrayList<>();
+
+    @OneToMany(mappedBy = "post",cascade = CascadeType.ALL)
+    private List<PostLikes> likesList=new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     private CommunityProfile communityProfile;
@@ -48,5 +54,14 @@ public class Post extends BaseEntity {
     public void setCommunityProfile(CommunityProfile communityProfile) {
         this.communityProfile = communityProfile;
         communityProfile.getPostList().add(this);
+    }
+
+    public void addLike() {
+        this.likesCount++;
+        System.out.println(likesCount);
+    }
+
+    public void removeLike() {
+        this.likesCount--;
     }
 }

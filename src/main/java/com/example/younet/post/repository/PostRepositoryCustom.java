@@ -8,5 +8,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PostRepositoryCustom {
     // QueryDsl
-    Slice<PostResponseDTO.postListResultDTO> getBySlice(Long lastPostId, Long categoryId, Long countryId, Pageable pageable);
+    Slice<PostResponseDTO.postListResultDTO> getPostListByDates(Long lastPostId, Long categoryId, Long countryId, Pageable pageable);
+    Slice<PostResponseDTO.postListResultDTO> getPostListByLikes(Long lastPostId, Long categoryId, Long countryId, Pageable pageable);
 }

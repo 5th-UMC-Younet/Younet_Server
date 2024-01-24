@@ -33,10 +33,15 @@ public class PostCommandService {
         return "ok";
     }
 
-    public Slice<PostResponseDTO.postListResultDTO> getPostListWithSliceAndOrderByDate
+    public Slice<PostResponseDTO.postListResultDTO> getPostListByDates
             (Long lastPostId, Long categoryId, Long countryId){
-        Pageable pageable=PageRequest.of(0,10);
-        return postRepository.getBySlice(lastPostId, categoryId, countryId, pageable);
+        Pageable pageable=PageRequest.of(0,3); // size: 10
+        return postRepository.getPostListByDates(lastPostId, categoryId, countryId, pageable);
+    }
+    public Slice<PostResponseDTO.postListResultDTO> getPostListByLikes
+            (Long lastPostId, Long categoryId, Long countryId){
+        Pageable pageable=PageRequest.of(0,4); // size: 10
+        return postRepository.getPostListByLikes(lastPostId, categoryId, countryId, pageable);
     }
 
 }
