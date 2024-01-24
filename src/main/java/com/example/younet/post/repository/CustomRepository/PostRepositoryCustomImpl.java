@@ -1,4 +1,4 @@
-package com.example.younet.post.repository;
+package com.example.younet.post.repository.CustomRepository;
 
 import com.example.younet.domain.*;
 import com.example.younet.post.dto.PostResponseDTO;
