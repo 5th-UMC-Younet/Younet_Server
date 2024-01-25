@@ -28,4 +28,13 @@ public class Comment extends BaseEntity {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String body;
 
+
+    public Long getPostId() {
+        return post.getId();
+    }
+
+    public Long getCommunityProfileId() {
+        return communityProfile.getId();
+    }
+
 }
