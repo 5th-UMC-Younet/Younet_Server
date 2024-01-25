@@ -23,19 +23,45 @@ public class Post extends BaseEntity {
     @Column(columnDefinition = "VARCHAR(50)")
     private String body;
 
+    @Column(nullable = false, columnDefinition = "INT default 0")
+    private int likesCount;
+
     @OneToMany(mappedBy = "post",cascade = CascadeType.ALL)
     private List<Image> imageList=new ArrayList<>();
 
+    @OneToMany(mappedBy = "post",cascade = CascadeType.ALL)
+    private List<PostLikes> likesList=new ArrayList<>();
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "communityProfile_id")
     private CommunityProfile communityProfile;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "country_id")
     private Country country;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
     private Category category;
 
+    public void setCategory(Category category) {
+        this.category = category;
+        category.getPostList().add(this);
+    }
+
+    public void setCountry(Country country) {
+        this.country = country;
+        country.getPostList().add(this);
+    }
+
+    public void setCommunityProfile(CommunityProfile communityProfile) {
+        this.communityProfile = communityProfile;
+        communityProfile.getPostList().add(this);
+    }
+
+    public void addLike() {
+        this.likesCount++;
+        System.out.println(likesCount);
+    }
+
+    public void removeLike() {
+        this.likesCount--;
+    }
 }

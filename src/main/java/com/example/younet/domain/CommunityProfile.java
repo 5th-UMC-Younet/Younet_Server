@@ -28,4 +28,6 @@ public class CommunityProfile extends BaseEntity {
     @OneToMany(mappedBy = "communityProfile",cascade = CascadeType.ALL)
     private List<Post> postList=new ArrayList<>();
 
+    @OneToMany(mappedBy = "communityProfile",cascade = CascadeType.ALL)
+    private List<PostLikes> likesList=new ArrayList<>();
 }
