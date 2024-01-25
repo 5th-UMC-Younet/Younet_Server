@@ -9,6 +9,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -80,6 +82,13 @@ public class User extends BaseEntity {
         this.email = email;
         this.role = role;
         this.loginType = loginType;
+    }
+
+    public List<String> getRoleList(){
+        if(this.role.getValue().length() > 0){
+            return Arrays.asList(this.role.getValue());
+        }
+        return new ArrayList<>();
     }
 
 }

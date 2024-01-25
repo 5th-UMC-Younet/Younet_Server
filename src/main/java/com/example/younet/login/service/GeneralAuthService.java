@@ -3,7 +3,12 @@ package com.example.younet.login.service;
 import com.example.younet.domain.User;
 import com.example.younet.domain.enums.LoginType;
 import com.example.younet.domain.enums.Role;
+import com.example.younet.global.errorException.CustomException;
+import com.example.younet.global.errorException.ErrorCode;
+import com.example.younet.global.jwt.JwtTokenDto;
+import com.example.younet.global.jwt.JwtTokenProvider;
 import com.example.younet.login.dto.EmailVerificationDto;
+import com.example.younet.login.dto.UserSigninRequestDto;
 import com.example.younet.login.dto.UserSignupRequestDto;
 import com.example.younet.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -25,12 +30,12 @@ public class GeneralAuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final MailService mailService;
-    //private final JwtTokenProvider jwtTokenProvider;
+    private final JwtTokenProvider tokenProvider;
 
     // 일반 자체 회원가입
     public void signUp(UserSignupRequestDto requestDto) {
-        //String state = (String) redisService.getValue(requestDto.getUserEmail());
-        //if(!"verified".equals(state)) throw new CustomException(ErrorCode.USER_EMAIL_AUTHENTICATION_STATUS_EXPIRED);
+        String state = (String) redisService.getValue(requestDto.getEmail());
+        if(!"verified".equals(state)) throw new CustomException(ErrorCode.USER_EMAIL_AUTHENTICATION_STATUS_EXPIRED);
 
         User user = User.builder()
                 .name(requestDto.getName())
@@ -84,5 +89,21 @@ public class GeneralAuthService {
         }
 
         redisService.setValueWithTTL(email, authCode, 30L, TimeUnit.MINUTES);
+    }
+
+    public JwtTokenDto signInAndGetToken(UserSigninRequestDto requestDto) {
+        // usrId, password 검증 후 JWT 토큰 발급
+        // redis에 refresh token 저장하기
+        User user = userRepository.findByUserId(requestDto.getUserId()).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_INVALID_USERID));
+
+        if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
+            throw new CustomException(ErrorCode.USER_INVALID_PASSWORD);
+        }
+
+        JwtTokenDto jwtTokenDto = tokenProvider.generateToken(user);
+        redisService.setValueWithTTL(jwtTokenDto.getRefreshToken(), user.getUserId().toString(), 7L, TimeUnit.DAYS);
+
+        return jwtTokenDto;
     }
 }

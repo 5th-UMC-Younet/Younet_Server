@@ -1,9 +1,15 @@
 package com.example.younet.login.controller;
 
+import com.example.younet.global.dto.ApplicationResponse;
+import com.example.younet.global.errorException.ErrorCode;
+import com.example.younet.global.jwt.JwtTokenDto;
 import com.example.younet.login.dto.EmailVerificationDto;
+import com.example.younet.login.dto.ReissueRequestDto;
+import com.example.younet.login.dto.UserSigninRequestDto;
 import com.example.younet.login.dto.UserSignupRequestDto;
+import com.example.younet.login.service.AuthService;
 import com.example.younet.login.service.GeneralAuthService;
-import jakarta.validation.Valid;
+import com.example.younet.login.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,17 +20,22 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class UserAuthController {
 
+    private final UserService userService;
     private final GeneralAuthService generalAuthService;
+    private final AuthService authService;
 
-    // 일반 회원가입 API
+    // 일반 회원가입
     @PostMapping("/user/signup")
-    @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity signup(@Valid @RequestBody UserSignupRequestDto request) throws Exception {
-        generalAuthService.signUp(request);
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ApplicationResponse<String> generalSignUp(@RequestBody UserSignupRequestDto requestDto) {
+        // 코드 리팩토링 필수(URI 설정, 비밀번호 암호화 등)
+        System.out.println("일반 회원가입");
+        if(generalAuthService.isDuplicatedEmail(requestDto.getEmail())) {
+            generalAuthService.signUp(requestDto);
+        }
+        return ApplicationResponse.ok(ErrorCode.SUCCESS_CREATED, "회원가입 성공");
     }
 
-    // 이메일 전송 API
+    // 이메일 인증 코드 전송
     @PostMapping("/signup/email")
     public ResponseEntity<String> getEmailAuthCode(@RequestParam(name = "email") String email) {
         if (generalAuthService.isDuplicatedEmail(email)) {
@@ -35,6 +46,7 @@ public class UserAuthController {
         }
     }
 
+    // 이메일 인증 성공 여부 확인
     @PostMapping("/signup/verification/email")
     public ResponseEntity<String> verifyEmail(@RequestBody EmailVerificationDto emailVerificationDto) {
         boolean verificationResult = generalAuthService.verifyEmail(emailVerificationDto);
@@ -45,4 +57,20 @@ public class UserAuthController {
         }
     }
 
+    // 일반 로그인
+    @PostMapping("/user/login")
+    public ApplicationResponse<JwtTokenDto> generalSignIn(@RequestBody UserSigninRequestDto requestDto) {
+        System.out.println("일반 로그인");
+        JwtTokenDto jwtTokenDto = generalAuthService.signInAndGetToken(requestDto);
+        System.out.println(jwtTokenDto);
+
+        return ApplicationResponse.ok(ErrorCode.SUCCESS_OK, jwtTokenDto);
+    }
+
+    @PostMapping("/auth/reissue")
+    public ApplicationResponse<JwtTokenDto> reissue(@RequestBody ReissueRequestDto reissueRequestDto) {
+        JwtTokenDto jwtTokenDto = authService.reissue(reissueRequestDto.getRefreshToken());
+
+        return ApplicationResponse.ok(ErrorCode.SUCCESS_OK, jwtTokenDto);
+    }
 }
