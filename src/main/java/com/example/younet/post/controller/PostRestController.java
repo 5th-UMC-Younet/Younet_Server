@@ -27,6 +27,10 @@ public class PostRestController {
         postRepository.save(post);
         return "ok";
     }
+    @PostMapping("/")
+    public String addPost(){
+        return null;
+    }
 
     @GetMapping("/byDates")
     public Slice<PostResponseDTO.postListResultDTO> getPostListWithSliceAndOrderByDates
