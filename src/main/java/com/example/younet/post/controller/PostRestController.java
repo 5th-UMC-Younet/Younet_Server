@@ -18,12 +18,6 @@ import org.springframework.web.bind.annotation.*;
 public class PostRestController {
     private final PostCommandService postCommandService;
     private final PostRepository postRepository;
-    @PostMapping("/")
-    // 게시물 등록 임시 코드
-    public String post(@RequestBody PostRequestDTO.JoinDTO request){
-        return postCommandService.addPost(request);
-    }
-
     @GetMapping("/like")
     // 좋아요 누르기 임시 코드
     @Transactional
