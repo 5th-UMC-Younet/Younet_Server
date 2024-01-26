@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 public class PostRequestDTO {
     @Builder
@@ -23,5 +24,7 @@ public class PostRequestDTO {
         Long countryId;
         @NotNull
         Long categoryId;
+
+        MultipartFile postImage;
     }
 }
