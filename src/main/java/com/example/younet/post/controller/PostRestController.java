@@ -13,6 +13,8 @@ import org.springframework.data.domain.Slice;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -33,10 +35,18 @@ public class PostRestController {
     public String addPost(){
         return null;
     }
-    @PostMapping(value = "/images",consumes = "multipart/form-data")
+    @PostMapping(value = "/image",consumes = "multipart/form-data")
     public String addPostImage(@RequestParam("post")Long postId, MultipartFile file){
         Image image=postCommandService.addImage(postId,file);
         if (image!=null)
+            return "ok";
+        return null;
+    }
+    // 다중 이미지
+    @PostMapping(value = "/images",consumes = "multipart/form-data")
+    public String addPostImages(@RequestParam("post")Long postId, @RequestParam("files") MultipartFile[] files){
+        List<Image> images=postCommandService.addImages(postId,files);
+        if (images!=null && !images.isEmpty())
             return "ok";
         return null;
     }

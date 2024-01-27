@@ -15,6 +15,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -48,4 +49,18 @@ public class PostCommandService {
         Post post=postRepository.findById(postId).get();
         return imageRepository.save(Image.builder().imageUrl(imageUrl).post(post).build());
     }
+
+    public List<Image> addImages(Long postId, MultipartFile[] files){
+        List<Image> images = new ArrayList<>();
+        Post post = postRepository.findById(postId).get();
+        for (MultipartFile file : files) {
+            String uuid = UUID.randomUUID().toString();
+            Uuid savedUuid = uuidRepository.save(Uuid.builder()
+                    .uuid(uuid).build());
+            String imageUrl = s3Manager.uploadFile(s3Manager.generateKeyName(savedUuid), file);
+            images.add(imageRepository.save(Image.builder().imageUrl(imageUrl).post(post).build()));
+        }
+        return images;
+    }
+
 }
