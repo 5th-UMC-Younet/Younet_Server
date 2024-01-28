@@ -2,6 +2,9 @@ package com.example.younet.post.service;
 
 import com.example.younet.aws.AmazonS3Manager;
 import com.example.younet.domain.*;
+import com.example.younet.post.converter.ImageConverter;
+import com.example.younet.post.converter.PostConverter;
+import com.example.younet.post.converter.SectionConverter;
 import com.example.younet.post.dto.PostRequestDTO;
 import com.example.younet.post.dto.PostResponseDTO;
 import com.example.younet.post.dto.SectionDTO;
@@ -43,39 +46,19 @@ public class PostCommandService {
         return postRepository.getPostListByLikes(lastPostId, categoryId, countryId, pageable);
     }
 
-    public List<Image> addImages(Long postId, MultipartFile[] files){
-        List<Image> images = new ArrayList<>();
-        Post post = postRepository.findById(postId).get();
-        for (MultipartFile file : files) {
-            String uuid = UUID.randomUUID().toString();
-            Uuid savedUuid = uuidRepository.save(Uuid.builder()
-                    .uuid(uuid).build());
-            String imageUrl = s3Manager.uploadFile(s3Manager.generateKeyName(savedUuid), file);
-            //images.add(imageRepository.save(Image.builder().imageUrl(imageUrl).post(post).build()));
-        }
-        return images;
-    }
-
     public Post addPost(PostRequestDTO.AddPostDTO request, List<MultipartFile> files) throws IOException{
 
         CommunityProfile communityProfile=communityProfileRepository.findById(request.getCommunityProfileId()).get();
         Country country=countryRepository.findById(request.getCountryId()).get();
         Category category=categoryRepository.findById(request.getCategoryId()).get();
 
-        Post post=Post.builder()
-                .title(request.getTitle())
-                .communityProfile(communityProfile)
-                .country(country)
-                .category(category)
-                .sections(new ArrayList<>())
-                .build();
+        Post newPost= PostConverter.toPost(request);
+        newPost.setCommunityProfile(communityProfile);
+        newPost.setCountry(country);
+        newPost.setCategory(category);
 
         for (SectionDTO sectionDTO: request.getSections()){
-            Section section=Section.builder()
-                    .body(sectionDTO.getBody())
-                    .post(post)
-                    .images(new ArrayList<>())
-                    .build();
+            Section newSection= SectionConverter.toSection(sectionDTO,newPost);
             for (String imageKey: sectionDTO.getImageKeys()){
                 MultipartFile file=files.stream()
                         .filter(f -> f.getOriginalFilename().equals(imageKey))
@@ -86,18 +69,14 @@ public class PostCommandService {
                 Uuid savedUuid = uuidRepository.save(Uuid.builder()
                         .uuid(uuid).build());
                 String imageUrl = s3Manager.uploadFile(s3Manager.generateKeyName(savedUuid), file);
-                Image image= Image.builder()
-                        .imageUrl(imageUrl)
-                        .section(section)
-                        .build();
-
-                section.getImages().add(image);
+                Image image= ImageConverter.toImage(imageUrl,newSection);
+                newSection.getImages().add(image);
             }
 
-            post.getSections().add(section);
+            newPost.getSections().add(newSection);
         }
 
-        return postRepository.save(post);
+        return postRepository.save(newPost);
     }
 
 }

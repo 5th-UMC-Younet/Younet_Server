@@ -2,6 +2,7 @@ package com.example.younet.post.controller;
 
 import com.example.younet.domain.Image;
 import com.example.younet.domain.Post;
+import com.example.younet.post.converter.PostConverter;
 import com.example.younet.post.dto.PostRequestDTO;
 import com.example.younet.post.dto.PostResponseDTO;
 import com.example.younet.post.repository.PostRepository;
@@ -35,20 +36,12 @@ public class PostRestController {
         return "ok";
     }
     @PostMapping("/")
-    public ResponseEntity<PostResponseDTO.postListResultDTO> addPost
+    public ResponseEntity<PostResponseDTO.AddPostResultDTO> addPost
             (@RequestPart("post") PostRequestDTO.AddPostDTO request,
              @RequestPart("files") List<MultipartFile> files) throws IOException {
         Post post=postCommandService.addPost(request, files);
-        return new ResponseEntity<>(PostResponseDTO.postListResultDTO.builder().postId(post.getId()).title(post.getTitle()).categoryName(post.getCategory().getName()).likesCount(post.getLikesCount()).build()
-        , HttpStatus.CREATED);
-    }
-
-    @PostMapping(value = "/images",consumes = "multipart/form-data")
-    public String addPostImages(@RequestParam("post")Long postId, @RequestParam("files") MultipartFile[] files){
-        List<Image> images=postCommandService.addImages(postId,files);
-        if (images!=null && !images.isEmpty())
-            return "ok";
-        return null;
+        return new ResponseEntity<>(PostConverter.toAddPostResultDTO(post)
+                , HttpStatus.CREATED);
     }
 
     @GetMapping("/byDates")
