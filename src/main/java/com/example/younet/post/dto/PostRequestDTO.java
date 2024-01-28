@@ -6,18 +6,17 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 public class PostRequestDTO {
     @Builder
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class JoinDTO{
+    public static class AddPostDTO{
         @NotBlank
         String title;
-        @NotBlank
-        String body;
         @NotNull
         Long communityProfileId;
         @NotNull
@@ -25,6 +24,6 @@ public class PostRequestDTO {
         @NotNull
         Long categoryId;
 
-        MultipartFile postImage;
+        List<SectionDTO> sections;
     }
 }

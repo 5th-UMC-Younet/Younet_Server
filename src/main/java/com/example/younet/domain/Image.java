@@ -19,6 +19,6 @@ public class Image extends BaseEntity {
     private String imageUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="post_id")
-    private Post post;
+    @JoinColumn(name="section_id")
+    private Section section;
 }

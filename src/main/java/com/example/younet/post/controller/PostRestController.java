@@ -10,9 +10,12 @@ import jakarta.annotation.Nullable;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 
@@ -32,17 +35,14 @@ public class PostRestController {
         return "ok";
     }
     @PostMapping("/")
-    public String addPost(){
-        return null;
+    public ResponseEntity<PostResponseDTO.postListResultDTO> addPost
+            (@RequestPart("post") PostRequestDTO.AddPostDTO request,
+             @RequestPart("files") List<MultipartFile> files) throws IOException {
+        Post post=postCommandService.addPost(request, files);
+        return new ResponseEntity<>(PostResponseDTO.postListResultDTO.builder().postId(post.getId()).title(post.getTitle()).categoryName(post.getCategory().getName()).likesCount(post.getLikesCount()).build()
+        , HttpStatus.CREATED);
     }
-    @PostMapping(value = "/image",consumes = "multipart/form-data")
-    public String addPostImage(@RequestParam("post")Long postId, MultipartFile file){
-        Image image=postCommandService.addImage(postId,file);
-        if (image!=null)
-            return "ok";
-        return null;
-    }
-    // 다중 이미지
+
     @PostMapping(value = "/images",consumes = "multipart/form-data")
     public String addPostImages(@RequestParam("post")Long postId, @RequestParam("files") MultipartFile[] files){
         List<Image> images=postCommandService.addImages(postId,files);

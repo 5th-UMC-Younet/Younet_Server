@@ -3,12 +3,16 @@ package com.example.younet.domain;
 import com.example.younet.domain.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Getter
+@DynamicInsert
+@DynamicUpdate
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -20,17 +24,20 @@ public class Post extends BaseEntity {
     @Column(nullable = false,columnDefinition = "VARCHAR(24)")
     private String title;
 
-    @Column(columnDefinition = "VARCHAR(50)")
-    private String body;
+//    @Column(columnDefinition = "VARCHAR(50)")
+//    private String body;
 
-    @Column(nullable = false, columnDefinition = "INT default 0")
-    private int likesCount;
+    @Column(nullable = false, columnDefinition = "BIGINT default 0")
+    private Long likesCount;
 
-    @OneToMany(mappedBy = "post",cascade = CascadeType.ALL)
-    private List<Image> imageList=new ArrayList<>();
+//    @OneToMany(mappedBy = "post",cascade = CascadeType.ALL)
+//    private List<Image> imageList=new ArrayList<>();
 
     @OneToMany(mappedBy = "post",cascade = CascadeType.ALL)
     private List<PostLikes> likesList=new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    private List<Section> sections=new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     private CommunityProfile communityProfile;
