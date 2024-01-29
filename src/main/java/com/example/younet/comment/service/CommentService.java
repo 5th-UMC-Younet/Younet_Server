@@ -67,4 +67,10 @@ public class CommentService {
         return new CommentResponseDTO.Comment(comment);
     }
 
+    @Transactional
+    public Long deleteComment(CommentRequestDTO.Delete requestDto) {
+        commentRepository.deleteById(requestDto.getCommentId());
+        return requestDto.getCommentId();
+    }
+
 }

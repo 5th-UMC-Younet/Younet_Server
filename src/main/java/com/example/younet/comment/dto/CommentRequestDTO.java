@@ -41,4 +41,11 @@ public class CommentRequestDTO {
         private final Long commentId;
         private final String body;
     }
+
+    @Getter
+    @Builder
+    @RequiredArgsConstructor
+    public static class Delete {
+        private final Long commentId;
+    }
 }

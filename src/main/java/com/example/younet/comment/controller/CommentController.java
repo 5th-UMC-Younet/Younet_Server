@@ -41,4 +41,8 @@ public class CommentController {
 
     }
 
+    @DeleteMapping("/")
+    public Long deleteComment(@RequestParam CommentRequestDTO.Delete requestDto) {
+        return commentService.deleteComment(requestDto);
+    }
 }
