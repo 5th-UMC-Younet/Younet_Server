@@ -9,7 +9,7 @@ import com.example.younet.global.jwt.JwtTokenDto;
 import com.example.younet.global.jwt.JwtTokenProvider;
 import com.example.younet.global.jwt.OauthToken;
 import com.example.younet.global.jwt.PrincipalDetails;
-import com.example.younet.login.dto.Kakao;
+import com.example.younet.login.dto.KakaoProfileDto;
 import com.example.younet.repository.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -81,7 +81,7 @@ public class KakaoAuthService {
         return oauthToken;
     }
 
-    public Kakao findProfile(OauthToken oauthToken) {
+    public KakaoProfileDto findProfile(OauthToken oauthToken) {
 
         String accessToken = oauthToken.getAccess_token();
 
@@ -95,11 +95,11 @@ public class KakaoAuthService {
         HttpEntity<MultiValueMap<String, String>> kakaoProfileRequest = new HttpEntity<>(headers);
 
         try {
-            ResponseEntity<Kakao> kakaoProfileResponse = rt.exchange(
+            ResponseEntity<KakaoProfileDto> kakaoProfileResponse = rt.exchange(
                     tokenUri,
                     HttpMethod.POST,
                     kakaoProfileRequest,
-                    Kakao.class
+                    KakaoProfileDto.class
             );
             return kakaoProfileResponse.getBody();
         } catch (Exception e) {
@@ -111,7 +111,7 @@ public class KakaoAuthService {
 
     public JwtTokenDto saveUserAndGetToken(OauthToken oauthToken) {
 
-        Kakao profile = findProfile(oauthToken);
+        KakaoProfileDto profile = findProfile(oauthToken);
 
         User user = null;
 
