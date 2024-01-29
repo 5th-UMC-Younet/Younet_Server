@@ -1,7 +1,8 @@
 package com.example.younet.post.controller;
 
-import com.example.younet.domain.Category;
+import com.example.younet.ApiPayload.ApiResponse;
 import com.example.younet.domain.Post;
+import com.example.younet.domain.Section;
 import com.example.younet.post.converter.PostConverter;
 import com.example.younet.post.dto.CategoryResponseDTO;
 import com.example.younet.post.dto.PostRequestDTO;
@@ -37,17 +38,16 @@ public class PostRestController {
         return "ok";
     }
     @PostMapping("/")
-    public ResponseEntity<PostResponseDTO.AddPostResultDTO> addPost
+    public ApiResponse<PostResponseDTO.AddPostResultDTO> addPost
             (@RequestPart("post") PostRequestDTO.AddPostDTO request,
              @RequestPart("files") List<MultipartFile> files) throws IOException {
         Post post=postCommandService.addPost(request, files);
-        return new ResponseEntity<>(PostConverter.toAddPostResultDTO(post)
-                , HttpStatus.CREATED);
+        return ApiResponse.onSuccess(HttpStatus.CREATED,PostConverter.toAddPostResultDTO(post));
     }
 
     @GetMapping("/categories")
-    public List<CategoryResponseDTO.CategoryListResultDTO> showCategoryList(){
-        return postCommandService.categoryList();
+    public ApiResponse<List<CategoryResponseDTO.CategoryListResultDTO>> showCategoryList(){
+        return ApiResponse.onSuccess(HttpStatus.OK,postCommandService.categoryList());
     }
 
     @GetMapping("/byDates")
