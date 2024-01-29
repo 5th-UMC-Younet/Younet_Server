@@ -1,5 +1,6 @@
 package com.example.younet.domain;
 
+import com.example.younet.domain.common.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -19,7 +20,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Reply {
+public class Reply extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -38,5 +39,11 @@ public class Reply {
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String body;
+
+    public Long getPostId() { return post.getId(); }
+    public Long getCommunityProfileId() { return communityProfile.getId(); }
+    public Long getCommentId() { return comment.getId(); }
+
+
 
 }
