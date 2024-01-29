@@ -58,4 +58,13 @@ public class CommentService {
         return newComment.getId();
     }
 
+    @Transactional
+    public CommentResponseDTO.Comment updateComment(CommentRequestDTO.Update requestDto) {
+        Comment comment = commentRepository.findById(requestDto.getCommentId())
+                .orElseThrow(() -> new IllegalArgumentException("댓글 ID를 찾을 수 없습니다."));
+
+        comment.updateComment(requestDto);
+        return new CommentResponseDTO.Comment(comment);
+    }
+
 }

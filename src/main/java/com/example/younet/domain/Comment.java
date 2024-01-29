@@ -1,5 +1,6 @@
 package com.example.younet.domain;
 
+import com.example.younet.comment.dto.CommentRequestDTO;
 import com.example.younet.domain.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -35,6 +36,10 @@ public class Comment extends BaseEntity {
 
     public Long getCommunityProfileId() {
         return communityProfile.getId();
+    }
+
+    public void updateComment(CommentRequestDTO.Update dto) {
+        this.body = dto.getBody();
     }
 
 }

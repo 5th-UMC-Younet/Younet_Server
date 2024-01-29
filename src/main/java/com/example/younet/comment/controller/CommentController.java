@@ -35,4 +35,10 @@ public class CommentController {
 
     }
 
+    @PatchMapping("/")
+    public CommentResponseDTO.Comment postComment(@RequestParam CommentRequestDTO.Update requestDto) {
+        return commentService.updateComment(requestDto);
+
+    }
+
 }

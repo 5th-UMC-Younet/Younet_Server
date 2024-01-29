@@ -33,4 +33,12 @@ public class CommentRequestDTO {
         private final Long communityProfileId;
         private final String body;
     }
+
+    @Getter
+    @Builder
+    @RequiredArgsConstructor
+    public static class Update {
+        private final Long commentId;
+        private final String body;
+    }
 }
