@@ -15,7 +15,8 @@ public class ReplyResponseDTO {
     public static class Reply {
 
         public Reply(com.example.younet.domain.Reply reply) {
-            this.commentId = reply.getId();
+            this.replyId = reply.getId();
+            this.commentId = reply.getCommentId();
             this.postId = reply.getPostId();
             this.communityProfileId = reply.getCommunityProfileId();
             this.body = reply.getBody();
@@ -23,6 +24,7 @@ public class ReplyResponseDTO {
             this.updatedAt = reply.getUpdatedAt();
         }
 
+        private final Long replyId;
         private final Long commentId;
         private final Long postId;
         private final Long communityProfileId;
