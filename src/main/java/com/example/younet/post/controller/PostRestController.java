@@ -1,8 +1,9 @@
 package com.example.younet.post.controller;
 
-import com.example.younet.domain.Image;
+import com.example.younet.domain.Category;
 import com.example.younet.domain.Post;
 import com.example.younet.post.converter.PostConverter;
+import com.example.younet.post.dto.CategoryResponseDTO;
 import com.example.younet.post.dto.PostRequestDTO;
 import com.example.younet.post.dto.PostResponseDTO;
 import com.example.younet.post.repository.PostRepository;
@@ -42,6 +43,11 @@ public class PostRestController {
         Post post=postCommandService.addPost(request, files);
         return new ResponseEntity<>(PostConverter.toAddPostResultDTO(post)
                 , HttpStatus.CREATED);
+    }
+
+    @GetMapping("/categories")
+    public List<CategoryResponseDTO.CategoryListResultDTO> showCategoryList(){
+        return postCommandService.categoryList();
     }
 
     @GetMapping("/byDates")

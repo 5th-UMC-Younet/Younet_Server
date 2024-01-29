@@ -5,6 +5,7 @@ import com.example.younet.domain.*;
 import com.example.younet.post.converter.ImageConverter;
 import com.example.younet.post.converter.PostConverter;
 import com.example.younet.post.converter.SectionConverter;
+import com.example.younet.post.dto.CategoryResponseDTO;
 import com.example.younet.post.dto.PostRequestDTO;
 import com.example.younet.post.dto.PostResponseDTO;
 import com.example.younet.post.dto.SectionDTO;
@@ -44,6 +45,15 @@ public class PostCommandService {
             (Long lastPostId, Long categoryId, Long countryId){
         Pageable pageable=PageRequest.of(0,10); // size: 10
         return postRepository.getPostListByLikes(lastPostId, categoryId, countryId, pageable);
+    }
+
+    public List<CategoryResponseDTO.CategoryListResultDTO> categoryList(){
+        return categoryRepository.findAll().stream()
+                .map(category -> CategoryResponseDTO.CategoryListResultDTO.builder()
+                        .categoryId(category.getId())
+                        .categoryName(category.getName())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     public Post addPost(PostRequestDTO.AddPostDTO request, List<MultipartFile> files) throws IOException{
