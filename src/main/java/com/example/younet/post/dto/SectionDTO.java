@@ -1,5 +1,6 @@
 package com.example.younet.post.dto;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
@@ -18,8 +19,9 @@ public class SectionDTO {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
+    @JsonPropertyOrder({"sectionId","body","images"})
     public static class SectionResultDTO{
-        Long id;
+        Long SectionId;
         String body;
         List<ImageResponseDTO.ImageResultDTO> images;
     }

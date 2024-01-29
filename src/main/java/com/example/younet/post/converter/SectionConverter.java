@@ -21,7 +21,7 @@ public class SectionConverter {
 
     public static SectionDTO.SectionResultDTO sectionResultDTO(Section section, List<ImageResponseDTO.ImageResultDTO> imageResultDTOs){
         return SectionDTO.SectionResultDTO.builder()
-                .id(section.getId())
+                .SectionId(section.getId())
                 .body(section.getBody())
                 .images(imageResultDTOs)
                 .build();

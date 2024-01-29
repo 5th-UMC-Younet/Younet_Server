@@ -33,8 +33,8 @@ public class PostResponseDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class SelectedPostResultDTO{
-        long id;
-        String title;
+        long postId;
+        String postTitle;
         Long likesCount;
         List<SectionDTO.SectionResultDTO> sections;
     }

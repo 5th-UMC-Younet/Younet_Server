@@ -16,7 +16,7 @@ public class ImageConverter {
 
     public static ImageResponseDTO.ImageResultDTO imageResultDTO(Image image){
         return ImageResponseDTO.ImageResultDTO.builder()
-                .id(image.getId())
+                .ImageId(image.getId())
                 .imageUrl(image.getImageUrl())
                 .build();
     }

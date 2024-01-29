@@ -37,8 +37,8 @@ public class PostConverter {
                     return SectionConverter.sectionResultDTO(section,imageResultDTOs);
                 }).collect(Collectors.toList());
         return PostResponseDTO.SelectedPostResultDTO.builder()
-                .id(post.getId())
-                .title(post.getTitle())
+                .postId(post.getId())
+                .postTitle(post.getTitle())
                 .likesCount(post.getLikesCount())
                 .sections(sectionResultDTOs)
                 .build();

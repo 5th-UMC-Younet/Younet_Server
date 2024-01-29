@@ -88,4 +88,9 @@ public class PostCommandService {
         return postRepository.save(newPost);
     }
 
+    public PostResponseDTO.SelectedPostResultDTO getAllOfPostContentById(Long postId){
+        Post post = postRepository.findById(postId).orElseThrow(() -> new RuntimeException("Post not found"));
+        post.getSections().forEach(Section::getImages);
+        return PostConverter.of(post);
+    }
 }

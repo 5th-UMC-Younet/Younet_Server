@@ -1,5 +1,6 @@
 package com.example.younet.post.dto;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,8 +11,9 @@ public class ImageResponseDTO {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
+    @JsonPropertyOrder({"imageId","imageUrl"})
     public static class ImageResultDTO{
-        Long id;
+        Long ImageId;
         String imageUrl;
     }
 }

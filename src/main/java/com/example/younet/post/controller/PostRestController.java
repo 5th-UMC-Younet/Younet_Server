@@ -2,7 +2,6 @@ package com.example.younet.post.controller;
 
 import com.example.younet.ApiPayload.ApiResponse;
 import com.example.younet.domain.Post;
-import com.example.younet.domain.Section;
 import com.example.younet.post.converter.PostConverter;
 import com.example.younet.post.dto.CategoryResponseDTO;
 import com.example.younet.post.dto.PostRequestDTO;
@@ -64,8 +63,6 @@ public class PostRestController {
 
     @GetMapping("/{postId}")
     public ApiResponse<PostResponseDTO.SelectedPostResultDTO> getAllOfPostContentsById(@PathVariable Long postId){
-        Post post = postRepository.findById(postId).orElseThrow(() -> new RuntimeException("Post not found"));
-        post.getSections().forEach(Section::getImages);
-        return ApiResponse.onSuccess(HttpStatus.OK, PostConverter.of(post));
+        return ApiResponse.onSuccess(HttpStatus.OK, postCommandService.getAllOfPostContentById(postId));
     }
 }
