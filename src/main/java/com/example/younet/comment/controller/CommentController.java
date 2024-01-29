@@ -18,31 +18,31 @@ public class CommentController {
 
     private final CommentService commentService;
 
-    @GetMapping("/post")
-    public Slice<CommentResponseDTO.Comment> getCommentsByPostIdWithPaging(@RequestParam CommentRequestDTO.GetByPostIdWithPaging requestDto) {
+    @GetMapping("post")
+    public Slice<CommentResponseDTO.Comment> getCommentsByPostIdWithPaging(@RequestBody CommentRequestDTO.GetByPostIdWithPaging requestDto) {
         return commentService.getCommentSliceByPostId(requestDto);
 
     }
 
-    @GetMapping("/community-profile")
-    public Slice<CommentResponseDTO.Comment> getCommentsByCommunityProfileIdWithPaging(@RequestParam CommentRequestDTO.GetByCommunityProfileIdWithPaging requestDto) {
+    @GetMapping("community-profile")
+    public Slice<CommentResponseDTO.Comment> getCommentsByCommunityProfileIdWithPaging(@RequestBody CommentRequestDTO.GetByCommunityProfileIdWithPaging requestDto) {
         return commentService.getCommentSliceByCommunityProfileId(requestDto);
     }
 
-    @PostMapping("/")
-    public Long postComment(@RequestParam CommentRequestDTO.Post requestDto) {
+    @PostMapping("")
+    public Long postComment(@RequestBody CommentRequestDTO.Post requestDto) {
         return commentService.saveComment(requestDto);
 
     }
 
-    @PatchMapping("/")
-    public CommentResponseDTO.Comment postComment(@RequestParam CommentRequestDTO.Update requestDto) {
+    @PatchMapping("")
+    public CommentResponseDTO.Comment postComment(@RequestBody CommentRequestDTO.Update requestDto) {
         return commentService.updateComment(requestDto);
 
     }
 
-    @DeleteMapping("/")
-    public Long deleteComment(@RequestParam CommentRequestDTO.Delete requestDto) {
+    @DeleteMapping("")
+    public Long deleteComment(@RequestBody CommentRequestDTO.Delete requestDto) {
         return commentService.deleteComment(requestDto);
     }
 }
