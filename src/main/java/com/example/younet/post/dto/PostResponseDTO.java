@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class PostResponseDTO {
     @Builder
@@ -25,5 +26,16 @@ public class PostResponseDTO {
     public static class AddPostResultDTO{
         Long postId;
         LocalDateTime createdAt;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SelectedPostResultDTO{
+        long id;
+        String title;
+        Long likesCount;
+        List<SectionDTO.SectionResultDTO> sections;
     }
 }

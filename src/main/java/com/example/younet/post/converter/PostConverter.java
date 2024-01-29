@@ -1,12 +1,16 @@
 package com.example.younet.post.converter;
 
 import com.example.younet.domain.Post;
+import com.example.younet.post.dto.ImageResponseDTO;
 import com.example.younet.post.dto.PostRequestDTO;
 import com.example.younet.post.dto.PostResponseDTO;
+import com.example.younet.post.dto.SectionDTO;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class PostConverter {
@@ -24,4 +28,19 @@ public class PostConverter {
                 .build();
     }
 
+    public static PostResponseDTO.SelectedPostResultDTO of(Post post){
+        List<SectionDTO.SectionResultDTO> sectionResultDTOs=post.getSections().stream()
+                .map(section -> {
+                    List<ImageResponseDTO.ImageResultDTO> imageResultDTOs= section.getImages().stream()
+                            .map(ImageConverter::imageResultDTO).collect(Collectors.toList());
+
+                    return SectionConverter.sectionResultDTO(section,imageResultDTOs);
+                }).collect(Collectors.toList());
+        return PostResponseDTO.SelectedPostResultDTO.builder()
+                .id(post.getId())
+                .title(post.getTitle())
+                .likesCount(post.getLikesCount())
+                .sections(sectionResultDTOs)
+                .build();
+    }
 }

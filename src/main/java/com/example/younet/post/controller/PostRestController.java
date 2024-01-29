@@ -14,7 +14,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -61,5 +60,12 @@ public class PostRestController {
             (@Nullable @RequestParam("lastpost") Long postId, @RequestParam("category") long categoryId, @RequestParam("country") long countryId)
     {
         return postCommandService.getPostListByLikes(postId,categoryId,countryId);
+    }
+
+    @GetMapping("/{postId}")
+    public ApiResponse<PostResponseDTO.SelectedPostResultDTO> getAllOfPostContentsById(@PathVariable Long postId){
+        Post post = postRepository.findById(postId).orElseThrow(() -> new RuntimeException("Post not found"));
+        post.getSections().forEach(Section::getImages);
+        return ApiResponse.onSuccess(HttpStatus.OK, PostConverter.of(post));
     }
 }
