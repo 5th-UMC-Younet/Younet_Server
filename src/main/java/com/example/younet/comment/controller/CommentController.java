@@ -25,7 +25,7 @@ public class CommentController {
     }
 
     @GetMapping("/community-profile")
-    public Slice<CommentResponseDTO.Comment> getCommentsByPostIdWithPaging(@RequestParam CommentRequestDTO.GetByCommunityProfileIdWithPaging requestDto) {
+    public Slice<CommentResponseDTO.Comment> getCommentsByCommunityProfileIdWithPaging(@RequestParam CommentRequestDTO.GetByCommunityProfileIdWithPaging requestDto) {
         return commentService.getCommentSliceByCommunityProfileId(requestDto);
     }
 
