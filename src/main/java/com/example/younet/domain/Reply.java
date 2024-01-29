@@ -1,6 +1,7 @@
 package com.example.younet.domain;
 
 import com.example.younet.domain.common.BaseEntity;
+import com.example.younet.reply.dto.ReplyRequestDTO;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -44,6 +45,9 @@ public class Reply extends BaseEntity {
     public Long getCommunityProfileId() { return communityProfile.getId(); }
     public Long getCommentId() { return comment.getId(); }
 
+    public void updateReply(ReplyRequestDTO.Update dto) {
+        this.body = dto.getBody();
+    }
 
 
 }
