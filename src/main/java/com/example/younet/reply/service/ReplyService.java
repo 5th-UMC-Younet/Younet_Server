@@ -31,8 +31,8 @@ public class ReplyService {
     @Transactional
     public Slice<ReplyResponseDTO.Reply> getReplySliceByCommentId(ReplyRequestDTO.GetByCommentIdWithPaging requestDto) {
         PageRequest pageable = PageRequest.of(requestDto.getPageNum(), requestDto.getPageSize(), Sort.by(
-                Sort.Order.asc("comment.created_at"),
-                Sort.Order.asc("created_at")));
+                Sort.Order.asc("comment.createdAt"),
+                Sort.Order.asc("createdAt")));
 
         return replyRepository.findSliceByPost_Id(requestDto.getCommentId(), pageable)
                 .map(ReplyResponseDTO.Reply::new);
@@ -41,8 +41,8 @@ public class ReplyService {
     @Transactional
     public Slice<ReplyResponseDTO.Reply> getReplySliceByPostId(ReplyRequestDTO.GetByPostIdWithPaging requestDto) {
         PageRequest pageable = PageRequest.of(requestDto.getPageNum(), requestDto.getPageSize(), Sort.by(
-                Sort.Order.asc("comment.created_at"),
-                Sort.Order.asc("created_at")));
+                Sort.Order.asc("comment.createdAt"),
+                Sort.Order.asc("createdAt")));
 
         return replyRepository.findSliceByPost_Id(requestDto.getPostId(), pageable)
                 .map(ReplyResponseDTO.Reply::new);
@@ -51,8 +51,8 @@ public class ReplyService {
     @Transactional
     public Slice<ReplyResponseDTO.Reply> getReplySliceByCommunityProfileId(ReplyRequestDTO.GetByCommunityProfileIdWithPaging requestDto) {
         PageRequest pageable = PageRequest.of(requestDto.getPageNum(), requestDto.getPageSize(), Sort.by(
-                Sort.Order.asc("comment.created_at"),
-                Sort.Order.asc("created_at")));
+                Sort.Order.asc("comment.createdAt"),
+                Sort.Order.asc("createdAt")));
 
         return replyRepository.findSliceByCommunityProfile_id(requestDto.getCommunityProfileId(), pageable)
                 .map(ReplyResponseDTO.Reply::new);

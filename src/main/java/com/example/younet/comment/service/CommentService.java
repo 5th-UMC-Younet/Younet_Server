@@ -26,7 +26,7 @@ public class CommentService {
 
     @Transactional
     public Slice<CommentResponseDTO.Comment> getCommentSliceByPostId(CommentRequestDTO.GetByPostIdWithPaging requestDto) {
-        PageRequest pageable = PageRequest.of(requestDto.getPageNum(), requestDto.getPageSize(), Sort.by(Sort.Direction.ASC, "created_at"));
+        PageRequest pageable = PageRequest.of(requestDto.getPageNum(), requestDto.getPageSize(), Sort.by(Sort.Direction.ASC, "createdAt"));
 
         return commentRepository.findSliceByPost_Id(requestDto.getPostId(), pageable)
                 .map(CommentResponseDTO.Comment::new);
@@ -34,7 +34,7 @@ public class CommentService {
 
     @Transactional
     public Slice<CommentResponseDTO.Comment> getCommentSliceByCommunityProfileId(CommentRequestDTO.GetByCommunityProfileIdWithPaging requestDto) {
-        PageRequest pageable = PageRequest.of(requestDto.getPageNum(), requestDto.getPageSize(), Sort.by(Sort.Direction.ASC, "created_at"));
+        PageRequest pageable = PageRequest.of(requestDto.getPageNum(), requestDto.getPageSize(), Sort.by(Sort.Direction.ASC, "createdAt"));
 
         return commentRepository.findSliceByCommunityProfile_id(requestDto.getCommunityProfileId(), pageable)
                 .map(CommentResponseDTO.Comment::new);
