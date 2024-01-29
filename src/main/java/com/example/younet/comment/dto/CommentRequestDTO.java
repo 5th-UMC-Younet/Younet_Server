@@ -24,4 +24,13 @@ public class CommentRequestDTO {
         private final int pageNum;
         private final int pageSize;
     }
+
+    @Getter
+    @Builder
+    @RequiredArgsConstructor
+    public static class Post {
+        private final Long postId;
+        private final Long communityProfileId;
+        private final String body;
+    }
 }

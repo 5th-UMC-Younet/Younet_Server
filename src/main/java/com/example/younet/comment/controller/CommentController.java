@@ -29,5 +29,10 @@ public class CommentController {
         return commentService.getCommentSliceByCommunityProfileId(requestDto);
     }
 
+    @PostMapping("/")
+    public Long postComment(@RequestParam CommentRequestDTO.Post requestDto) {
+        return commentService.saveComment(requestDto);
+
+    }
 
 }
