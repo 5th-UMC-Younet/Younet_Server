@@ -19,7 +19,8 @@ import java.util.List;
 public class Post extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    @Column(name = "post_id")
+    private Long id;
 
     @Column(nullable = false,columnDefinition = "VARCHAR(24)")
     private String title;
