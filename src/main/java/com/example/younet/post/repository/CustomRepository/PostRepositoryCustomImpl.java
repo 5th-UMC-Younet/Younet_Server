@@ -29,7 +29,8 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom{
                 .select(Projections.fields(PostResponseDTO.postListResultDTO.class,
                         post.id.as("postId"),
                         post.title.as("title"),
-                        post.body.as("body"),
+//                        post.body.as("body"),
+                        post.likesCount.as("likesCount"),
                         post.category.name.as("categoryName")))
                 .from(post)
                 .where(
@@ -48,7 +49,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom{
 
     @Override
     public Slice<PostResponseDTO.postListResultDTO> getPostListByLikes(Long lastPostId, Long categoryId, Long countryId, Pageable pageable) {
-        int lastLikesCount = 0;
+        long lastLikesCount=0;
         if (lastPostId != null) {
             Post lastPost = queryFactory
                     .selectFrom(post)
@@ -62,7 +63,8 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom{
                 .select(Projections.fields(PostResponseDTO.postListResultDTO.class,
                         post.id.as("postId"),
                         post.title.as("title"),
-                        post.body.as("body"),
+//                        post.body.as("body"),
+                        post.likesCount.as("likesCount"),
                         post.category.name.as("categoryName")))
                 .from(post)
                 .where(
@@ -78,7 +80,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom{
 
         return new SliceImpl<>(content, pageable, hasNext);
     }
-    private BooleanExpression ltLikesCountAndId(int likesCount, Long postId) {
+    private BooleanExpression ltLikesCountAndId(Long likesCount, Long postId) {
         if (postId == null) {
             return null;
         }
