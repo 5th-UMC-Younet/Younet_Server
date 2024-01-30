@@ -48,15 +48,15 @@ public class PostRestController {
         return ApiResponse.onSuccess(HttpStatus.OK,postCommandService.categoryList());
     }
 
-    @GetMapping("/byDates")
+    @GetMapping("/{countryId}/{categoryId}/byDates")
     public Slice<PostResponseDTO.postListResultDTO> getPostListWithSliceAndOrderByDates
-            (@Nullable @RequestParam("lastpost") Long postId, @RequestParam("category") long categoryId, @RequestParam("country") long countryId)
+            (@Nullable @RequestParam("lastpost") Long postId,@PathVariable long countryId, @PathVariable long categoryId)
     {
         return postCommandService.getPostListByDates(postId,categoryId,countryId);
     }
-    @GetMapping("/byLikes")
+    @GetMapping("/{countryId}/{categoryId}/byLikes")
     public Slice<PostResponseDTO.postListResultDTO> getPostListWithSliceAndOrderByLikes
-            (@Nullable @RequestParam("lastpost") Long postId, @RequestParam("category") long categoryId, @RequestParam("country") long countryId)
+            (@Nullable @RequestParam("lastpost") Long postId, @PathVariable long countryId, @PathVariable long categoryId)
     {
         return postCommandService.getPostListByLikes(postId,categoryId,countryId);
     }
