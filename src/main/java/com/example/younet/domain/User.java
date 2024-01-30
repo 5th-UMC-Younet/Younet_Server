@@ -5,13 +5,10 @@ import com.example.younet.domain.enums.LoginType;
 import com.example.younet.domain.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 @Entity
@@ -22,11 +19,11 @@ import java.util.List;
 public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false, columnDefinition = "bigint")
+    @Column(nullable = false, columnDefinition = "bigint", name="user_id")
     private Long id;
 
     @Column(nullable = false, length = 50)
-    private String userId;
+    private String userLoginId;
 
     @Column(nullable = false, length = 255)
     private String password;
@@ -74,8 +71,8 @@ public class User extends BaseEntity {
     private String hostSkl;
 
     @Builder
-    public User(String userId, String password, String name, String nickname, String email, Role role, LoginType loginType) {
-        this.userId = userId;
+    public User(String userLoginId, String password, String name, String nickname, String email, Role role, LoginType loginType) {
+        this.userLoginId = userLoginId;
         this.password = password;
         this.name = name;
         this.nickname = nickname;

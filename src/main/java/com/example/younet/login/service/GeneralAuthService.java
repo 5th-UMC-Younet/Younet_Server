@@ -40,7 +40,7 @@ public class GeneralAuthService {
         User user = User.builder()
                 .name(requestDto.getName())
                 .nickname(requestDto.getNickname())
-                .userId(requestDto.getUserId())
+                .userLoginId(requestDto.getUserId())
                 .email(requestDto.getEmail())
                 .password(passwordEncoder.encode(requestDto.getPassword()))
                 .loginType(LoginType.INAPP)
@@ -94,7 +94,7 @@ public class GeneralAuthService {
     public JwtTokenDto signInAndGetToken(UserSigninRequestDto requestDto) {
         // usrId, password 검증 후 JWT 토큰 발급
         // redis에 refresh token 저장하기
-        User user = userRepository.findByUserId(requestDto.getUserId()).orElseThrow(
+        User user = userRepository.findByUserLoginId(requestDto.getUserId()).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_INVALID_USERID));
 
         if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
@@ -102,7 +102,7 @@ public class GeneralAuthService {
         }
 
         JwtTokenDto jwtTokenDto = tokenProvider.generateToken(user);
-        redisService.setValueWithTTL(jwtTokenDto.getRefreshToken(), user.getUserId().toString(), 7L, TimeUnit.DAYS);
+        redisService.setValueWithTTL(jwtTokenDto.getRefreshToken(), user.getUserLoginId().toString(), 7L, TimeUnit.DAYS);
 
         return jwtTokenDto;
     }
