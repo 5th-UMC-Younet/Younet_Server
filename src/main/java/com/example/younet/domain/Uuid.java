@@ -8,17 +8,12 @@ import lombok.*;
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
-
-public class Image extends BaseEntity {
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+public class Uuid extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
-    @Column(nullable = false)
-    private String imageUrl;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="section_id")
-    private Section section;
+    @Column(unique = true)
+    private String uuid;
 }
