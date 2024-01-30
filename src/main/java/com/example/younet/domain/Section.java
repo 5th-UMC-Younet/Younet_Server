@@ -21,7 +21,7 @@ public class Section extends BaseEntity {
     private String body;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="post_id")
+    @JoinColumn(name="post_id", referencedColumnName = "post_id")
     private Post post;
 
     @OneToMany(mappedBy = "section",cascade = CascadeType.ALL)
