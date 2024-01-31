@@ -35,6 +35,9 @@ public enum ErrorCode {
 
     // Redis 관련
     REDIS_NOT_FOUND(HttpStatus.NOT_FOUND, "데이터를 찾을 수 없습니다.", 7001),
+
+    // 알 수 없는 에러
+    UNKNOWN_ERROR(HttpStatus.BAD_GATEWAY, "알 수 없는 오류입니다",8001),
     ;
 
     private final HttpStatus httpStatus;

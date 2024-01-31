@@ -39,7 +39,7 @@ public class JwtTokenProvider {
         Date accessTokenExpiresIn = new Date(now + ACCESS_TOKEN_EXPIRATION_TIME);
         String accessToken = JWT.create()
                 .withSubject(user.getEmail())
-                .withClaim("id", user.getUserLoginId())
+                .withClaim("id", user.getId())
                 .withClaim("name", user.getNickname())
                 .withExpiresAt(accessTokenExpiresIn)
                 .sign(Algorithm.HMAC256(key));
