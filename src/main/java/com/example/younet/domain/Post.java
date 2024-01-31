@@ -25,14 +25,8 @@ public class Post extends BaseEntity {
     @Column(nullable = false,columnDefinition = "VARCHAR(24)")
     private String title;
 
-//    @Column(columnDefinition = "VARCHAR(50)")
-//    private String body;
-
     @Column(nullable = false, columnDefinition = "BIGINT default 0")
     private Long likesCount;
-
-//    @OneToMany(mappedBy = "post",cascade = CascadeType.ALL)
-//    private List<Image> imageList=new ArrayList<>();
 
     @OneToMany(mappedBy = "post",cascade = CascadeType.ALL)
     private List<PostLikes> likesList=new ArrayList<>();
