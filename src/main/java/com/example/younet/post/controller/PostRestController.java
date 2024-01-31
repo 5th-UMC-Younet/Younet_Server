@@ -4,6 +4,7 @@ import com.example.younet.ApiPayload.ApiResponse;
 import com.example.younet.domain.Post;
 import com.example.younet.post.converter.PostConverter;
 import com.example.younet.post.dto.CategoryResponseDTO;
+import com.example.younet.post.dto.CountryResponseDTO;
 import com.example.younet.post.dto.PostRequestDTO;
 import com.example.younet.post.dto.PostResponseDTO;
 import com.example.younet.post.repository.PostRepository;
@@ -41,6 +42,11 @@ public class PostRestController {
              @RequestPart("files") List<MultipartFile> files) throws IOException {
         Post post=postCommandService.addPost(request, files);
         return ApiResponse.onSuccess(HttpStatus.CREATED,PostConverter.toAddPostResultDTO(post));
+    }
+
+    @GetMapping("/countries")
+    public ApiResponse<List<CountryResponseDTO.CountryListResultDTO>> showCountryList(){
+        return ApiResponse.onSuccess(HttpStatus.OK,postCommandService.countryList());
     }
 
     @GetMapping("/categories")

@@ -5,10 +5,7 @@ import com.example.younet.domain.*;
 import com.example.younet.post.converter.ImageConverter;
 import com.example.younet.post.converter.PostConverter;
 import com.example.younet.post.converter.SectionConverter;
-import com.example.younet.post.dto.CategoryResponseDTO;
-import com.example.younet.post.dto.PostRequestDTO;
-import com.example.younet.post.dto.PostResponseDTO;
-import com.example.younet.post.dto.SectionDTO;
+import com.example.younet.post.dto.*;
 import com.example.younet.post.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -53,6 +50,15 @@ public class PostCommandService {
                         .categoryName(category.getName())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    public List<CountryResponseDTO.CountryListResultDTO> countryList(){
+        return countryRepository.findAll().stream()
+                .map(country -> CountryResponseDTO.CountryListResultDTO.builder()
+                        .countryId(country.getId())
+                        .countryName(country.getName())
+                        .build()
+                ).collect(Collectors.toList());
     }
 
     public Post addPost(PostRequestDTO.AddPostDTO request, List<MultipartFile> files) throws IOException{
