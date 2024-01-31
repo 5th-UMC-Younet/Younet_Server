@@ -24,7 +24,7 @@ public class PostLikesController {
     }
 
     @GetMapping("post")
-    public ApiResponse<LikeResponseDTO.CountPostLikes> removeLike(@RequestBody LikeRequestDTO.CountPostLikes requestDto) {
+    public ApiResponse<LikeResponseDTO.CountPostLikes> countLikes(@RequestBody LikeRequestDTO.CountPostLikes requestDto) {
 
         LikeResponseDTO.CountPostLikes response = LikeResponseDTO.CountPostLikes.builder()
                 .postId(requestDto.getPostId())
