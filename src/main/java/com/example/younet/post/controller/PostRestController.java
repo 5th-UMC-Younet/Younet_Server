@@ -4,15 +4,12 @@ import com.example.younet.ApiPayload.ApiResponse;
 import com.example.younet.domain.Post;
 import com.example.younet.post.converter.PostConverter;
 import com.example.younet.post.dto.CategoryResponseDTO;
-import com.example.younet.post.dto.CountryResponseDTO;
 import com.example.younet.post.dto.PostRequestDTO;
 import com.example.younet.post.dto.PostResponseDTO;
 import com.example.younet.post.repository.PostRepository;
 import com.example.younet.post.service.PostCommandService;
-import jakarta.annotation.Nullable;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -44,27 +41,9 @@ public class PostRestController {
         return ApiResponse.onSuccess(HttpStatus.CREATED,PostConverter.toAddPostResultDTO(post));
     }
 
-    @GetMapping("/countries")
-    public ApiResponse<List<CountryResponseDTO.CountryListResultDTO>> showCountryList(){
-        return ApiResponse.onSuccess(HttpStatus.OK,postCommandService.countryList());
-    }
-
     @GetMapping("/categories")
     public ApiResponse<List<CategoryResponseDTO.CategoryListResultDTO>> showCategoryList(){
         return ApiResponse.onSuccess(HttpStatus.OK,postCommandService.categoryList());
-    }
-
-    @GetMapping("/{countryId}/{categoryId}/byDates")
-    public Slice<PostResponseDTO.postListResultDTO> getPostListWithSliceAndOrderByDates
-            (@Nullable @RequestParam("lastpost") Long postId,@PathVariable long countryId, @PathVariable long categoryId)
-    {
-        return postCommandService.getPostListByDates(postId,categoryId,countryId);
-    }
-    @GetMapping("/{countryId}/{categoryId}/byLikes")
-    public Slice<PostResponseDTO.postListResultDTO> getPostListWithSliceAndOrderByLikes
-            (@Nullable @RequestParam("lastpost") Long postId, @PathVariable long countryId, @PathVariable long categoryId)
-    {
-        return postCommandService.getPostListByLikes(postId,categoryId,countryId);
     }
 
     @GetMapping("/{postId}")
