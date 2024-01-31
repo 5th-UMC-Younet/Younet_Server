@@ -26,12 +26,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         try {
-            // Request Header에서 JWT 토큰 꺼내기
             String jwt = resolveToken(request);
 
-            // 유효성검사
             if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
-                // Black List에 올라와 있는지 검사.
                 if("Deprecated".equals(redisService.getValue(jwt))){
                     request.setAttribute("exception", ErrorCode.AUTH_DEPRECATED_ACCESS_TOKEN);
                     filterChain.doFilter(request, response);

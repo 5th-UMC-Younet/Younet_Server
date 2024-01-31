@@ -71,7 +71,8 @@ public class User extends BaseEntity {
     private String hostSkl;
 
     @Builder
-    public User(String userLoginId, String password, String name, String nickname, String email, Role role, LoginType loginType) {
+    public User(Long userId, String userLoginId, String password, String name, String nickname, String email, Role role, LoginType loginType) {
+        this.id = userId;
         this.userLoginId = userLoginId;
         this.password = password;
         this.name = name;

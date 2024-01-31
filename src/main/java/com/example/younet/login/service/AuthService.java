@@ -21,12 +21,11 @@ public class AuthService {
     private final UserRepository userRepository;
     private final JwtTokenProvider tokenProvider;
 
+    // 토큰 재발급
     public JwtTokenDto reissue(String oldRefreshToken) {
         String value = (String) redisService.getValue(oldRefreshToken);
-        System.out.println(oldRefreshToken);
         System.out.println(value);
         if ("Deprecated".equals(value) || !tokenProvider.validateToken(oldRefreshToken)) {
-            // refresh 토큰이 블랙리스트에 존재하는지 검사 & 유효성 검사
             throw new CustomException(ErrorCode.AUTH_DEPRECATED_REFRESH_TOKEN);
         }
 

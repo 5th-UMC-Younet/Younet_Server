@@ -112,7 +112,6 @@ public class KakaoAuthService {
     public JwtTokenDto saveUserAndGetToken(OauthToken oauthToken) {
 
         KakaoProfileDto profile = findProfile(oauthToken);
-
         User user = null;
 
         try {
@@ -123,7 +122,7 @@ public class KakaoAuthService {
                     .name(profile.getKakao_account().getProfile().getName())
                     .nickname(profile.getKakao_account().getProfile().getNickname())
                     .email(profile.getKakao_account().getEmail())
-                    .userId(null)
+                    .userLoginId(null)
                     .password(null)
                     .role(Role.MEMBER)
                     .loginType(LoginType.KAKAO)
@@ -131,10 +130,10 @@ public class KakaoAuthService {
 
             userRepository.save(user);
         }
-        redisService.setValueWithTTL(user.getUserId().toString(), oauthToken, 50L, TimeUnit.DAYS);
+        redisService.setValueWithTTL(user.getId().toString(), oauthToken, 50L, TimeUnit.DAYS);
 
         JwtTokenDto jwtTokenDto = tokenProvider.generateToken(user);
-        redisService.setValueWithTTL(jwtTokenDto.getRefreshToken(), user.getUserId().toString(), 7L, TimeUnit.DAYS);
+        redisService.setValueWithTTL(jwtTokenDto.getRefreshToken(), user.getId().toString(), 7L, TimeUnit.DAYS);
 
         return jwtTokenDto;
     }
@@ -160,7 +159,7 @@ public class KakaoAuthService {
                     logoutRequest,
                     String.class
             );
-            redisService.deleteValue(user.getUserId().toString());
+            redisService.deleteValue(user.getId().toString());
 
         } catch (Exception e) {
             throw new CustomException(ErrorCode.AUTH_EXPIRED_ACCESS_TOKEN);
