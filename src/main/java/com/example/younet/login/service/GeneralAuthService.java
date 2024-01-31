@@ -102,7 +102,7 @@ public class GeneralAuthService {
         }
 
         JwtTokenDto jwtTokenDto = tokenProvider.generateToken(user);
-        redisService.setValueWithTTL(jwtTokenDto.getRefreshToken(), user.getUserLoginId().toString(), 7L, TimeUnit.DAYS);
+        redisService.setValueWithTTL(jwtTokenDto.getRefreshToken(), user.getId().toString(), 7L, TimeUnit.DAYS);
 
         return jwtTokenDto;
     }
