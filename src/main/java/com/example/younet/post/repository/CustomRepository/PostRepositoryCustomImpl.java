@@ -23,16 +23,16 @@ import java.util.List;
 public class PostRepositoryCustomImpl implements PostRepositoryCustom{
     private final JPAQueryFactory queryFactory;
     QPost post= QPost.post;
-    QSection section=QSection.section;
     QImage image=QImage.image;
     QComment comment=QComment.comment;
+    QSection section=QSection.section;
     @Override
     public Slice<PostResponseDTO.postListResultDTO> getPostListByDates(Long lastPostId, Long categoryId, Long countryId, Pageable pageable) {
         LocalDateTime date=null;
         if (lastPostId!=null) {
             date = queryFactory.select(post.createdAt).from(post).where(post.id.eq(lastPostId)).fetchOne();
         }
-            JPAQuery<PostResponseDTO.postListResultDTO> query = commonQuery(categoryId, countryId)
+            JPAQuery<PostResponseDTO.postListResultDTO> query = commonCommunityQuery(categoryId, countryId)
                 .where(btPostCreated(date))
                 .orderBy(post.createdAt.desc());
         return getSliceResult(query,pageable);
@@ -49,11 +49,19 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom{
             lastLikesCount = lastPost.getLikesCount();
         }
 
-        JPAQuery<PostResponseDTO.postListResultDTO> query = commonQuery(categoryId, countryId)
+        JPAQuery<PostResponseDTO.postListResultDTO> query = commonCommunityQuery(categoryId, countryId)
                 .where(ltLikesCountAndId(lastLikesCount, lastPostId))
                 .orderBy(post.likesCount.desc(), post.createdAt.desc());
         return getSliceResult(query,pageable);
     }
+
+    @Override
+    public Slice<PostResponseDTO.postListResultDTO> getPostList(String keyword, Pageable pageable) {
+        JPAQuery<PostResponseDTO.postListResultDTO> query=commonSearchQuery(keyword)
+                .orderBy(post.likesCount.desc(),post.createdAt.desc());
+        return getSliceResult(query,pageable);
+    }
+
     private BooleanExpression ltLikesCountAndId(Long likesCount, Long postId) {
         if (postId == null) {
             return null;
@@ -68,6 +76,10 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom{
         return post.createdAt.before(date);
     }
 
+//    private BooleanExpression containsKeyword(String keyword){
+//
+//    }
+
     public boolean isHasNext(List<?> content, Pageable pageable) {
         boolean hasNext = false;
         if (content.size() > pageable.getPageSize()) {
@@ -76,7 +88,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom{
         }
         return hasNext;
     }
-    private JPAQuery<PostResponseDTO.postListResultDTO> commonQuery(Long categoryId, Long countryId) {
+    private JPAQuery<PostResponseDTO.postListResultDTO> commonCommunityQuery(Long categoryId, Long countryId) {
         return queryFactory
                 .select(Projections.fields(PostResponseDTO.postListResultDTO.class,
                         post.id.as("postId"),
@@ -94,6 +106,29 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom{
                 .where(
                         post.category.id.eq(categoryId),
                         post.country.id.eq(countryId)
+                );
+    }
+    private JPAQuery<PostResponseDTO.postListResultDTO> commonSearchQuery(String keyword) {
+        return queryFactory
+                .select(Projections.fields(PostResponseDTO.postListResultDTO.class,
+                        post.id.as("postId"),
+                        post.title.as("title"),
+                        post.likesCount.as("likesCount"),
+                        post.category.name.as("categoryName"),
+                        post.createdAt.as("createdAt"),
+                        post.introduction.as("bodySample"),
+                        ExpressionUtils.as(JPAExpressions.select(image.imageUrl)
+                                .from(image)
+                                .where(image.name.eq(post.representativeImage)), "imageSampleUrl"),
+                        ExpressionUtils.as(JPAExpressions.select(comment.count()).from(comment).where(comment.post.id.eq(post.id)),"commentsCount")
+                ))
+                .from(post)
+                .leftJoin(section).on(section.post.id.eq(post.id))
+                .where(
+//                        post.category.id.eq(categoryId),
+//                        post.country.id.eq(countryId),
+                        post.title.containsIgnoreCase(keyword)
+                                .or(section.body.containsIgnoreCase(keyword))
                 );
     }
     private Slice<PostResponseDTO.postListResultDTO> getSliceResult(JPAQuery<PostResponseDTO.postListResultDTO> query, Pageable pageable) {

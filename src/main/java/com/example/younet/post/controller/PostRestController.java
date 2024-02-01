@@ -8,6 +8,7 @@ import com.example.younet.post.dto.PostRequestDTO;
 import com.example.younet.post.dto.PostResponseDTO;
 import com.example.younet.post.repository.PostRepository;
 import com.example.younet.post.service.PostCommandService;
+import jakarta.annotation.Nullable;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -36,7 +37,7 @@ public class PostRestController {
     @PostMapping("/")
     public ApiResponse<PostResponseDTO.AddPostResultDTO> addPost
             (@RequestPart("post") PostRequestDTO.AddPostDTO request,
-             @RequestPart("files") List<MultipartFile> files) throws IOException {
+             @Nullable @RequestPart("files") List<MultipartFile> files) throws IOException {
         Post post=postCommandService.addPost(request, files);
         return ApiResponse.onSuccess(HttpStatus.CREATED,PostConverter.toAddPostResultDTO(post));
     }

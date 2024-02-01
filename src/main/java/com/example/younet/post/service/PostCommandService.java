@@ -73,33 +73,34 @@ public class PostCommandService {
         newPost.setCategory(category);
 
         int i=0,j=0;
-        for (SectionDTO sectionDTO: request.getSections()){
-            Section newSection= SectionConverter.toSection(sectionDTO,newPost);
-            for (String imageKey: sectionDTO.getImageKeys()){
-                MultipartFile file=files.stream()
-                        .filter(f -> f.getOriginalFilename().equals(imageKey))
-                        .findFirst()
-                        .orElseThrow(() -> new FileNotFoundException("File not found: " + imageKey));
+        for (SectionDTO sectionDTO: request.getSections()) {
+            Section newSection = SectionConverter.toSection(sectionDTO, newPost);
+            if (sectionDTO.getImageKeys() != null) {
+                for (String imageKey : sectionDTO.getImageKeys()) {
+                    MultipartFile file = files.stream()
+                            .filter(f -> f.getOriginalFilename().equals(imageKey))
+                            .findFirst()
+                            .orElseThrow(() -> new FileNotFoundException("File not found: " + imageKey));
 
-                String uuid = UUID.randomUUID().toString();
-                Uuid savedUuid = uuidRepository.save(Uuid.builder()
-                        .uuid(uuid).build());
-                String imageUrl = s3Manager.uploadFile(s3Manager.generateKeyName(savedUuid), file);
-                Image image= ImageConverter.toImage(savedUuid.getUuid(),imageUrl,newSection);
-                if (i==0) {
-                    newPost.setRepresentativeImage(savedUuid.getUuid());
-                    i++;
+                    String uuid = UUID.randomUUID().toString();
+                    Uuid savedUuid = uuidRepository.save(Uuid.builder()
+                            .uuid(uuid).build());
+                    String imageUrl = s3Manager.uploadFile(s3Manager.generateKeyName(savedUuid), file);
+                    Image image = ImageConverter.toImage(savedUuid.getUuid(), imageUrl, newSection);
+                    if (i == 0) {
+                        newPost.setRepresentativeImage(savedUuid.getUuid());
+                        i++;
+                    }
+                    newSection.getImages().add(image);
                 }
-                newSection.getImages().add(image);
             }
-            if (j==0){
-                String body= newSection.getBody();
-                newPost.setIntroduction((body.length()>20)? body.substring(0,20):body);
-                j++;
-            }
-            newPost.getSections().add(newSection);
+                if (j == 0) {
+                    String body = newSection.getBody();
+                    newPost.setIntroduction((body.length() > 20) ? body.substring(0, 20) : body);
+                    j++;
+                }
+                newPost.getSections().add(newSection);
         }
-
         return postRepository.save(newPost);
     }
 
