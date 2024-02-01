@@ -7,11 +7,13 @@ import com.example.younet.domain.User;
 import com.example.younet.global.errorException.CustomException;
 import com.example.younet.global.errorException.ErrorCode;
 import com.example.younet.repository.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.util.Date;
 
@@ -32,6 +34,7 @@ public class JwtTokenProvider {
         this.userRepository = userRepository;
     }
 
+    // accessToken, refreshToken 생성
     public JwtTokenDto generateToken(User user) {
         long now = (new Date()).getTime();
 
@@ -74,6 +77,7 @@ public class JwtTokenProvider {
         );
     }
 
+    // 토큰 유효성 검사
     public boolean validateToken(String token) {
 
         try {
@@ -88,5 +92,26 @@ public class JwtTokenProvider {
         } catch (JWTVerificationException e) {
             throw new CustomException(ErrorCode.JWT_WRONG_TOKEN);
         }
+    }
+
+    // accessToken 값 가져오기
+    public String resolveAccessToken(HttpServletRequest request) {
+
+        String token = request.getHeader(JwtTokenProvider.HEADER_STRING);
+
+        if (StringUtils.hasText(token) && token.startsWith(JwtTokenProvider.TOKEN_PREFIX)) {
+            return token.replace(JwtTokenProvider.TOKEN_PREFIX, "");
+        }
+        return null;
+    }
+
+    // accessToken 만료일 가져오기
+    public Long getExpiration(String accessToken) {
+        Date expiration = JWT.require(Algorithm.HMAC256(key))
+                .build()
+                .verify(accessToken.replace(TOKEN_PREFIX, ""))
+                .getExpiresAt();
+        Long now = new Date().getTime();
+        return (expiration.getTime() - now);
     }
 }

@@ -4,9 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.example.younet.global.dto.ApplicationResponse;
 import com.example.younet.global.errorException.ErrorCode;
-import com.example.younet.global.jwt.JwtTokenDto;
-import com.example.younet.global.jwt.OauthToken;
-import com.example.younet.global.jwt.PrincipalDetails;
+import com.example.younet.global.jwt.*;
 import com.example.younet.login.dto.EmailVerificationDto;
 import com.example.younet.login.dto.ReissueRequestDto;
 import com.example.younet.login.dto.UserSigninRequestDto;
@@ -31,6 +29,7 @@ public class UserAuthController {
     private final GeneralAuthService generalAuthService;
     private final AuthService authService;
     private final KakaoAuthService kakaoAuthService;
+    private final JwtTokenProvider jwtTokenProvider;
 
 
     // 일반 회원가입
@@ -109,12 +108,22 @@ public class UserAuthController {
         }
     }
 
-    // 로그아웃 (JwtToken, OauthToken 만료하기)
-    @PostMapping("/auth/logout")
-    public ApplicationResponse<String> serviceLogout(@AuthenticationPrincipal PrincipalDetails principalDetails,
+    // 일반 로그아웃
+    @PostMapping("/user/logout")
+    public ApplicationResponse<String> userLogout(HttpServletRequest request, @AuthenticationPrincipal PrincipalDetails principalDetails) {
+
+        String token = jwtTokenProvider.resolveAccessToken(request);
+        generalAuthService.userLogout(principalDetails, token);
+        return ApplicationResponse.ok(ErrorCode.SUCCESS_OK, "일반 로그아웃 되었습니다.");
+    }
+
+
+    // 카카오 로그아웃 (JwtToken, OauthToken 만료하기)
+    @PostMapping("/auth/kakao/logout")
+    public ApplicationResponse<String> kakaoLogout(@AuthenticationPrincipal PrincipalDetails principalDetails,
                                                      @RequestBody JwtTokenDto jwtTokenDto) {
         authService.deprecateTokens(jwtTokenDto);
-        kakaoAuthService.serviceLogout(principalDetails);
-        return ApplicationResponse.ok(ErrorCode.SUCCESS_OK, "로그아웃 되었습니다.");
+        kakaoAuthService.kakaoLogout(principalDetails);
+        return ApplicationResponse.ok(ErrorCode.SUCCESS_OK, "카카오 로그아웃 되었습니다.");
     }
 }

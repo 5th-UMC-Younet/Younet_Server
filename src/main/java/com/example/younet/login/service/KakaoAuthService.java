@@ -139,32 +139,30 @@ public class KakaoAuthService {
     }
 
     // 카카오 로그아웃
-    public void serviceLogout(PrincipalDetails principalDetails){
+    public void kakaoLogout(PrincipalDetails principalDetails){
         User user = principalDetails.getUser();
 
-        if(user.getLoginType()!= LoginType.KAKAO) return;
         OauthToken oauthToken = getOauthToken(user.getId());
-        if(oauthToken == null) return;
-
         RestTemplate rt = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + oauthToken.getAccess_token());
         HttpEntity<MultiValueMap<String, String>> logoutRequest = new HttpEntity<>(headers);
 
-        try {
-            ResponseEntity<String> response = rt.exchange(
-                    "https://kapi.kakao.com/v1/user/logout",
-                    HttpMethod.POST,
-                    logoutRequest,
-                    String.class
-            );
-            redisService.deleteValue(user.getId().toString());
+        if(user.getLoginType()== LoginType.KAKAO) {
+            try {
+                ResponseEntity<String> response = rt.exchange(
+                        "https://kapi.kakao.com/v1/user/logout",
+                        HttpMethod.POST,
+                        logoutRequest,
+                        String.class
+                );
+                redisService.deleteValue(user.getId().toString());
 
-        } catch (Exception e) {
-            throw new CustomException(ErrorCode.AUTH_EXPIRED_ACCESS_TOKEN);
+            } catch (Exception e) {
+                throw new CustomException(ErrorCode.AUTH_EXPIRED_ACCESS_TOKEN);
+            }
         }
-
     }
 
     // Oauth 만료 여부 확인
