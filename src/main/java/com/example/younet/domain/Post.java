@@ -28,6 +28,9 @@ public class Post extends BaseEntity {
     @Column(nullable = false, columnDefinition = "BIGINT default 0")
     private Long likesCount;
 
+    @Column
+    private String representativeImage; // 대표 이미지 uuid
+
     @OneToMany(mappedBy = "post",cascade = CascadeType.ALL)
     private List<PostLikes> likesList=new ArrayList<>();
 
@@ -58,6 +61,9 @@ public class Post extends BaseEntity {
         communityProfile.getPostList().add(this);
     }
 
+    public void setRepresentativeImage(String uuid){
+        this.representativeImage=uuid;
+    }
     public void addLike() {
         this.likesCount++;
         System.out.println(likesCount);

@@ -7,10 +7,11 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class ImageConverter {
-    public static Image toImage(String imageUrl,Section newSection){
+    public static Image toImage(String uuid, String imageUrl,Section newSection){
         return Image.builder()
                 .section(newSection)
                 .imageUrl(imageUrl)
+                .name(uuid)
                 .build();
     }
 

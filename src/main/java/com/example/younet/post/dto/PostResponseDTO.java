@@ -16,8 +16,12 @@ public class PostResponseDTO {
     public static class postListResultDTO{
         Long postId;
         String title;
+//        String bodySample;
+        String imageSampleUrl;
         String categoryName;
         Long likesCount;
+        LocalDateTime createdAt;
+        Long commentsCount;
     }
     @Builder
     @Getter

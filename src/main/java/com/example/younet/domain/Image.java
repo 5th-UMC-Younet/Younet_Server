@@ -18,6 +18,9 @@ public class Image extends BaseEntity {
     @Column(nullable = false)
     private String imageUrl;
 
+    @Column
+    private String name;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="section_id")
     private Section section;

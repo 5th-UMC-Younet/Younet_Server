@@ -72,6 +72,7 @@ public class PostCommandService {
         newPost.setCountry(country);
         newPost.setCategory(category);
 
+        int i=0;
         for (SectionDTO sectionDTO: request.getSections()){
             Section newSection= SectionConverter.toSection(sectionDTO,newPost);
             for (String imageKey: sectionDTO.getImageKeys()){
@@ -84,7 +85,11 @@ public class PostCommandService {
                 Uuid savedUuid = uuidRepository.save(Uuid.builder()
                         .uuid(uuid).build());
                 String imageUrl = s3Manager.uploadFile(s3Manager.generateKeyName(savedUuid), file);
-                Image image= ImageConverter.toImage(imageUrl,newSection);
+                Image image= ImageConverter.toImage(savedUuid.getUuid(),imageUrl,newSection);
+                if (i==0) {
+                    newPost.setRepresentativeImage(savedUuid.getUuid());
+                    i++;
+                }
                 newSection.getImages().add(image);
             }
 
