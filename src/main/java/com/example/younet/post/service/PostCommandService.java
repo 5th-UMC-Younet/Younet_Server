@@ -72,7 +72,7 @@ public class PostCommandService {
         newPost.setCountry(country);
         newPost.setCategory(category);
 
-        int i=0;
+        int i=0,j=0;
         for (SectionDTO sectionDTO: request.getSections()){
             Section newSection= SectionConverter.toSection(sectionDTO,newPost);
             for (String imageKey: sectionDTO.getImageKeys()){
@@ -92,7 +92,11 @@ public class PostCommandService {
                 }
                 newSection.getImages().add(image);
             }
-
+            if (j==0){
+                String body= newSection.getBody();
+                newPost.setIntroduction((body.length()>20)? body.substring(0,20):body);
+                j++;
+            }
             newPost.getSections().add(newSection);
         }
 

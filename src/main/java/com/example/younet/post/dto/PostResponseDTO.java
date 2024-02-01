@@ -16,7 +16,7 @@ public class PostResponseDTO {
     public static class postListResultDTO{
         Long postId;
         String title;
-//        String bodySample;
+        String bodySample;
         String imageSampleUrl;
         String categoryName;
         Long likesCount;

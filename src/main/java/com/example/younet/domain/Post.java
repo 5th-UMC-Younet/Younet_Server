@@ -22,7 +22,7 @@ public class Post extends BaseEntity {
     @Column(name = "post_id")
     private Long id;
 
-    @Column(nullable = false,columnDefinition = "VARCHAR(24)")
+    @Column(nullable = false,columnDefinition = "VARCHAR(20)")
     private String title;
 
     @Column(nullable = false, columnDefinition = "BIGINT default 0")
@@ -30,6 +30,9 @@ public class Post extends BaseEntity {
 
     @Column
     private String representativeImage; // 대표 이미지 uuid
+
+    @Column(columnDefinition = "VARCHAR(20)")
+    private String introduction; // 서두
 
     @OneToMany(mappedBy = "post",cascade = CascadeType.ALL)
     private List<PostLikes> likesList=new ArrayList<>();
@@ -64,6 +67,7 @@ public class Post extends BaseEntity {
     public void setRepresentativeImage(String uuid){
         this.representativeImage=uuid;
     }
+    public void setIntroduction(String body){this.introduction=body;}
     public void addLike() {
         this.likesCount++;
         System.out.println(likesCount);

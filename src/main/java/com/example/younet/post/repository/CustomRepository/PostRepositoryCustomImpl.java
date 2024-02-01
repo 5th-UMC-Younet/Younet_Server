@@ -84,6 +84,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom{
                         post.likesCount.as("likesCount"),
                         post.category.name.as("categoryName"),
                         post.createdAt.as("createdAt"),
+                        post.introduction.as("bodySample"),
                         ExpressionUtils.as(JPAExpressions.select(image.imageUrl)
                                 .from(image)
                                 .where(image.name.eq(post.representativeImage)), "imageSampleUrl"),
