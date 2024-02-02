@@ -33,7 +33,7 @@ public class PostCommunityController {
     {
         return postCommandService.getPostListByLikes(postId,categoryId,countryId);
     }
-    @GetMapping("/search/{countryId}/{keyword}")
+    @GetMapping("/search/{keyword}/{countryId}")
     public List<PostResponseDTO.searchPostResultDTO> getSearchResult
             (@PathVariable Long countryId, @PathVariable String keyword){
         return postCommandService.getSearchResult(countryId,keyword);
