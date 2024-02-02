@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -43,6 +44,28 @@ public class PostCommandService {
         return postRepository.getPostListByLikes(lastPostId, categoryId, countryId, pageable);
     }
 
+    public Slice<PostResponseDTO.postListResultDTO> getSearchResultByLikes
+            (Long lastPostId, Long categoryId, Long countryId,String keyword){
+        Pageable pageable= PageRequest.of(0,10);
+        return postRepository.searchPostListByLikes(lastPostId,countryId,categoryId,keyword,pageable);
+    }
+
+    public Slice<PostResponseDTO.postListResultDTO> getSearchResultByDates
+            (Long lastPostId, Long categoryId, Long countryId,String keyword){
+        Pageable pageable= PageRequest.of(0,10);
+        return postRepository.searchPostListByDates(lastPostId,countryId,categoryId,keyword,pageable);
+    }
+
+    public List<PostResponseDTO.searchPostResultDTO> getSearchResult(Long countryId, String keyword) {
+        List<Category> categories = categoryRepository.findAll();
+
+        return categories.stream()
+                .map(category -> PostResponseDTO.searchPostResultDTO.builder()
+                        .categoryName(category.getName())
+                        .postListResultDTOS(postRepository.searchPostList(countryId, category.getId(), keyword))
+                        .build())
+                .collect(Collectors.toList());
+    }
     public List<CategoryResponseDTO.CategoryListResultDTO> categoryList(){
         return categoryRepository.findAll().stream()
                 .map(category -> CategoryResponseDTO.CategoryListResultDTO.builder()
@@ -72,25 +95,35 @@ public class PostCommandService {
         newPost.setCountry(country);
         newPost.setCategory(category);
 
-        for (SectionDTO sectionDTO: request.getSections()){
-            Section newSection= SectionConverter.toSection(sectionDTO,newPost);
-            for (String imageKey: sectionDTO.getImageKeys()){
-                MultipartFile file=files.stream()
-                        .filter(f -> f.getOriginalFilename().equals(imageKey))
-                        .findFirst()
-                        .orElseThrow(() -> new FileNotFoundException("File not found: " + imageKey));
+        int i=0,j=0;
+        for (SectionDTO sectionDTO: request.getSections()) {
+            Section newSection = SectionConverter.toSection(sectionDTO, newPost);
+            if (sectionDTO.getImageKeys() != null) {
+                for (String imageKey : sectionDTO.getImageKeys()) {
+                    MultipartFile file = files.stream()
+                            .filter(f -> f.getOriginalFilename().equals(imageKey))
+                            .findFirst()
+                            .orElseThrow(() -> new FileNotFoundException("File not found: " + imageKey));
 
-                String uuid = UUID.randomUUID().toString();
-                Uuid savedUuid = uuidRepository.save(Uuid.builder()
-                        .uuid(uuid).build());
-                String imageUrl = s3Manager.uploadFile(s3Manager.generateKeyName(savedUuid), file);
-                Image image= ImageConverter.toImage(imageUrl,newSection);
-                newSection.getImages().add(image);
+                    String uuid = UUID.randomUUID().toString();
+                    Uuid savedUuid = uuidRepository.save(Uuid.builder()
+                            .uuid(uuid).build());
+                    String imageUrl = s3Manager.uploadFile(s3Manager.generateKeyName(savedUuid), file);
+                    Image image = ImageConverter.toImage(savedUuid.getUuid(), imageUrl, newSection);
+                    if (i == 0) {
+                        newPost.setRepresentativeImage(savedUuid.getUuid());
+                        i++;
+                    }
+                    newSection.getImages().add(image);
+                }
             }
-
-            newPost.getSections().add(newSection);
+                if (j == 0) {
+                    String body = newSection.getBody();
+                    newPost.setIntroduction((body.length() > 20) ? body.substring(0, 20) : body);
+                    j++;
+                }
+                newPost.getSections().add(newSection);
         }
-
         return postRepository.save(newPost);
     }
 

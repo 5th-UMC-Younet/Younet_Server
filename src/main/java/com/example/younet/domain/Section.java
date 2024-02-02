@@ -17,7 +17,7 @@ public class Section extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(columnDefinition = "VARCHAR(50)") // 추후에 TEXT 형으로 바꾸기
+    @Column
     private String body;
 
     @ManyToOne(fetch = FetchType.LAZY)
