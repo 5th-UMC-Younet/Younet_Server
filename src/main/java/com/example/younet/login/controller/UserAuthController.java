@@ -53,7 +53,7 @@ public class UserAuthController {
     }
 
     // 이메일 인증 성공 여부 확인
-    @PostMapping("/signup/verification/email")
+    @PostMapping("/signup/email/verification")
     public ResponseEntity<String> verifyEmail(@RequestBody EmailVerificationDto emailVerificationDto) {
         boolean verificationResult = generalAuthService.verifyEmail(emailVerificationDto);
         if (verificationResult) {
@@ -79,7 +79,7 @@ public class UserAuthController {
     }
 
     // 카카오 로그인 - OauthToken 발급 후 회원 정보 DB저장/JWT생성
-    @GetMapping("/oauth2/kakao")
+    @GetMapping("/kakao/login")
     public ApplicationResponse<JwtTokenDto> Login(@RequestParam("code") String code) {
 
         OauthToken oauthToken = kakaoAuthService.getKakaoAccessToken(code);
@@ -119,7 +119,7 @@ public class UserAuthController {
 
 
     // 카카오 로그아웃 (JwtToken, OauthToken 만료하기)
-    @PostMapping("/auth/kakao/logout")
+    @PostMapping("/kakao/logout")
     public ApplicationResponse<String> kakaoLogout(@AuthenticationPrincipal PrincipalDetails principalDetails,
                                                      @RequestBody JwtTokenDto jwtTokenDto) {
         authService.deprecateTokens(jwtTokenDto);
