@@ -27,6 +27,14 @@ public class PostResponseDTO {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
+    public static class searchPostResultDTO{
+        String categoryName;
+        List<postListResultDTO> postListResultDTOS;
+    }
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class AddPostResultDTO{
         Long postId;
         LocalDateTime createdAt;

@@ -48,6 +48,14 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom{
         return getSliceResult(query,pageable);
     }
 
+    @Override
+    public List<PostResponseDTO.postListResultDTO> searchPostList(Long countryId, Long categoryId, String keyword) {
+        return commonSearchQuery(categoryId,countryId,keyword)
+                .orderBy(post.createdAt.desc())
+                .limit(2)
+                .fetch();
+    }
+
     // 검색[더보기-최신 순]
     @Override
     public Slice<PostResponseDTO.postListResultDTO> searchPostListByDates(Long lastPostId,Long countryId, Long categoryId, String keyword, Pageable pageable) {
@@ -131,26 +139,10 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom{
                 );
     }
     private JPAQuery<PostResponseDTO.postListResultDTO> commonSearchQuery(Long categoryId,Long countryId,String keyword) {
-        return queryFactory
-                .select(Projections.fields(PostResponseDTO.postListResultDTO.class,
-                        post.id.as("postId"),
-                        post.title.as("title"),
-                        post.likesCount.as("likesCount"),
-                        post.category.name.as("categoryName"),
-                        post.createdAt.as("createdAt"),
-                        post.introduction.as("bodySample"),
-                        ExpressionUtils.as(JPAExpressions.select(image.imageUrl)
-                                .from(image)
-                                .where(image.name.eq(post.representativeImage)), "imageSampleUrl"),
-                        ExpressionUtils.as(JPAExpressions.select(comment.count()).from(comment).where(comment.post.id.eq(post.id)),"commentsCount")
-                ))
-                .from(post)
-                .leftJoin(section).on(section.post.id.eq(post.id)) // keyword는 leftjoin이 필요해서 위 코드랑 합칠 수 없음!
-                .where(
-                        post.category.id.eq(categoryId),
-                        post.country.id.eq(countryId),
-                        containsKeyword(keyword)
-                        );
+        return commonCommunityQuery(categoryId,countryId)
+                .leftJoin(section).on(section.post.id.eq(post.id))
+                .where(containsKeyword(keyword))
+                .distinct();
     }
     private Slice<PostResponseDTO.postListResultDTO> getSliceResult(JPAQuery<PostResponseDTO.postListResultDTO> query, Pageable pageable) {
         List<PostResponseDTO.postListResultDTO> content = query.limit(pageable.getPageSize() + 1).fetch();

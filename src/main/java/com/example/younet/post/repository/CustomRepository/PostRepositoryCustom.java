@@ -5,6 +5,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface PostRepositoryCustom {
     // QueryDsl
@@ -13,4 +15,5 @@ public interface PostRepositoryCustom {
 
     Slice<PostResponseDTO.postListResultDTO> searchPostListByLikes(Long lastPostId,Long countryId,Long categoryId, String keyword, Pageable pageable);
     Slice<PostResponseDTO.postListResultDTO> searchPostListByDates(Long lastPostId,Long countryId,Long categoryId, String keyword, Pageable pageable);
+    List<PostResponseDTO.postListResultDTO> searchPostList(Long countryId,Long categoryId, String keyword);
 }

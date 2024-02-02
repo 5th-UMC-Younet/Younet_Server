@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -55,6 +56,16 @@ public class PostCommandService {
         return postRepository.searchPostListByDates(lastPostId,countryId,categoryId,keyword,pageable);
     }
 
+    public List<PostResponseDTO.searchPostResultDTO> getSearchResult(Long countryId, String keyword) {
+        List<Category> categories = categoryRepository.findAll();
+
+        return categories.stream()
+                .map(category -> PostResponseDTO.searchPostResultDTO.builder()
+                        .categoryName(category.getName())
+                        .postListResultDTOS(postRepository.searchPostList(countryId, category.getId(), keyword))
+                        .build())
+                .collect(Collectors.toList());
+    }
     public List<CategoryResponseDTO.CategoryListResultDTO> categoryList(){
         return categoryRepository.findAll().stream()
                 .map(category -> CategoryResponseDTO.CategoryListResultDTO.builder()
