@@ -43,6 +43,18 @@ public class PostCommandService {
         return postRepository.getPostListByLikes(lastPostId, categoryId, countryId, pageable);
     }
 
+    public Slice<PostResponseDTO.postListResultDTO> getSearchResultByLikes
+            (Long lastPostId, Long categoryId, Long countryId,String keyword){
+        Pageable pageable= PageRequest.of(0,10);
+        return postRepository.searchPostListByLikes(lastPostId,countryId,categoryId,keyword,pageable);
+    }
+
+    public Slice<PostResponseDTO.postListResultDTO> getSearchResultByDates
+            (Long lastPostId, Long categoryId, Long countryId,String keyword){
+        Pageable pageable= PageRequest.of(0,10);
+        return postRepository.searchPostListByDates(lastPostId,countryId,categoryId,keyword,pageable);
+    }
+
     public List<CategoryResponseDTO.CategoryListResultDTO> categoryList(){
         return categoryRepository.findAll().stream()
                 .map(category -> CategoryResponseDTO.CategoryListResultDTO.builder()

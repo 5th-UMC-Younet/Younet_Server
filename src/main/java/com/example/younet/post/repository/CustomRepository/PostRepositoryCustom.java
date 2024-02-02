@@ -11,5 +11,6 @@ public interface PostRepositoryCustom {
     Slice<PostResponseDTO.postListResultDTO> getPostListByDates(Long lastPostId, Long categoryId, Long countryId, Pageable pageable);
     Slice<PostResponseDTO.postListResultDTO> getPostListByLikes(Long lastPostId, Long categoryId, Long countryId, Pageable pageable);
 
-    Slice<PostResponseDTO.postListResultDTO> getPostList(String keyword, Pageable pageable);
+    Slice<PostResponseDTO.postListResultDTO> searchPostListByLikes(Long lastPostId,Long countryId,Long categoryId, String keyword, Pageable pageable);
+    Slice<PostResponseDTO.postListResultDTO> searchPostListByDates(Long lastPostId,Long countryId,Long categoryId, String keyword, Pageable pageable);
 }

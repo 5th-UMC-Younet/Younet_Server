@@ -28,21 +28,27 @@ public class PostCommunityController {
     }
     @GetMapping("/{countryId}/{categoryId}/byDates")
     public Slice<PostResponseDTO.postListResultDTO> getPostListWithSliceAndOrderByDates
-            (@Nullable @RequestParam("lastpost") Long postId, @PathVariable long countryId, @PathVariable long categoryId)
+            (@Nullable @RequestParam("lastPost") Long postId, @PathVariable long countryId, @PathVariable long categoryId)
     {
         return postCommandService.getPostListByDates(postId,categoryId,countryId);
     }
     @GetMapping("/{countryId}/{categoryId}/byLikes")
     public Slice<PostResponseDTO.postListResultDTO> getPostListWithSliceAndOrderByLikes
-            (@Nullable @RequestParam("lastpost") Long postId, @PathVariable long countryId, @PathVariable long categoryId)
+            (@Nullable @RequestParam("lastPost") Long postId, @PathVariable long countryId, @PathVariable long categoryId)
     {
         return postCommandService.getPostListByLikes(postId,categoryId,countryId);
     }
 
-    @GetMapping("/search/{keyword}")
-    public Slice<PostResponseDTO.postListResultDTO> getSearchResult(@PathVariable String keyword){
-        Pageable pageable= PageRequest.of(0,10);
-        return postRepository.getPostList(keyword,pageable);
+    @GetMapping("/search/{keyword}/{countryId}/{categoryId}/byLikes")
+    public Slice<PostResponseDTO.postListResultDTO> getSearchResultByLikes
+            (@Nullable @RequestParam("lastPost") Long postId, @PathVariable long countryId, @PathVariable long categoryId,@PathVariable String keyword){
+        return postCommandService.getSearchResultByLikes(postId,categoryId,countryId,keyword);
+    }
+
+    @GetMapping("/search/{keyword}/{countryId}/{categoryId}/byDates")
+    public Slice<PostResponseDTO.postListResultDTO> getSearchResultByDates
+            (@Nullable @RequestParam("lastPost") Long postId, @PathVariable long countryId, @PathVariable long categoryId,@PathVariable String keyword){
+        return postCommandService.getSearchResultByDates(postId,categoryId,countryId,keyword);
     }
 
 }

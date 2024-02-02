@@ -40,14 +40,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom{
 
     @Override
     public Slice<PostResponseDTO.postListResultDTO> getPostListByLikes(Long lastPostId, Long categoryId, Long countryId, Pageable pageable) {
-        long lastLikesCount=0;
-        if (lastPostId != null) {
-            Post lastPost = queryFactory
-                    .selectFrom(post)
-                    .where(post.id.eq(lastPostId))
-                    .fetchOne();
-            lastLikesCount = lastPost.getLikesCount();
-        }
+        long lastLikesCount=fetchLastLikesCount(lastPostId);
 
         JPAQuery<PostResponseDTO.postListResultDTO> query = commonCommunityQuery(categoryId, countryId)
                 .where(ltLikesCountAndId(lastLikesCount, lastPostId))
@@ -55,13 +48,32 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom{
         return getSliceResult(query,pageable);
     }
 
+    // 검색[더보기-최신 순]
     @Override
-    public Slice<PostResponseDTO.postListResultDTO> getPostList(String keyword, Pageable pageable) {
-        JPAQuery<PostResponseDTO.postListResultDTO> query=commonSearchQuery(keyword)
-                .orderBy(post.likesCount.desc(),post.createdAt.desc());
+    public Slice<PostResponseDTO.postListResultDTO> searchPostListByDates(Long lastPostId,Long countryId, Long categoryId, String keyword, Pageable pageable) {
+        LocalDateTime date = null;
+        if (lastPostId!=null) {
+            date = queryFactory.select(post.createdAt).from(post).where(post.id.eq(lastPostId)).fetchOne();
+        }
+        JPAQuery<PostResponseDTO.postListResultDTO> query=commonSearchQuery(categoryId, countryId,keyword)
+                .where(btPostCreated(date))
+                .orderBy(post.createdAt.desc());
         return getSliceResult(query,pageable);
     }
 
+    // 검색[더보기-좋아요 순]
+    @Override
+    public Slice<PostResponseDTO.postListResultDTO> searchPostListByLikes(Long lastPostId,Long countryId, Long categoryId,String keyword, Pageable pageable) {
+        long lastLikesCount=fetchLastLikesCount(lastPostId);
+        JPAQuery<PostResponseDTO.postListResultDTO> query=commonSearchQuery(categoryId, countryId,keyword)
+                .where(ltLikesCountAndId(lastLikesCount,lastPostId))
+                .orderBy(post.likesCount.desc(),post.createdAt.desc());
+        return getSliceResult(query,pageable);
+    }
+    
+    private BooleanExpression containsKeyword(String keyword){
+        return post.title.containsIgnoreCase(keyword).or(section.body.containsIgnoreCase(keyword));
+    }
     private BooleanExpression ltLikesCountAndId(Long likesCount, Long postId) {
         if (postId == null) {
             return null;
@@ -76,9 +88,19 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom{
         return post.createdAt.before(date);
     }
 
-//    private BooleanExpression containsKeyword(String keyword){
-//
-//    }
+    private long fetchLastLikesCount(Long lastPostId) {
+        long lastLikesCount = 0;
+        if (lastPostId != null) {
+            Post lastPost = queryFactory
+                    .selectFrom(post)
+                    .where(post.id.eq(lastPostId))
+                    .fetchOne();
+            if (lastPost != null) {
+                lastLikesCount = lastPost.getLikesCount();
+            }
+        }
+        return lastLikesCount;
+    }
 
     public boolean isHasNext(List<?> content, Pageable pageable) {
         boolean hasNext = false;
@@ -108,7 +130,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom{
                         post.country.id.eq(countryId)
                 );
     }
-    private JPAQuery<PostResponseDTO.postListResultDTO> commonSearchQuery(String keyword) {
+    private JPAQuery<PostResponseDTO.postListResultDTO> commonSearchQuery(Long categoryId,Long countryId,String keyword) {
         return queryFactory
                 .select(Projections.fields(PostResponseDTO.postListResultDTO.class,
                         post.id.as("postId"),
@@ -123,13 +145,12 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom{
                         ExpressionUtils.as(JPAExpressions.select(comment.count()).from(comment).where(comment.post.id.eq(post.id)),"commentsCount")
                 ))
                 .from(post)
-                .leftJoin(section).on(section.post.id.eq(post.id))
+                .leftJoin(section).on(section.post.id.eq(post.id)) // keyword는 leftjoin이 필요해서 위 코드랑 합칠 수 없음!
                 .where(
-//                        post.category.id.eq(categoryId),
-//                        post.country.id.eq(countryId),
-                        post.title.containsIgnoreCase(keyword)
-                                .or(section.body.containsIgnoreCase(keyword))
-                );
+                        post.category.id.eq(categoryId),
+                        post.country.id.eq(countryId),
+                        containsKeyword(keyword)
+                        );
     }
     private Slice<PostResponseDTO.postListResultDTO> getSliceResult(JPAQuery<PostResponseDTO.postListResultDTO> query, Pageable pageable) {
         List<PostResponseDTO.postListResultDTO> content = query.limit(pageable.getPageSize() + 1).fetch();
