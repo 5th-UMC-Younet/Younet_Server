@@ -29,6 +29,9 @@ public class Comment extends BaseEntity {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String body;
 
+    @OneToMany(mappedBy = "comment",cascade = CascadeType.ALL)
+    private List<Reply> replyList;
+
 
     public Long getPostId() {
         return post.getId();

@@ -2,6 +2,10 @@ package com.example.younet.comment.dto;
 
 
 import com.example.younet.domain.Comment;
+import com.example.younet.domain.Reply;
+import com.example.younet.reply.dto.ReplyResponseDTO;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +24,9 @@ public class CommentResponseDTO {
             this.postId = comment.getPostId();
             this.communityProfileId = comment.getCommunityProfileId();
             this.body = comment.getBody();
+            this.replyList = comment.getReplyList().stream()
+                    .map(element -> new ReplyResponseDTO.Reply(element))
+                    .collect(Collectors.toList());
             this.createdAt = comment.getCreatedAt();
             this.updatedAt = comment.getUpdatedAt();
         }
@@ -28,6 +35,7 @@ public class CommentResponseDTO {
         private final Long postId;
         private final Long communityProfileId;
         private final String body;
+        private final List<ReplyResponseDTO.Reply> replyList;
         private final LocalDateTime createdAt;
         private final LocalDateTime updatedAt;
     }

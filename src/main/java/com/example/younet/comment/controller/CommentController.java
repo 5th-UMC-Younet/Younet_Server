@@ -36,7 +36,7 @@ public class CommentController {
     }
 
     @PatchMapping("")
-    public CommentResponseDTO.Comment postComment(@RequestBody CommentRequestDTO.Update requestDto) {
+    public CommentResponseDTO.Comment updateComment(@RequestBody CommentRequestDTO.Update requestDto) {
         return commentService.updateComment(requestDto);
 
     }
