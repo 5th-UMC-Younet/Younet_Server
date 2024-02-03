@@ -48,6 +48,9 @@ public class User extends BaseEntity {
     @Column(columnDefinition="TEXT")
     private String profilePicture;
 
+    @Column(length = 255)
+    private String profileText;
+
     private LocalDate inactiveDate;
 
     private Long refreshToken;
