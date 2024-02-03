@@ -15,6 +15,7 @@ public class UserProfileDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UserResultDTO {
+        Long userId;
         String profilePicture;
         String name;
         String hostCntr;
@@ -32,6 +33,6 @@ public class UserProfileDto {
         String bodySample;
         LocalDateTime createdAt;
         Long likesCount;
-        //Long commentsCount;
+        Long commentsCount;
     }
 }

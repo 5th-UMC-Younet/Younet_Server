@@ -1,5 +1,6 @@
 package com.example.younet.userprofile.mypage.service;
 
+import com.example.younet.comment.repository.CommentRepository;
 import com.example.younet.domain.Post;
 import com.example.younet.domain.User;
 import com.example.younet.global.errorException.CustomException;
@@ -22,10 +23,10 @@ public class UserProfileService {
 
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private PostRepository postRepository;
-    //private ScrapRepository scrapRepository;
+    @Autowired
+    private CommentRepository commentRepository;
 
     public UserProfileDto.UserResultDTO findUserInfo(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(
@@ -39,12 +40,13 @@ public class UserProfileService {
                         post.getTitle(),
                         post.getIntroduction(),
                         post.getCreatedAt(),
-                        post.getLikesCount()
-                        //post.getCommentsCount()
+                        post.getLikesCount(),
+                        commentRepository.countCommentsByPostId(post.getId())
                 ))
                 .collect(Collectors.toList());
 
         return UserProfileDto.UserResultDTO.builder()
+                .userId(user.getId())
                 .profilePicture(user.getProfilePicture())
                 .name(user.getName())
                 .hostCntr(user.getHostContr())
