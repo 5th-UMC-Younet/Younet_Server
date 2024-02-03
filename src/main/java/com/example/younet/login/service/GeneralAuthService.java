@@ -7,9 +7,9 @@ import com.example.younet.global.errorException.CustomException;
 import com.example.younet.global.errorException.ErrorCode;
 import com.example.younet.global.jwt.JwtTokenDto;
 import com.example.younet.global.jwt.JwtTokenProvider;
-import com.example.younet.global.jwt.OauthToken;
 import com.example.younet.global.jwt.PrincipalDetails;
-import com.example.younet.login.dto.EmailVerificationDto;
+import com.example.younet.login.dto.PasswordEmailVerficationDto;
+import com.example.younet.login.dto.SignupEmailVerificationDto;
 import com.example.younet.login.dto.UserSigninRequestDto;
 import com.example.younet.login.dto.UserSignupRequestDto;
 import com.example.younet.repository.UserRepository;
@@ -17,16 +17,10 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.MessagingException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.concurrent.TimeUnit;
 
@@ -95,15 +89,16 @@ public class GeneralAuthService {
         redisService.setValueWithTTL(email, authCode, 30L, TimeUnit.MINUTES);
     }
 
-    // 이메일 인증 코드 검사
-    public boolean verifyEmail(EmailVerificationDto emailVerificationDto) {
-        String authCode = (String) redisService.getValue(emailVerificationDto.getUserEmail());
+    // 비밀번호 찾기 - 이메일 인증 코드 검사
+    // 아이디, 인증 코드로 검사
+    public boolean findPasswordVerifyEmail(PasswordEmailVerficationDto passwordEmailVerficationDto) {
+        String authCode = (String) redisService.getValue(passwordEmailVerficationDto.getUserLoginId());
 
-        if(!emailVerificationDto.getCode().equals(authCode)){
+        if(!passwordEmailVerficationDto.getCode().equals(authCode)){
             throw new CustomException(ErrorCode.USER_INVALID_EMAIL_AUTH_CODE);
         }
         else {
-            redisService.setValueWithTTL(emailVerificationDto.getUserEmail(), "verified", 10, TimeUnit.MINUTES);
+            redisService.setValueWithTTL(passwordEmailVerficationDto.getUserLoginId(), "verified", 10, TimeUnit.MINUTES);
             return true;
         }
     }
@@ -165,6 +160,19 @@ public class GeneralAuthService {
         redisService.setValueWithTTL(email, authCode, 30L, TimeUnit.MINUTES);
     }
 
+    // 회원가입 - 이메일 인증 코드 검사
+    // 이메일, 이메일 인증 코드로 검사
+    public boolean signupVerifyEmail(SignupEmailVerificationDto emailVerificationDto) {
+        String authCode = (String) redisService.getValue(emailVerificationDto.getUserEmail());
+
+        if(!emailVerificationDto.getCode().equals(authCode)){
+            throw new CustomException(ErrorCode.USER_INVALID_EMAIL_AUTH_CODE);
+        }
+        else {
+            redisService.setValueWithTTL(emailVerificationDto.getUserEmail(), "verified", 10, TimeUnit.MINUTES);
+            return true;
+        }
+    }
 
     // 일반 로그아웃
     public void userLogout(PrincipalDetails principalDetails, String token){

@@ -5,14 +5,11 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.example.younet.global.dto.ApplicationResponse;
 import com.example.younet.global.errorException.ErrorCode;
 import com.example.younet.global.jwt.*;
-import com.example.younet.login.dto.EmailVerificationDto;
-import com.example.younet.login.dto.ReissueRequestDto;
-import com.example.younet.login.dto.UserSigninRequestDto;
-import com.example.younet.login.dto.UserSignupRequestDto;
+import com.example.younet.global.jwt.OauthToken;
+import com.example.younet.login.dto.*;
 import com.example.younet.login.service.AuthService;
 import com.example.younet.login.service.GeneralAuthService;
 import com.example.younet.login.service.KakaoAuthService;
-import com.example.younet.login.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -51,10 +48,10 @@ public class UserAuthController {
         return ResponseEntity.ok("가입 시 입력하신 이메일로 인증 번호가 발송되었습니다.");
     }
 
-    // 이메일 인증 성공 여부 확인 - (비밀번호 찾기 & 회원가입)
-    @PostMapping("/user/email/verification")
-    public ResponseEntity<String> verifyEmail(@RequestBody EmailVerificationDto emailVerificationDto) {
-        boolean verificationResult = generalAuthService.verifyEmail(emailVerificationDto);
+    // 비밀번호 찾기 - 이메일 인증 성공 여부 확인
+    @PostMapping("/user/findPassword/email/verification")
+    public ResponseEntity<String> passwordVerifttEmail(@RequestBody PasswordEmailVerficationDto passwordEmailVerficationDto) {
+        boolean verificationResult = generalAuthService.findPasswordVerifyEmail(passwordEmailVerficationDto);
         if (verificationResult) {
             return ResponseEntity.ok("인증에 성공하였습니다.");
         } else {
@@ -62,7 +59,7 @@ public class UserAuthController {
         }
     }
 
-    // 비밀번호 재설정
+    // 비밀번호 재설정 - 비밀번호만 입력받음
     @PostMapping("/user/resetPassword")
     public ResponseEntity<String> resetPassword(@RequestBody UserSignupRequestDto requestDto) {
         generalAuthService.updatePassword(requestDto.getEmail(), requestDto.getPassword());
@@ -80,6 +77,17 @@ public class UserAuthController {
         }
     }
 
+    // 회원가입 - 이메일 인증 성공 여부 확인
+    @PostMapping("/user/email/verification")
+    public ResponseEntity<String> verifyEmail(@RequestBody SignupEmailVerificationDto signupEmailVerificationDto) {
+        boolean verificationResult = generalAuthService.signupVerifyEmail(signupEmailVerificationDto);
+        if (verificationResult) {
+            return ResponseEntity.ok("인증에 성공하였습니다.");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("인증에 실패하였습니다.");
+        }
+    }
+
     // 일반 회원가입
     @PostMapping("/user/signup")
     public ApplicationResponse<String> generalSignUp(@RequestBody UserSignupRequestDto requestDto) {
@@ -88,6 +96,19 @@ public class UserAuthController {
         }
         return ApplicationResponse.ok(ErrorCode.SUCCESS_CREATED, "회원가입이 완료되었습니다.");
     }
+
+    // 일반 로그아웃
+    @PostMapping("/user/logout")
+    public ApplicationResponse<String> userLogout(HttpServletRequest request, @AuthenticationPrincipal PrincipalDetails principalDetails) {
+
+        String token = jwtTokenProvider.resolveAccessToken(request);
+        generalAuthService.userLogout(principalDetails, token);
+        return ApplicationResponse.ok(ErrorCode.SUCCESS_OK, "일반 로그아웃 되었습니다.");
+    }
+
+//    // 일반 회원탈퇴
+//    @PostMapping("user/withdraw")
+//    public ApplicationResponse<String> userWithdraw()
 
     // 토큰 재발급
     @PostMapping("/auth/reissue")
@@ -127,14 +148,6 @@ public class UserAuthController {
         }
     }
 
-    // 일반 로그아웃
-    @PostMapping("/user/logout")
-    public ApplicationResponse<String> userLogout(HttpServletRequest request, @AuthenticationPrincipal PrincipalDetails principalDetails) {
-
-        String token = jwtTokenProvider.resolveAccessToken(request);
-        generalAuthService.userLogout(principalDetails, token);
-        return ApplicationResponse.ok(ErrorCode.SUCCESS_OK, "일반 로그아웃 되었습니다.");
-    }
 
 
     // 카카오 로그아웃 (JwtToken, OauthToken 만료하기)
