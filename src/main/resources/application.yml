@@ -39,6 +39,26 @@ spring:
           starttls:
             enable: true
             required: true
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-id: 3b73fcf4ca8748158d21ac1aea0cda46
+            client-secret: yU1ydnfNqQNEjYLlRMT1gliSmm67opKB
+            redirect-uri: https://localhost:8080/oauth2/kakao
+            authorization-grant-type: authorization_code
+            client-authentication-method: POST
+            client-name: Kakao
+            scope:
+              - profile
+              - account_email
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
 jwt:
   header: Authorization
   secret: younetspringbootsecretkeysdlfksjdflwlekfjsldkjflskejflskejfaoeiubnscom

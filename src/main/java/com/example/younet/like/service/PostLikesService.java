@@ -1,9 +1,9 @@
 package com.example.younet.like.service;
 
 
-import com.example.younet.domain.CommunityProfile;
-import com.example.younet.domain.Post;
-import com.example.younet.domain.PostLikes;
+import com.example.younet.alarm.repository.CommonAlarmRepository;
+import com.example.younet.domain.*;
+import com.example.younet.domain.enums.AlarmType;
 import com.example.younet.like.dto.LikeRequestDTO;
 import com.example.younet.like.repository.PostLikesRepository;
 import com.example.younet.post.repository.CommunityProfileRepository;
@@ -19,6 +19,7 @@ public class PostLikesService {
     private final PostLikesRepository postLikesRepository;
     private final PostRepository postRepository;
     private final CommunityProfileRepository communityProfileRepository;
+    private final CommonAlarmRepository commonAlarmRepository;
 
     @Transactional
     public PostLikes addLike(LikeRequestDTO.Add requestDto) {
@@ -27,14 +28,22 @@ public class PostLikesService {
         CommunityProfile targetCommuProfile = communityProfileRepository.findById(requestDto.getCommunityProfileId())
                 .orElseThrow(() -> new IllegalArgumentException("커뮤니티 프로필 ID를 찾을 수 없습니다."));
 
-        PostLikes newLike = PostLikes.builder()
+        targetPost.addLike();
+        PostLikes savedLike = postLikesRepository.save(PostLikes.builder()
                 .post(targetPost)
                 .communityProfile(targetCommuProfile)
+                .build());
+
+        CommonAlarm commonAlarm=CommonAlarm.builder()
+                .alarmType(AlarmType.LIKE)
+                .isConfirmed(false)
+                .postId(targetPost.getId())
+                .receiver(targetPost.getCommunityProfile())
+                .actorId(targetCommuProfile.getId())
                 .build();
+        commonAlarmRepository.save(commonAlarm);
 
-        targetPost.addLike();
-
-        return postLikesRepository.save(newLike);
+        return savedLike;
     }
 
     @Transactional
