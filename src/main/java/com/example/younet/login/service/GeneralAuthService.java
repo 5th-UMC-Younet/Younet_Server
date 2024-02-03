@@ -19,9 +19,13 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.MessagingException;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -129,7 +133,6 @@ public class GeneralAuthService {
         userRepository.save(user);
     }
 
-
     // 이메일 중복 검사
     public boolean isDuplicatedEmail(String email) {
         if(userRepository.existsByEmail(email))
@@ -185,5 +188,12 @@ public class GeneralAuthService {
         Long expiration = tokenProvider.getExpiration(token);
         redisTemplate.opsForValue().set(token, "logout", expiration, TimeUnit.MILLISECONDS);
 
+    }
+
+    // 일반 회원탈퇴
+    public void withdrawUser(PrincipalDetails principalDetails, String token) {
+
+        User user = principalDetails.getUser();
+        userRepository.delete(user);
     }
 }

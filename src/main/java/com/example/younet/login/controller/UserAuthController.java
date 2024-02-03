@@ -106,16 +106,13 @@ public class UserAuthController {
         return ApplicationResponse.ok(ErrorCode.SUCCESS_OK, "일반 로그아웃 되었습니다.");
     }
 
-//    // 일반 회원탈퇴
-//    @PostMapping("user/withdraw")
-//    public ApplicationResponse<String> userWithdraw()
+    // 일반 회원탈퇴
+    @PostMapping("user/withdrawl")
+    public ApplicationResponse<String> userWithdraw(HttpServletRequest request, @AuthenticationPrincipal PrincipalDetails principalDetails) {
 
-    // 토큰 재발급
-    @PostMapping("/auth/reissue")
-    public ApplicationResponse<JwtTokenDto> reissue(@RequestBody ReissueRequestDto reissueRequestDto) {
-        JwtTokenDto jwtTokenDto = authService.reissue(reissueRequestDto.getRefreshToken());
-
-        return ApplicationResponse.ok(ErrorCode.SUCCESS_OK, jwtTokenDto);
+        String token = jwtTokenProvider.resolveAccessToken(request);
+        generalAuthService.withdrawUser(principalDetails, token);
+        return ApplicationResponse.ok(ErrorCode.SUCCESS_OK, "회원 탈퇴가 완료되었습니다.");
     }
 
     // 카카오 로그인 - OauthToken 발급 후 회원 정보 DB저장/JWT생성
@@ -126,6 +123,25 @@ public class UserAuthController {
         JwtTokenDto jwtTokenDto = kakaoAuthService.saveUserAndGetToken(oauthToken);
 
         return ApplicationResponse.ok(ErrorCode.SUCCESS_CREATED, jwtTokenDto);
+    }
+
+    // 카카오 로그아웃 (JwtToken, OauthToken 만료하기)
+    @PostMapping("/kakao/logout")
+    public ApplicationResponse<String> serviceLogout(@AuthenticationPrincipal PrincipalDetails principalDetails,
+                                                     @RequestBody JwtTokenDto jwtTokenDto) {
+        // 로그아웃: JwtToken 만료시키기 & 카카오 로그인일 경우, OauthToken 또한 만료시키기.
+        System.out.println("서비스 로그아웃");
+        authService.deprecateTokens(jwtTokenDto);
+        kakaoAuthService.serviceLogout(principalDetails);
+        return ApplicationResponse.ok(ErrorCode.SUCCESS_OK, "카카오 로그아웃 되었습니다.");
+    }
+
+    // 토큰 재발급
+    @PostMapping("/auth/reissue")
+    public ApplicationResponse<JwtTokenDto> reissue(@RequestBody ReissueRequestDto reissueRequestDto) {
+        JwtTokenDto jwtTokenDto = authService.reissue(reissueRequestDto.getRefreshToken());
+
+        return ApplicationResponse.ok(ErrorCode.SUCCESS_OK, jwtTokenDto);
     }
 
     // JWT 토큰 디코딩 -> json 형식으로 반환
@@ -148,18 +164,6 @@ public class UserAuthController {
         }
     }
 
-
-
-    // 카카오 로그아웃 (JwtToken, OauthToken 만료하기)
-    @PostMapping("/kakao/logout")
-    public ApplicationResponse<String> serviceLogout(@AuthenticationPrincipal PrincipalDetails principalDetails,
-                                                     @RequestBody JwtTokenDto jwtTokenDto) {
-        // 로그아웃: JwtToken 만료시키기 & 카카오 로그인일 경우, OauthToken 또한 만료시키기.
-        System.out.println("서비스 로그아웃");
-        authService.deprecateTokens(jwtTokenDto);
-        kakaoAuthService.serviceLogout(principalDetails);
-        return ApplicationResponse.ok(ErrorCode.SUCCESS_OK, "카카오 로그아웃 되었습니다.");
-    }
 //    @PostMapping("/kakao/logout")
 //    public ApplicationResponse<String> kakaoLogout(@AuthenticationPrincipal PrincipalDetails principalDetails,
 //                                                     @RequestBody JwtTokenDto jwtTokenDto) {
