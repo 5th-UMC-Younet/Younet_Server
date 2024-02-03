@@ -14,8 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class UserProfileController {
 
-    @Autowired
-    private UserProfileService userProfileService;
+    private final UserProfileService userProfileService;
 
     // 커뮤니티 -> 유저 프로필 조회
     @GetMapping("/user/profile/{userId}")

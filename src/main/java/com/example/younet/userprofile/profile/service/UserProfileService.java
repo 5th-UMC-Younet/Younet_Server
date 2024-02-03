@@ -21,12 +21,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserProfileService {
 
-    @Autowired
-    private PostRepository postRepository;
-    @Autowired
-    private CommentRepository commentRepository;
-    @Autowired
-    private CommunityProfileRepository communityProfileRepository;
+    private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
+    private final CommunityProfileRepository communityProfileRepository;
 
     public UserProfileDto.UserResultDTO findUserInfo(Long userId) {
         CommunityProfile communityProfile = communityProfileRepository.findById(userId).orElseThrow(
