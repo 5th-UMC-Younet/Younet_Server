@@ -1,8 +1,5 @@
-package com.example.younet.userprofile.mypage.dto;
+package com.example.younet.userprofile.profile.dto;
 
-import com.example.younet.domain.Post;
-import com.example.younet.domain.User;
-import com.example.younet.post.dto.PostResponseDTO;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -18,7 +15,7 @@ public class UserProfileDto {
         Long userId;
         String profilePicture;
         String name;
-        String hostCntr;
+        String likeCntr;
         String profileText;
         List<userProfilePostDTO> posts;
     }

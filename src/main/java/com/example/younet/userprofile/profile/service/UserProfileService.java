@@ -1,13 +1,13 @@
-package com.example.younet.userprofile.mypage.service;
+package com.example.younet.userprofile.profile.service;
 
 import com.example.younet.comment.repository.CommentRepository;
+import com.example.younet.domain.CommunityProfile;
 import com.example.younet.domain.Post;
-import com.example.younet.domain.User;
 import com.example.younet.global.errorException.CustomException;
 import com.example.younet.global.errorException.ErrorCode;
+import com.example.younet.post.repository.CommunityProfileRepository;
 import com.example.younet.post.repository.PostRepository;
-import com.example.younet.repository.UserRepository;
-import com.example.younet.userprofile.mypage.dto.UserProfileDto;
+import com.example.younet.userprofile.profile.dto.UserProfileDto;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,14 +22,14 @@ import java.util.stream.Collectors;
 public class UserProfileService {
 
     @Autowired
-    private UserRepository userRepository;
-    @Autowired
     private PostRepository postRepository;
     @Autowired
     private CommentRepository commentRepository;
+    @Autowired
+    private CommunityProfileRepository communityProfileRepository;
 
     public UserProfileDto.UserResultDTO findUserInfo(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(
+        CommunityProfile communityProfile = communityProfileRepository.findById(userId).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_INVALID_FIND_ID));
 
         List<Post> posts = postRepository.findByUserIdOrderByCreatedAtDesc(userId);
@@ -46,11 +46,11 @@ public class UserProfileService {
                 .collect(Collectors.toList());
 
         return UserProfileDto.UserResultDTO.builder()
-                .userId(user.getId())
-                .profilePicture(user.getProfilePicture())
-                .name(user.getName())
-                .hostCntr(user.getHostContr())
-                .profileText(user.getProfileText())
+                .userId(communityProfile.getUser().getId())
+                .profilePicture(communityProfile.getUser().getProfilePicture())
+                .name(communityProfile.getUser().getName())
+                .likeCntr(communityProfile.getCountry().getName())
+                .profileText(communityProfile.getUser().getProfileText())
                 .posts(postDTOs)
                 .build();
     }
