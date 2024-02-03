@@ -26,12 +26,13 @@ public enum ErrorCode {
     AUTH_DEPRECATED_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "더 이상 사용되지 않는 Access 토큰입니다", 2012),
 
     // User (3000번대)
-    USER_INVALID_LOGIN_TYPE(HttpStatus.BAD_REQUEST, "잘못된 로그인 타입입니다.", 4001),
-    USER_DUPLICATED_USER_EMAIL(HttpStatus.BAD_REQUEST, "이미 존재하는 이메일입니다.", 4002),
-    USER_INVALID_USERID(HttpStatus.BAD_REQUEST, "유저 아이디를 다시 확인해주세요.", 4003),
-    USER_INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호를 다시 확인해주세요", 4004),
-    USER_INVALID_EMAIL_AUTH_CODE(HttpStatus.BAD_REQUEST, "유효하지 않는 인증 코드입니다.", 4005),
-    USER_EMAIL_AUTHENTICATION_STATUS_EXPIRED(HttpStatus.NOT_FOUND, "이메일 인증을 다시 해주세요.", 4006),
+    USER_INVALID_LOGIN(HttpStatus.BAD_REQUEST, "비밀번호가 틀렸거나 존재하지 않는 아이디입니다.", 3001),
+    USER_INVALID_FIND_ID(HttpStatus.BAD_REQUEST, "관련된 아이디가 존재하지 않습니다.", 3002),
+    USER_INVALID_EMAIL_AUTH_CODE(HttpStatus.BAD_REQUEST, "유효하지 않는 인증 코드입니다.", 3003),
+    USER_INVALID_FIND_EMAIL(HttpStatus.BAD_REQUEST, "관련된 이메일이 존재하지 않습니다.", 3004),
+    USER_INVALID_LOGIN_TYPE(HttpStatus.BAD_REQUEST, "잘못된 로그인 타입입니다.", 3005),
+    USER_DUPLICATED_USER_EMAIL(HttpStatus.BAD_REQUEST, "이미 존재하는 이메일입니다.", 3006),
+    USER_EMAIL_AUTHENTICATION_STATUS_EXPIRED(HttpStatus.NOT_FOUND, "이메일 인증을 다시 해주세요.", 3007),
 
     // Redis 관련
     REDIS_NOT_FOUND(HttpStatus.NOT_FOUND, "데이터를 찾을 수 없습니다.", 7001),

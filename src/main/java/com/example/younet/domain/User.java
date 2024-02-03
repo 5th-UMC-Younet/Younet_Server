@@ -70,6 +70,14 @@ public class User extends BaseEntity {
     @Column(length = 50)
     private String hostSkl;
 
+    public void updateRefreshToken(Long refreshToken){
+        this.refreshToken = refreshToken;
+    }
+
+    public void updatePassword(String password) {
+        this.password = password;
+    }
+
     @Builder
     public User(Long userId, String userLoginId, String password, String name, String nickname, String email, Role role, LoginType loginType) {
         this.id = userId;
