@@ -25,35 +25,34 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class UserAuthController {
 
-    private final UserService userService;
     private final GeneralAuthService generalAuthService;
     private final AuthService authService;
     private final KakaoAuthService kakaoAuthService;
     private final JwtTokenProvider jwtTokenProvider;
 
-
-    // 일반 회원가입
-    @PostMapping("/user/signup")
-    public ApplicationResponse<String> generalSignUp(@RequestBody UserSignupRequestDto requestDto) {
-        if(generalAuthService.isDuplicatedEmail(requestDto.getEmail())) {
-            generalAuthService.signUp(requestDto);
-        }
-        return ApplicationResponse.ok(ErrorCode.SUCCESS_CREATED, "회원가입 성공");
+    // 일반 로그인
+    @PostMapping("/user/login")
+    public ApplicationResponse<JwtTokenDto> generalSignIn(@RequestBody UserSigninRequestDto requestDto) {
+        JwtTokenDto jwtTokenDto = generalAuthService.signInAndGetToken(requestDto);
+        return ApplicationResponse.ok(ErrorCode.SUCCESS_OK, jwtTokenDto);
     }
 
-    // 이메일 인증 코드 전송
-    @PostMapping("/signup/email")
-    public ResponseEntity<String> getEmailAuthCode(@RequestParam(name = "email") String email) {
-        if (generalAuthService.isDuplicatedEmail(email)) {
-            generalAuthService.sendEmailAuthCode(email);
-            return ResponseEntity.ok("인증 코드가 전송되었습니다.");
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("중복된 이메일입니다.");
-        }
+    // 아이디 찾기
+    @GetMapping("/user/findId")
+    public ApplicationResponse<String> findId(@RequestParam(name = "name") String name, @RequestParam(name = "email") String email) {
+        String findUserId = generalAuthService.findId(name, email);
+        return ApplicationResponse.ok(ErrorCode.SUCCESS_OK, findUserId);
     }
 
-    // 이메일 인증 성공 여부 확인
-    @PostMapping("/signup/email/verification")
+    // 비밀번호 찾기 - 이메일 인증번호 전송
+    @PostMapping("/user/findPassword/email")
+    public ResponseEntity<String> getEmailAuthCodeForFindPassword(@RequestParam(name = "userLoginId") String userLoginId) {
+        generalAuthService.sendEmailAuthCodeForFindPassword(userLoginId);
+        return ResponseEntity.ok("가입 시 입력하신 이메일로 인증 번호가 발송되었습니다.");
+    }
+
+    // 이메일 인증 성공 여부 확인 - (비밀번호 찾기 & 회원가입)
+    @PostMapping("/user/email/verification")
     public ResponseEntity<String> verifyEmail(@RequestBody EmailVerificationDto emailVerificationDto) {
         boolean verificationResult = generalAuthService.verifyEmail(emailVerificationDto);
         if (verificationResult) {
@@ -63,11 +62,31 @@ public class UserAuthController {
         }
     }
 
-    // 일반 로그인
-    @PostMapping("/user/login")
-    public ApplicationResponse<JwtTokenDto> generalSignIn(@RequestBody UserSigninRequestDto requestDto) {
-        JwtTokenDto jwtTokenDto = generalAuthService.signInAndGetToken(requestDto);
-        return ApplicationResponse.ok(ErrorCode.SUCCESS_OK, jwtTokenDto);
+    // 비밀번호 재설정
+    @PostMapping("/user/resetPassword")
+    public ResponseEntity<String> resetPassword(@RequestBody UserSignupRequestDto requestDto) {
+        generalAuthService.updatePassword(requestDto.getEmail(), requestDto.getPassword());
+        return ResponseEntity.ok("비밀번호가 재설정되었습니다.");
+    }
+
+    // 회원가입 - 이메일 인증 코드 전송
+    @PostMapping("/user/signup/email")
+    public ResponseEntity<String> getEmailAuthCode(@RequestParam(name = "email") String email) {
+        if (generalAuthService.isDuplicatedEmail(email)) {
+            generalAuthService.sendEmailAuthCode(email);
+            return ResponseEntity.ok("인증 코드가 전송되었습니다.");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("중복된 이메일입니다.");
+        }
+    }
+
+    // 일반 회원가입
+    @PostMapping("/user/signup")
+    public ApplicationResponse<String> generalSignUp(@RequestBody UserSignupRequestDto requestDto) {
+        if(generalAuthService.isDuplicatedEmail(requestDto.getEmail())) {
+            generalAuthService.signUp(requestDto);
+        }
+        return ApplicationResponse.ok(ErrorCode.SUCCESS_CREATED, "회원가입이 완료되었습니다.");
     }
 
     // 토큰 재발급
@@ -120,10 +139,19 @@ public class UserAuthController {
 
     // 카카오 로그아웃 (JwtToken, OauthToken 만료하기)
     @PostMapping("/kakao/logout")
-    public ApplicationResponse<String> kakaoLogout(@AuthenticationPrincipal PrincipalDetails principalDetails,
+    public ApplicationResponse<String> serviceLogout(@AuthenticationPrincipal PrincipalDetails principalDetails,
                                                      @RequestBody JwtTokenDto jwtTokenDto) {
+        // 로그아웃: JwtToken 만료시키기 & 카카오 로그인일 경우, OauthToken 또한 만료시키기.
+        System.out.println("서비스 로그아웃");
         authService.deprecateTokens(jwtTokenDto);
-        kakaoAuthService.kakaoLogout(principalDetails);
+        kakaoAuthService.serviceLogout(principalDetails);
         return ApplicationResponse.ok(ErrorCode.SUCCESS_OK, "카카오 로그아웃 되었습니다.");
     }
+//    @PostMapping("/kakao/logout")
+//    public ApplicationResponse<String> kakaoLogout(@AuthenticationPrincipal PrincipalDetails principalDetails,
+//                                                     @RequestBody JwtTokenDto jwtTokenDto) {
+//        authService.deprecateTokens(jwtTokenDto);
+//        kakaoAuthService.kakaoLogout(principalDetails);
+//        return ApplicationResponse.ok(ErrorCode.SUCCESS_OK, "카카오 로그아웃 되었습니다.");
+//    }
 }

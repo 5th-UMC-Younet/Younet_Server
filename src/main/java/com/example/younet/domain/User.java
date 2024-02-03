@@ -74,6 +74,10 @@ public class User extends BaseEntity {
         this.refreshToken = refreshToken;
     }
 
+    public void updatePassword(String password) {
+        this.password = password;
+    }
+
     @Builder
     public User(Long userId, String userLoginId, String password, String name, String nickname, String email, Role role, LoginType loginType) {
         this.id = userId;

@@ -42,6 +42,80 @@ public class GeneralAuthService {
     private final JwtTokenProvider tokenProvider;
     private final RedisTemplate redisTemplate;
 
+
+    // userLoginId, password 검증 후 JWT 토큰 발급
+    // redis에 refresh token 저장하기
+    public JwtTokenDto signInAndGetToken(UserSigninRequestDto requestDto) {
+        User user = userRepository.findByUserLoginId(requestDto.getUserId()).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_INVALID_LOGIN));
+
+        if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
+            throw new CustomException(ErrorCode.USER_INVALID_LOGIN);
+        }
+
+        // JWT 토큰 생성 후, refreshToken을 redis에 저장
+        JwtTokenDto jwtTokenDto = tokenProvider.generateToken(user);
+        redisService.setValueWithTTL(jwtTokenDto.getRefreshToken(), user.getId().toString(), 7L, TimeUnit.DAYS);
+
+        return jwtTokenDto;
+    }
+
+    // name, email 검증 후 회원 ID 반환
+    public String findId(String name, String email) {
+        User user = userRepository.findByNameAndEmail(name, email).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_INVALID_FIND_ID));
+        return user.getUserLoginId();
+    }
+
+    // 아이디 검증 후 존재하는 아이디인 경우
+    // 해당 메일로 인증 번호 발송
+    @Async
+    public void sendEmailAuthCodeForFindPassword(String userLoginId) {
+
+        User user = userRepository.findByUserLoginId(userLoginId).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_INVALID_FIND_ID));
+
+        String email = user.getEmail();
+
+        String authCode = mailService.generateCode();
+
+        String body = "";
+        body += "<h3>" + "안녕하세요, Younet 이메일 인증 코드입니다." + "</h3>";
+        body += "<h3>" + "아래 인증코드를 입력하시면, 비밀번호를 재설정 할 수 있습니다." + "</h3>";
+        body += "<h1>" + authCode + "</h1>";
+        body += "<h3>" + "인증 코드는 10분간 유효합니다." + "</h3>";
+
+        try {
+            mailService.sendEmail(email, "[Younet] 비밀번호 재설정을 위한 이메일 인증", body);
+        }
+        catch (MessagingException e) {
+            e.printStackTrace();
+        }
+
+        redisService.setValueWithTTL(email, authCode, 30L, TimeUnit.MINUTES);
+    }
+
+    // 이메일 인증 코드 검사
+    public boolean verifyEmail(EmailVerificationDto emailVerificationDto) {
+        String authCode = (String) redisService.getValue(emailVerificationDto.getUserEmail());
+
+        if(!emailVerificationDto.getCode().equals(authCode)){
+            throw new CustomException(ErrorCode.USER_INVALID_EMAIL_AUTH_CODE);
+        }
+        else {
+            redisService.setValueWithTTL(emailVerificationDto.getUserEmail(), "verified", 10, TimeUnit.MINUTES);
+            return true;
+        }
+    }
+
+    // 비밀번호 찾기 -> 비밀번호 재설정
+    public Long updatePassword(String email, String password) {
+        User user = userRepository.findByEmail(email).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_INVALID_FIND_EMAIL));
+        user.updatePassword(passwordEncoder.encode(password));
+        return user.getId();
+    }
+
     // 일반 자체 회원가입
     public void signUp(UserSignupRequestDto requestDto) {
         String state = (String) redisService.getValue(requestDto.getEmail());
@@ -60,16 +134,6 @@ public class GeneralAuthService {
         userRepository.save(user);
     }
 
-    // 이메일 인증 코드 검사
-    public boolean verifyEmail(EmailVerificationDto emailVerificationDto) {
-        String authCode = (String) redisService.getValue(emailVerificationDto.getUserEmail());
-
-        if(!emailVerificationDto.getCode().equals(authCode))
-            System.out.println("Invalid email verification code.");
-
-        redisService.setValueWithTTL(emailVerificationDto.getUserEmail(), "verified", 10, TimeUnit.MINUTES);
-        return true;
-    }
 
     // 이메일 중복 검사
     public boolean isDuplicatedEmail(String email) {
@@ -101,21 +165,6 @@ public class GeneralAuthService {
         redisService.setValueWithTTL(email, authCode, 30L, TimeUnit.MINUTES);
     }
 
-    public JwtTokenDto signInAndGetToken(UserSigninRequestDto requestDto) {
-        // usrId, password 검증 후 JWT 토큰 발급
-        // redis에 refresh token 저장하기
-        User user = userRepository.findByUserLoginId(requestDto.getUserId()).orElseThrow(
-                () -> new CustomException(ErrorCode.USER_INVALID_USERID));
-
-        if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
-            throw new CustomException(ErrorCode.USER_INVALID_PASSWORD);
-        }
-
-        JwtTokenDto jwtTokenDto = tokenProvider.generateToken(user);
-        redisService.setValueWithTTL(jwtTokenDto.getRefreshToken(), user.getId().toString(), 7L, TimeUnit.DAYS);
-
-        return jwtTokenDto;
-    }
 
     // 일반 로그아웃
     public void userLogout(PrincipalDetails principalDetails, String token){
