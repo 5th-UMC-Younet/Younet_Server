@@ -1,12 +1,15 @@
 package com.example.younet.reply.service;
 
+import com.example.younet.alarm.repository.CommonAlarmRepository;
 import com.example.younet.comment.dto.CommentRequestDTO;
 import com.example.younet.comment.dto.CommentResponseDTO;
 import com.example.younet.comment.repository.CommentRepository;
 import com.example.younet.domain.Comment;
+import com.example.younet.domain.CommonAlarm;
 import com.example.younet.domain.CommunityProfile;
 import com.example.younet.domain.Post;
 import com.example.younet.domain.Reply;
+import com.example.younet.domain.enums.AlarmType;
 import com.example.younet.post.repository.CommunityProfileRepository;
 import com.example.younet.post.repository.PostRepository;
 import com.example.younet.reply.dto.ReplyRequestDTO;
@@ -27,6 +30,7 @@ public class ReplyService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final CommunityProfileRepository communityProfileRepository;
+    private final CommonAlarmRepository commonAlarmRepository;
 
     @Transactional
     public Slice<ReplyResponseDTO.Reply> getReplySliceByCommentId(ReplyRequestDTO.GetByCommentIdWithPaging requestDto) {
@@ -74,6 +78,15 @@ public class ReplyService {
                 .communityProfile(communityProfile)
                 .body(requestDto.getBody())
                 .build();
+
+        CommonAlarm replyAlarm = CommonAlarm.builder()
+                .alarmType(AlarmType.REPLY)
+                .isConfirmed(false)
+                .postId(comment.getId())
+                .receiver(comment.getCommunityProfile())
+                .actorId(communityProfile.getId())
+                .build();
+        commonAlarmRepository.save(replyAlarm);
 
         replyRepository.save(newReply);
         return newReply.getId();

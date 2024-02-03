@@ -1,11 +1,14 @@
 package com.example.younet.comment.service;
 
+import com.example.younet.alarm.repository.CommonAlarmRepository;
 import com.example.younet.comment.dto.CommentRequestDTO;
 import com.example.younet.comment.dto.CommentResponseDTO;
 import com.example.younet.comment.repository.CommentRepository;
 import com.example.younet.domain.Comment;
+import com.example.younet.domain.CommonAlarm;
 import com.example.younet.domain.CommunityProfile;
 import com.example.younet.domain.Post;
+import com.example.younet.domain.enums.AlarmType;
 import com.example.younet.post.repository.CommunityProfileRepository;
 import com.example.younet.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +26,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final CommunityProfileRepository communityProfileRepository;
+    private final CommonAlarmRepository commonAlarmRepository;
 
     @Transactional
     public Slice<CommentResponseDTO.Comment> getCommentSliceByPostId(CommentRequestDTO.GetByPostIdWithPaging requestDto) {
@@ -53,6 +57,15 @@ public class CommentService {
                 .communityProfile(communityProfile)
                 .body(requestDto.getBody())
                 .build();
+
+        CommonAlarm commentAlarm = CommonAlarm.builder()
+                .alarmType(AlarmType.COMMENT)
+                .isConfirmed(false)
+                .postId(post.getId())
+                .receiver(post.getCommunityProfile())
+                .actorId(communityProfile.getId())
+                .build();
+        commonAlarmRepository.save(commentAlarm);
 
         commentRepository.save(newComment);
         return newComment.getId();
