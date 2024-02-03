@@ -9,6 +9,7 @@ import com.example.younet.like.repository.PostLikesRepository;
 import com.example.younet.post.repository.CommunityProfileRepository;
 import com.example.younet.post.repository.PostRepository;
 import jakarta.transaction.Transactional;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -28,22 +29,31 @@ public class PostLikesService {
         CommunityProfile targetCommuProfile = communityProfileRepository.findById(requestDto.getCommunityProfileId())
                 .orElseThrow(() -> new IllegalArgumentException("커뮤니티 프로필 ID를 찾을 수 없습니다."));
 
+        Optional<PostLikes> postLikesOptional = postLikesRepository
+                .findByPost_IdAndCommunityProfile_Id(targetPost.getId(),targetCommuProfile.getId());
+
         targetPost.addLike();
-        PostLikes savedLike = postLikesRepository.save(PostLikes.builder()
-                .post(targetPost)
-                .communityProfile(targetCommuProfile)
-                .build());
 
-        CommonAlarm commonAlarm=CommonAlarm.builder()
-                .alarmType(AlarmType.LIKE)
-                .isConfirmed(false)
-                .postId(targetPost.getId())
-                .receiver(targetPost.getCommunityProfile())
-                .actorId(targetCommuProfile.getId())
-                .build();
-        commonAlarmRepository.save(commonAlarm);
+        if(postLikesOptional.isEmpty()) { // 어떤 유저가 특정 게시글에 처음으로 좋아요를 누르는 경우
+            PostLikes savedLike = postLikesRepository.save(PostLikes.builder()
+                    .post(targetPost)
+                    .communityProfile(targetCommuProfile)
+                    .build());
 
-        return savedLike;
+            CommonAlarm commonAlarm=CommonAlarm.builder()
+                    .alarmType(AlarmType.LIKE)
+                    .isConfirmed(false)
+                    .postId(targetPost.getId())
+                    .receiver(targetPost.getCommunityProfile())
+                    .actorId(targetCommuProfile.getId())
+                    .build();
+            commonAlarmRepository.save(commonAlarm);
+            return savedLike;
+        }
+
+        PostLikes targetPostLike = postLikesOptional.get();
+        targetPostLike.activateLike();
+        return  targetPostLike;
     }
 
     @Transactional
@@ -62,7 +72,7 @@ public class PostLikesService {
 
         Post targetPost = target.getPost();
 
-        postLikesRepository.delete(target);
+        target.deactivateLike();
         targetPost.removeLike();
         return target;
     }

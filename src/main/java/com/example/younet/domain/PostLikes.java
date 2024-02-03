@@ -20,4 +20,9 @@ public class PostLikes extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private CommunityProfile communityProfile;
+
+    private boolean isActivated;
+
+    public void activateLike() { this.isActivated = true; }
+    public void deactivateLike() { this.isActivated = false; }
 }
