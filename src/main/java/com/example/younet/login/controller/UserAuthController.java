@@ -116,7 +116,7 @@ public class UserAuthController {
     }
 
     // 카카오 로그인 - OauthToken 발급 후 회원 정보 DB저장/JWT생성
-    @GetMapping("/kakao/login")
+    @GetMapping("/oauth2/kakao")
     public ApplicationResponse<JwtTokenDto> Login(@RequestParam("code") String code) {
 
         OauthToken oauthToken = kakaoAuthService.getKakaoAccessToken(code);
@@ -129,10 +129,9 @@ public class UserAuthController {
     @PostMapping("/kakao/logout")
     public ApplicationResponse<String> serviceLogout(@AuthenticationPrincipal PrincipalDetails principalDetails,
                                                      @RequestBody JwtTokenDto jwtTokenDto) {
-        // 로그아웃: JwtToken 만료시키기 & 카카오 로그인일 경우, OauthToken 또한 만료시키기.
-        System.out.println("서비스 로그아웃");
+        // JwtToken 만료 & OauthToken 만료
         authService.deprecateTokens(jwtTokenDto);
-        kakaoAuthService.serviceLogout(principalDetails);
+        kakaoAuthService.kakaoLogout(principalDetails);
         return ApplicationResponse.ok(ErrorCode.SUCCESS_OK, "카카오 로그아웃 되었습니다.");
     }
 
@@ -157,18 +156,10 @@ public class UserAuthController {
             String name = decodedJWT.getClaim("name").asString();
             String nickname = decodedJWT.getClaim("nickname").asString();
             String email = decodedJWT.getClaim("sub").asString();
-            String json = "{ \"name\": \"" + name + "\", \"username\": \"" + nickname + "\", \"email\": \"" + email + "\"}";
+            String json = "{ \"name\": \"" + name + "\", \"nickname\": \"" + nickname + "\", \"email\": \"" + email + "\"}";
             return json;
         } catch (Exception e) {
             return "{ \"error\": \"Token invalid\" }";
         }
     }
-
-//    @PostMapping("/kakao/logout")
-//    public ApplicationResponse<String> kakaoLogout(@AuthenticationPrincipal PrincipalDetails principalDetails,
-//                                                     @RequestBody JwtTokenDto jwtTokenDto) {
-//        authService.deprecateTokens(jwtTokenDto);
-//        kakaoAuthService.kakaoLogout(principalDetails);
-//        return ApplicationResponse.ok(ErrorCode.SUCCESS_OK, "카카오 로그아웃 되었습니다.");
-//    }
 }

@@ -185,21 +185,13 @@ public class KakaoAuthService {
         return jwtTokenDto;
     }
 
-    // 카카오 로그아웃
-    public void serviceLogout(PrincipalDetails principalDetails){
-        // 서비스 로그아웃(카카오)
+    public void kakaoLogout(PrincipalDetails principalDetails){
         User user = principalDetails.getUser();
-
-        if(user.getLoginType()!= LoginType.KAKAO) return;
-
         OauthToken oauthToken = getOauthToken(user.getId());
-        if(oauthToken == null) return;
-
-        System.out.println(oauthToken);
 
         RestTemplate rt = new RestTemplate();
-
         HttpHeaders headers = new HttpHeaders();
+
         headers.add("Authorization", "Bearer " + oauthToken.getAccess_token());
         HttpEntity<MultiValueMap<String, String>> logoutRequest = new HttpEntity<>(headers);
 
@@ -211,13 +203,12 @@ public class KakaoAuthService {
                     String.class
             );
 
-            System.out.println("회원번호 " + response.getBody() + " 로그아웃");
             redisService.deleteValue(user.getId().toString());
+            System.out.println("삭제 완료");
 
         } catch (Exception e) {
             throw new CustomException(ErrorCode.AUTH_EXPIRED_ACCESS_TOKEN);
         }
-
     }
 
     // Oauth 만료 여부 확인
