@@ -1,6 +1,7 @@
 package com.example.younet.domain;
 
 import com.example.younet.domain.common.BaseEntity;
+import com.example.younet.domain.enums.AuthType;
 import com.example.younet.domain.enums.LoginType;
 import com.example.younet.domain.enums.Role;
 import jakarta.persistence.*;
@@ -62,8 +63,9 @@ public class User extends BaseEntity {
     @Column(columnDefinition="tinyint(0) default 0")
     private boolean isAbroad;
 
-    @Column(columnDefinition="tinyint(0) default 0")
-    private boolean isAuth;
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private AuthType isAuth;
 
     @Column(length = 50)
     private String mainSkl;
@@ -83,7 +85,7 @@ public class User extends BaseEntity {
     }
 
     @Builder
-    public User(Long userId, String userLoginId, String password, String name, String nickname, String email, Role role, LoginType loginType) {
+    public User(Long userId, String userLoginId, String password, String name, String nickname, String email, Role role, LoginType loginType, AuthType authType) {
         this.id = userId;
         this.userLoginId = userLoginId;
         this.password = password;
@@ -92,6 +94,7 @@ public class User extends BaseEntity {
         this.email = email;
         this.role = role;
         this.loginType = loginType;
+        this.isAuth = authType;
     }
 
     public List<String> getRoleList(){
