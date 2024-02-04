@@ -1,6 +1,8 @@
 package com.example.younet.chat.service;
 
+import com.example.younet.chat.dto.MessageListDto;
 import com.example.younet.chat.dto.OneToOneChatListDto;
+import com.example.younet.chat.dto.ReadAllMessageDto;
 import com.example.younet.domain.*;
 import com.example.younet.domain.enums.Profile;
 import com.example.younet.global.jwt.PrincipalDetails;
@@ -85,6 +87,7 @@ public class ChatService {
             User otheruser = joinChatRepository.findJoinChatByAnotherUser(chatRoomList.get(i).getId(), loginUser.getId()).getUser();
             String name, img, message;
             LocalDateTime createdAt;
+            Long chatRoomId = chatRoomList.get(i).getId();
 
             Message lastestMessage = messageRepository.findLatestMessage(chatRoomList.get(i).getId());
             message = lastestMessage.getMessage(); // 가장 최근 메세지 내용
@@ -99,6 +102,7 @@ public class ChatService {
                 img = communityProfile.getProfilePicture();
             }
             result.add(OneToOneChatListDto.builder()
+                    .chatRoomId(chatRoomId)
                     .name(name)
                     .profilePicture(img)
                     .message(message)
@@ -112,6 +116,19 @@ public class ChatService {
 
 
     //채팅방 메세지 불러오기 (1:1)
+    @Transactional
+    public ReadAllMessageDto readAllMessages(Long chat_room_id, @AuthenticationPrincipal PrincipalDetails principalDetails)
+    {
+        User loginUser = principalDetails.getUser(); //현재 로그인된 유저 객체
+        List<MessageListDto> messageListDtos = messageRepository.findMessagesByChatRoomId(chat_room_id)
+                .stream().map(MessageListDto::new).toList();
+
+        ReadAllMessageDto allMessageDto = ReadAllMessageDto.builder()
+                .loginUserId(loginUser.getId())
+                .messageListDtoList(messageListDtos)
+                .build();
+        return allMessageDto;
+    }
 
 
     //참여중인 오픈채팅 목록
