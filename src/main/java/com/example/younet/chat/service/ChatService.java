@@ -1,12 +1,16 @@
 package com.example.younet.chat.service;
 
-import com.example.younet.domain.ChatRequest;
-import com.example.younet.domain.User;
+import com.example.younet.chat.dto.OneToOneChatListDto;
+import com.example.younet.domain.*;
 import com.example.younet.domain.enums.Profile;
 import com.example.younet.global.jwt.PrincipalDetails;
 
+import com.example.younet.post.repository.CommunityProfileRepository;
 import com.example.younet.repository.ChatRequestRepository;
+import com.example.younet.repository.ChatRoomRepository;
+import com.example.younet.repository.JoinChatRepository;
 import com.example.younet.repository.UserRepository;
+import com.example.younet.repository.MessageRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -15,7 +19,12 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -24,7 +33,10 @@ import java.util.Date;
 public class ChatService {
     private final UserRepository userRepository;
     private final ChatRequestRepository chatRequestRepository;
-
+    private final JoinChatRepository joinChatRepository;
+    private final ChatRoomRepository chatRoomRepository;
+    private final CommunityProfileRepository communityProfileRepository;
+    private final MessageRepository messageRepository;
 
     //커뮤니티 프로필: [1:1 채팅] 요청
     @Transactional
@@ -48,5 +60,70 @@ public class ChatService {
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    //참여중인 1:1 채팅 목록
+    @Transactional
+    public List<OneToOneChatListDto> readOneToOneChatList(@AuthenticationPrincipal PrincipalDetails principalDetails){
+        User loginUser = principalDetails.getUser(); //현재 로그인된 유저
+
+        //로직: JoinChat 테이블에서 (회원ID = 현재 로그인된 유저 객체의 ID) 인 리스트 조회
+        List<JoinChat> joinChatList = joinChatRepository.findByUserId(loginUser.getId());
+
+        List<OneToOneChatListDto> result = new ArrayList<>();
+
+        for (int i=0; i<joinChatList.size(); i++)
+        {
+            // 조회한 JoinChat 리스트에 나온 채팅방 ID를 사용하여 채팅방 목록 중복없이 조회 (조회시 메세지 최신순 정렬)
+            List<ChatRoom> chatRoomList = chatRoomRepository.findByChatroomIdOrderByMessageCreatedAtDesc(joinChatList.get(i).getChatRoom().getId());
+
+            User otheruser = joinChatRepository.findJoinChatByAnotherUser(chatRoomList.get(i).getId(), loginUser.getId()).getUser();
+            String name, img, message;
+            LocalDateTime createdAt;
+
+            Message lastestMessage = messageRepository.findLatestMessage(chatRoomList.get(i).getId());
+            message = lastestMessage.getMessage(); // 가장 최근 메세지 내용
+            createdAt = lastestMessage.getCreatedAt(); // 메세지 생성 시각(created_at)
+
+            if (chatRoomList.get(i).getProfile() == Profile.REALNAME) { // 실명 프로필
+                name = otheruser.getName();
+                img = otheruser.getProfilePicture();
+            } else { // 닉네임 프로필
+                CommunityProfile communityProfile = communityProfileRepository.findByUserId(otheruser.getId());
+                name = communityProfile.getName(); // 닉네임
+                img = communityProfile.getProfilePicture();
+            }
+            result.add(OneToOneChatListDto.builder()
+                    .name(name)
+                    .profilePicture(img)
+                    .message(message)
+                    .createdAt(createdAt)
+                    .build());
+        }
+            //TO-DO: 안읽은 메세지 수 카운트하는 로직 추가
+
+        return result;
+    }
+
+    //참여중인 오픈채팅 목록
+
+    //오픈채팅방 생성
+
+    //채팅방 메세지 불러오기 (1:1)
+
+    //채팅방 메세지 불러오기 (오픈채팅)
+
+    //오픈채팅방 -> 참여 정보 (JoinChat 테이블)
+
+    //오픈채팅방 -> 참여중인 유저 목록
+
+    //오픈채팅방 -> 사용자 프로필 조회 (실명채팅방, 닉네임채팅방)
+
+    //오픈 프로필: [1:1 채팅] 요청
+    @Transactional
+    public ResponseEntity<?> createOpenChatRequest(Long user_id, @AuthenticationPrincipal PrincipalDetails principalDetails){
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    //오픈채팅방 나가기 (JoinChat 테이블에서 삭제)
 
 }
