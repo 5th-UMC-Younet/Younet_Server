@@ -13,6 +13,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -47,6 +48,9 @@ public class User extends BaseEntity {
 
     @Column(columnDefinition="TEXT")
     private String profilePicture;
+
+    @Column(length = 255)
+    private String profileText;
 
     private LocalDate inactiveDate;
 
