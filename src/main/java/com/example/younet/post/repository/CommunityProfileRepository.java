@@ -9,6 +9,5 @@ import java.util.Optional;
 @Repository
 public interface CommunityProfileRepository extends JpaRepository<CommunityProfile,Long> {
     Optional<CommunityProfile> findById(Long userId);
-
     CommunityProfile findByUserId(Long userId);
 }
