@@ -6,11 +6,7 @@ import com.example.younet.domain.enums.Profile;
 import com.example.younet.global.jwt.PrincipalDetails;
 
 import com.example.younet.post.repository.CommunityProfileRepository;
-import com.example.younet.repository.ChatRequestRepository;
-import com.example.younet.repository.ChatRoomRepository;
-import com.example.younet.repository.JoinChatRepository;
-import com.example.younet.repository.UserRepository;
-import com.example.younet.repository.MessageRepository;
+import com.example.younet.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -37,6 +33,7 @@ public class ChatService {
     private final ChatRoomRepository chatRoomRepository;
     private final CommunityProfileRepository communityProfileRepository;
     private final MessageRepository messageRepository;
+    private final ChatAlarmRepository chatAlarmRepository;
 
     //커뮤니티 프로필: [1:1 채팅] 요청
     @Transactional
@@ -56,7 +53,16 @@ public class ChatService {
                 .receiver(receiver)
                 .profile(Profile.NICKNAME)
                 .build();
-        chatRequestRepository.save(chatRequest);
+//        chatRequestRepository.save(chatRequest);
+
+        chatAlarmRepository.save(
+                ChatAlarm.builder()
+                        .isConfirmed(false)
+                        .requesterId(communityProfileRepository.findByUserId(requester.getId()).getId())
+                        .receiver(communityProfileRepository.findByUserId(receiver.getId()))
+                        .chatRequest(chatRequestRepository.save(chatRequest))
+                        .build()
+        );
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -99,16 +105,18 @@ public class ChatService {
                     .createdAt(createdAt)
                     .build());
         }
-            //TO-DO: 안읽은 메세지 수 카운트하는 로직 추가
+            //TODO: 안읽은 메세지 수 카운트하는 로직 추가
 
         return result;
     }
 
+
+    //채팅방 메세지 불러오기 (1:1)
+
+
     //참여중인 오픈채팅 목록
 
     //오픈채팅방 생성
-
-    //채팅방 메세지 불러오기 (1:1)
 
     //채팅방 메세지 불러오기 (오픈채팅)
 
