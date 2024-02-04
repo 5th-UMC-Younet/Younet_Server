@@ -70,6 +70,7 @@ public class MyPageService {
                 .userId(communityProfile.getUser().getId())
                 .profilePicture(communityProfile.getUser().getProfilePicture())
                 .name(communityProfile.getUser().getName())
+                .nickname(communityProfile.getUser().getNickname())
                 .likeCntr(communityProfile.getCountry().getName())
                 .profileText(communityProfile.getUser().getProfileText())
                 .posts(postDTOs)

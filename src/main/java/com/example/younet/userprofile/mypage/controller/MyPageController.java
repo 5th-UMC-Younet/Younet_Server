@@ -22,4 +22,6 @@ public class MyPageController {
         MyPageDto.MyProfileDTO myPageDto = myPageService.myPageInfo(principalDetails);
         return ApplicationResponse.ok(ErrorCode.SUCCESS_OK, myPageDto);
     }
+
+    // 커뮤니티 -> 유저 프로필 수정 페이지 조회
 }
