@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor
 public class OneToOneChatListDto{
+    private Long chatRoomId; //채팅방 id
     private String name; //채팅에 참여하는 상대방 닉네임/실명
     private String profilePicture; //채팅에 참여하는 상대방 프로필 이미지
     private String message; //가장 최근 메세지 내용(message)
