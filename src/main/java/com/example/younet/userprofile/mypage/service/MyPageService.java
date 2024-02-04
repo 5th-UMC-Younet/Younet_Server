@@ -69,9 +69,8 @@ public class MyPageService {
 
         return MyPageDto.MyProfileDTO.builder()
                 .userId(communityProfile.getUser().getId())
-                .profilePicture(communityProfile.getUser().getProfilePicture())
+                .profilePicture(communityProfile.getProfilePicture())
                 .name(communityProfile.getUser().getName())
-                .nickname(communityProfile.getUser().getNickname())
                 .likeCntr(communityProfile.getCountry().getName())
                 .profileText(communityProfile.getUser().getProfileText())
                 .posts(postDTOs)
