@@ -19,12 +19,11 @@ public class ProfileAuthController {
     private final ProfileAuthService profileAuthService;
 
     // 본인 인증 여부 확인
-//    @GetMapping("/profile/auth")
-//    public ResponseEntity<String> getIsProfileAuth(@AuthenticationPrincipal PrincipalDetails principalDetails) {
-//        profileAuthService.isProfileAuth(principalDetails);
-//        return ResponseEntity.ok("본인인증된 계정입니다.");
-//    }
-
+    @GetMapping("/profile/auth")
+    public ResponseEntity<String> getIsProfileAuth(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        profileAuthService.isProfileAuth(principalDetails);
+        return ResponseEntity.ok("본인인증된 계정입니다.");
+    }
 
     // 본인 인증 요청
 

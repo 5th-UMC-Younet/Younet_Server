@@ -1,5 +1,9 @@
 package com.example.younet.profileauth.service;
 
+import com.example.younet.domain.User;
+import com.example.younet.global.errorException.CustomException;
+import com.example.younet.global.errorException.ErrorCode;
+import com.example.younet.global.jwt.PrincipalDetails;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -9,10 +13,15 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ProfileAuthService {
 
-
-
-    // 서비스 리턴 값에 따라 반환 값 다르게?
-    // NOTYET 이면 "본인 인증 전에는 이용할 수 없습니다." -> 서비스 단에서 처리
-    // PROGRESSTING 이면 "본인 인증이 진행 중입니다." -> 서비스 단에서 처리
-    // DONE 이면 ok 던지기
+    public void isProfileAuth(PrincipalDetails principalDetails) {
+        User user = principalDetails.getUser();
+        String isAuth = String.valueOf(user.getIsAuth());
+        if(isAuth == "NOTYET"){
+            throw new CustomException(ErrorCode.USER_IS_AUTH_NOTYET);
+        } else if (isAuth == "PROGRESS"){
+            throw new CustomException(ErrorCode.USER_IS_AUTH_PROGRESS);
+        } else {
+            return;
+        }
+    }
 }

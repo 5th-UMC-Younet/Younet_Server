@@ -33,6 +33,8 @@ public enum ErrorCode {
     USER_INVALID_LOGIN_TYPE(HttpStatus.BAD_REQUEST, "잘못된 로그인 타입입니다.", 3005),
     USER_DUPLICATED_USER_EMAIL(HttpStatus.BAD_REQUEST, "이미 존재하는 이메일입니다.", 3006),
     USER_EMAIL_AUTHENTICATION_STATUS_EXPIRED(HttpStatus.NOT_FOUND, "이메일 인증을 다시 해주세요.", 3007),
+    USER_IS_AUTH_NOTYET(HttpStatus.BAD_REQUEST, "본인 인증 전에는 이용할 수 없습니다.", 3008),
+    USER_IS_AUTH_PROGRESS(HttpStatus.BAD_REQUEST, "본인 인증이 진행 중입니다.", 3009),
 
     // Redis 관련
     REDIS_NOT_FOUND(HttpStatus.NOT_FOUND, "데이터를 찾을 수 없습니다.", 7001),
