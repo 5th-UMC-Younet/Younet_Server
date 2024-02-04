@@ -1,6 +1,5 @@
 package com.example.younet.alarm.controller;
 
-import com.example.younet.ApiPayload.ApiResponse;
 import com.example.younet.alarm.dto.AlarmResponseDTO;
 import com.example.younet.alarm.service.AlarmCommandService;
 import jakarta.annotation.Nullable;
@@ -18,9 +17,10 @@ import java.net.URI;
 @RequestMapping("/alarm")
 public class AlarmRestController {
     private final AlarmCommandService alarmCommandService;
-    @GetMapping("/chatRequest")
-    public void getListOfChatRequestAlarm(){
-
+    @GetMapping("/chatRequest/{receiverId}")
+    public Slice<AlarmResponseDTO.chatAlarmListResultDTO> getListOfChatRequestAlarm
+            (@PathVariable("receiverId")Long receiverId, @Nullable @RequestParam("lastChatAlarm")Long lastChatAlarmId){
+        return alarmCommandService.getChatAlarmList(lastChatAlarmId,receiverId);
     }
 
     @GetMapping("/community/{receiverId}")
@@ -32,13 +32,15 @@ public class AlarmRestController {
     @GetMapping("/confirm/{alarmId}")
     public ResponseEntity<?> confirmCommonAlarm(@PathVariable("alarmId") Long alarmId){
         HttpHeaders headers=new HttpHeaders();
-        long postId=alarmCommandService.updateIsConfirmed(alarmId);
+        long postId=alarmCommandService.updateIsConfirmed(alarmId).getPostId();
         headers.setLocation(URI.create("/post/"+postId));
         return new ResponseEntity<>(headers, HttpStatus.MOVED_PERMANENTLY);
     }
     @GetMapping("/delete/{alarmId}")
-    public ApiResponse<?> deleteCommonAlarm(@PathVariable("alarmId") Long alarmId){
-        long postId=alarmCommandService.updateIsConfirmed(alarmId);
-        return ApiResponse.onSuccess(HttpStatus.OK,postId);
+    public ResponseEntity<?> deleteCommonAlarm(@PathVariable("alarmId") Long alarmId){
+        long receiverId=alarmCommandService.updateIsConfirmed(alarmId).getReceiver().getId();
+        HttpHeaders headers=new HttpHeaders();
+        headers.setLocation(URI.create("/alarm/community/"+receiverId));
+        return new ResponseEntity<>(headers,HttpStatus.MOVED_PERMANENTLY);
     }
 }

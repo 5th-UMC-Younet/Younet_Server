@@ -16,15 +16,19 @@ import org.springframework.stereotype.Service;
 public class AlarmCommandService {
     private final CommonAlarmRepository commonAlarmRepository;
 
-    public long updateIsConfirmed(Long alarmId){
+    public CommonAlarm updateIsConfirmed(Long alarmId){
         CommonAlarm commonAlarm=commonAlarmRepository.findById(alarmId).get();
         commonAlarm.setConfirmed(true);
-        commonAlarmRepository.save(commonAlarm);
-        return commonAlarm.getPostId();
+        return commonAlarmRepository.save(commonAlarm);
     }
 
     public Slice<AlarmResponseDTO.commonAlarmListResultDTO> getCommonAlarmList(Long lastAlarmId,Long receiverId){
         Pageable pageable= PageRequest.of(0,10);
         return commonAlarmRepository.getCommonAlarmList(lastAlarmId,receiverId,pageable);
+    }
+
+    public Slice<AlarmResponseDTO.chatAlarmListResultDTO> getChatAlarmList(Long lastChatAlarmId,Long receiverId){
+        Pageable pageable=PageRequest.of(0,10);
+        return commonAlarmRepository.getChatAlarmList(lastChatAlarmId,receiverId,pageable);
     }
 }

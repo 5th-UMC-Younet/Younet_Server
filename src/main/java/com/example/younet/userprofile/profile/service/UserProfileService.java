@@ -44,7 +44,7 @@ public class UserProfileService {
 
         return UserProfileDto.UserResultDTO.builder()
                 .userId(communityProfile.getUser().getId())
-                .profilePicture(communityProfile.getUser().getProfilePicture())
+                .profilePicture(communityProfile.getProfilePicture())
                 .name(communityProfile.getUser().getName())
                 .likeCntr(communityProfile.getCountry().getName())
                 .profileText(communityProfile.getUser().getProfileText())

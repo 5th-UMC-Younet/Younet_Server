@@ -19,7 +19,6 @@ public class MyPageDto {
         Long userId;
         String profilePicture;
         String name;
-        String nickname;
         String likeCntr;
         String profileText;
         List<MyProfilePostDTO> posts;
