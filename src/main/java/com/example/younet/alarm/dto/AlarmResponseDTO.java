@@ -20,5 +20,14 @@ public class AlarmResponseDTO {
         Long actorId;
         LocalDateTime createdAt;
     }
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class chatAlarmListResultDTO{
+        Long chatAlarmId;
+        Long requesterId;
+        LocalDateTime createdAt;
+    }
 
 }
