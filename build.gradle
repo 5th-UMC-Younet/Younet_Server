@@ -75,7 +75,8 @@ dependencies {
 
     // messaging
     implementation 'org.springframework:spring-messaging'
-
+    // 카카오 로그인
+    implementation 'com.google.code.gson:gson:2.8.7'
 
 }
 

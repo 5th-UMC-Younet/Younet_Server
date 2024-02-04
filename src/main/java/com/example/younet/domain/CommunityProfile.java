@@ -34,4 +34,7 @@ public class CommunityProfile extends BaseEntity {
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    @Column(columnDefinition="TEXT")
+    private String profilePicture;
 }
