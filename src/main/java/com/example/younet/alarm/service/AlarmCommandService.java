@@ -26,4 +26,9 @@ public class AlarmCommandService {
         Pageable pageable= PageRequest.of(0,10);
         return commonAlarmRepository.getCommonAlarmList(lastAlarmId,receiverId,pageable);
     }
+
+    public Slice<AlarmResponseDTO.chatAlarmListResultDTO> getChatAlarmList(Long lastChatAlarmId,Long receiverId){
+        Pageable pageable=PageRequest.of(0,10);
+        return commonAlarmRepository.getChatAlarmList(lastChatAlarmId,receiverId,pageable);
+    }
 }

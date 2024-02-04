@@ -1,6 +1,5 @@
 package com.example.younet.alarm.controller;
 
-import com.example.younet.ApiPayload.ApiResponse;
 import com.example.younet.alarm.dto.AlarmResponseDTO;
 import com.example.younet.alarm.service.AlarmCommandService;
 import jakarta.annotation.Nullable;
@@ -18,9 +17,10 @@ import java.net.URI;
 @RequestMapping("/alarm")
 public class AlarmRestController {
     private final AlarmCommandService alarmCommandService;
-    @GetMapping("/chatRequest")
-    public void getListOfChatRequestAlarm(){
-
+    @GetMapping("/chatRequest/{receiverId}")
+    public Slice<AlarmResponseDTO.chatAlarmListResultDTO> getListOfChatRequestAlarm
+            (@PathVariable("receiverId")Long receiverId, @Nullable @RequestParam("lastChatAlarm")Long lastChatAlarmId){
+        return alarmCommandService.getChatAlarmList(lastChatAlarmId,receiverId);
     }
 
     @GetMapping("/community/{receiverId}")
