@@ -1,6 +1,7 @@
 package com.example.younet.login.service;
 
 import com.example.younet.domain.User;
+import com.example.younet.domain.enums.AuthType;
 import com.example.younet.domain.enums.LoginType;
 import com.example.younet.domain.enums.Role;
 import com.example.younet.global.errorException.CustomException;
@@ -165,6 +166,7 @@ public class KakaoAuthService {
                     .password("")
                     .role(Role.MEMBER)
                     .loginType(LoginType.KAKAO)
+                    .isAuth(AuthType.NOTYET)
                     .build();
 
             userRepository.save(user);
