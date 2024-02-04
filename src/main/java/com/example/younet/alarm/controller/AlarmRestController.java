@@ -1,15 +1,15 @@
 package com.example.younet.alarm.controller;
 
 import com.example.younet.ApiPayload.ApiResponse;
+import com.example.younet.alarm.dto.AlarmResponseDTO;
 import com.example.younet.alarm.service.AlarmCommandService;
+import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 
@@ -21,6 +21,12 @@ public class AlarmRestController {
     @GetMapping("/chatRequest")
     public void getListOfChatRequestAlarm(){
 
+    }
+
+    @GetMapping("/community/{receiverId}")
+    public Slice<AlarmResponseDTO.commonAlarmListResultDTO> getCommonAlarmList
+            (@PathVariable("receiverId")Long receiverId, @Nullable @RequestParam("lastAlarm")Long lastAlarmId){
+        return alarmCommandService.getCommonAlarmList(lastAlarmId,receiverId);
     }
     // 알림 확인
     @GetMapping("/confirm/{alarmId}")
