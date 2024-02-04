@@ -6,6 +6,7 @@ import lombok.*;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -28,6 +29,6 @@ public class Auth {
     private User user;
 
     @OneToOne
-    @JoinColumn(name = "hostSchool_id")
-    private HostSchool hostSchool;
+    @JoinColumn(name = "mainSchool_id")
+    private MainSchool mainSchool;
 }
