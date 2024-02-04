@@ -16,6 +16,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.awt.print.PrinterGraphics;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -76,5 +77,24 @@ public class MyPageService {
                 .posts(postDTOs)
                 .scraps(scrapDTOs)
                 .build();
+    }
+
+    public void myPageEdit(PrincipalDetails principalDetails, MyPageDto.MyProfileInfoDTO myProfileInfoDTO) {
+        User user = principalDetails.getUser();
+        Long userId = user.getId();
+
+        CommunityProfile communityProfile = communityProfileRepository.findById(userId).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_INVALID_FIND_ID));
+        Long communityProfileId = communityProfile.getUser().getId();
+
+        communityProfile.getUser().setProfilePicture(myProfileInfoDTO.getProfilePicture());
+        communityProfile.getUser().setName(myProfileInfoDTO.getName());
+        communityProfile.getUser().setNickname(myProfileInfoDTO.getNickname());
+        communityProfile.getCountry().setName(myProfileInfoDTO.getLikeCntr());
+        communityProfile.getUser().setProfileText(myProfileInfoDTO.getProfileText());
+
+        communityProfileRepository.save(communityProfile);
+
+        return ;
     }
 }
