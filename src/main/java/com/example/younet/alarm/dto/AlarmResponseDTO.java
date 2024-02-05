@@ -26,7 +26,7 @@ public class AlarmResponseDTO {
     @AllArgsConstructor
     public static class chatAlarmListResultDTO{
         Long chatAlarmId;
-        Long requesterId;
+        String requesterName;
         LocalDateTime createdAt;
     }
 

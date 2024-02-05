@@ -18,8 +18,8 @@ public class ChatAlarm extends BaseEntity {
     @Column(columnDefinition="tinyint(0) default 0")
     private boolean isConfirmed;
 
-    @Column
-    private Long requesterId; // communityProfile id가 들어와야 함
+//    @Column
+//    private Long requesterId; // communityProfile id가 들어와야 함
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="receiver_id")
