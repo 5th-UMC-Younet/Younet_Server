@@ -63,7 +63,6 @@ public class CommonAlarmRepositoryCustomImpl implements CommonAlarmRepositoryCus
         List<AlarmResponseDTO.chatAlarmListResultDTO> content=queryFactory.select(
                 Projections.fields(AlarmResponseDTO.chatAlarmListResultDTO.class,
                         chatAlarm.id.as("chatAlarmId"),
-                        //chatAlarm.requesterId.as("requesterId"),
                         Expressions.as(
                                 new CaseBuilder()
                                         .when(chatRequest.profile.eq(Profile.REALNAME))
