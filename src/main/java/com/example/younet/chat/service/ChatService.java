@@ -4,6 +4,7 @@ import com.example.younet.chat.dto.MessageListDto;
 import com.example.younet.chat.dto.OneToOneChatListDto;
 import com.example.younet.chat.dto.ReadAllMessageDto;
 import com.example.younet.domain.*;
+import com.example.younet.domain.enums.AlarmType;
 import com.example.younet.domain.enums.Profile;
 import com.example.younet.global.jwt.PrincipalDetails;
 
@@ -60,8 +61,8 @@ public class ChatService {
         chatAlarmRepository.save(
                 ChatAlarm.builder()
                         .isConfirmed(false)
-                        .requesterId(communityProfileRepository.findByUserId(requester.getId()).getId())
-                        .receiver(communityProfileRepository.findByUserId(receiver.getId()))
+//                        .requesterId(communityProfileRepository.findByUserId(requester.getId()).getId())
+//                        .receiver(communityProfileRepository.findByUserId(receiver.getId()))
                         .chatRequest(chatRequestRepository.save(chatRequest))
                         .build()
         );
@@ -130,18 +131,53 @@ public class ChatService {
         return allMessageDto;
     }
 
+    //[1:1 채팅] 요청 수락 및 채팅방 생성 API
+    @Transactional
+    public ResponseEntity<?> acceptChatRequest(Long chatAlarmId, @AuthenticationPrincipal PrincipalDetails principalDetails)
+    {
+        User loginUser = principalDetails.getUser();
+        // 1. chatAlarm: isConfirmed 필드 true
+        ChatAlarm chatAlarm=chatAlarmRepository.findById(chatAlarmId).get();
+        chatAlarm.setConfirmed(true);
 
-    //참여중인 오픈채팅 목록
+        ChatRequest chatRequest=chatRequestRepository.findById(chatAlarm.getChatRequest().getId()).get();
+        chatRequest.setAccepted(true);
+
+        // 2. ChatRoom 및 JoinChat 데이터 추가
+        ChatRoom chatRoom = chatRoomRepository.save(ChatRoom.builder()
+                .profile(chatAlarm.getChatRequest().getProfile())
+                .build());
+
+        joinChatRepository.save(JoinChat.builder()
+                .chatRoom(chatRoom)
+                .user(loginUser) //로그인한 사용자 -> 수락자 = 요청받은자(Receiver)
+                .build());
+
+        joinChatRepository.save(JoinChat.builder()
+                .chatRoom(chatRoom)
+                .user(chatAlarm.getChatRequest().getRequester()) //요청자(requester)
+                .build());
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    //채팅방 입장: 소켓 연결
+
+
+    //채팅 전송하기
+
+
+
+    //참여중인 오픈채팅 목록 조회
+
 
     //오픈채팅방 생성
 
-    //채팅방 메세지 불러오기 (오픈채팅)
+    //오픈채팅방: 개별 채팅방 내 메세지 목록 불러오기
 
-    //오픈채팅방 -> 참여 정보 (JoinChat 테이블)
+    //오픈채팅방 -> 참여중인 유저 목록 조회
 
-    //오픈채팅방 -> 참여중인 유저 목록
-
-    //오픈채팅방 -> 사용자 프로필 조회 (실명채팅방, 닉네임채팅방)
+    //오픈채팅방 -> 사용자 프로필 개별조회 (실명채팅방, 닉네임채팅방)
 
     //오픈 프로필: [1:1 채팅] 요청
     @Transactional
@@ -149,6 +185,8 @@ public class ChatService {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    //오픈채팅방 나가기 (JoinChat 테이블에서 삭제)
+    //오픈채팅방 나가기 (JoinChat 테이블에서 삭제 or isDel 컬럼 추가)
+
+    //1:1 채팅 나가기
 
 }

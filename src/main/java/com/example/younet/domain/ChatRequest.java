@@ -1,5 +1,6 @@
 package com.example.younet.domain;
 
+import com.example.younet.domain.common.BaseEntity;
 import com.example.younet.domain.enums.Profile;
 import jakarta.persistence.*;
 import lombok.*;
@@ -14,7 +15,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChatRequest { // [1:1 채팅] 요청
+public class ChatRequest extends BaseEntity { // [1:1 채팅] 요청
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
