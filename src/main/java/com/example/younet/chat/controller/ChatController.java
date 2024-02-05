@@ -5,10 +5,13 @@ import com.example.younet.chat.dto.ReadAllMessageDto;
 import com.example.younet.chat.service.ChatService;
 import com.example.younet.global.jwt.PrincipalDetails;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 @RequestMapping("/chat")
@@ -38,7 +41,14 @@ public class ChatController {
         return chatService.readAllMessages(chat_room_id, principalDetails);
     }
 
-    //1:1 채팅요청 수락 + 채팅방 생성 API
+    //[1:1 채팅] 요청 수락 + 채팅방 생성 API
+    @PostMapping("/accept/{chatAlarmId}")
+    public ResponseEntity<?> acceptChatRequest(@PathVariable("chatAlarmId") Long chatAlarmId, @AuthenticationPrincipal PrincipalDetails principalDetails){
+        return chatService.acceptChatRequest(chatAlarmId, principalDetails);
+    }
+
+
+    //채팅방 입장: 소켓 연결
 
     //채팅 메세지 전송 API
 
