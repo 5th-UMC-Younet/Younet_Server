@@ -1,6 +1,7 @@
 package com.example.younet.login.service;
 
 import com.example.younet.domain.User;
+import com.example.younet.domain.enums.AuthType;
 import com.example.younet.domain.enums.LoginType;
 import com.example.younet.domain.enums.Role;
 import com.example.younet.global.errorException.CustomException;
@@ -165,6 +166,7 @@ public class KakaoAuthService {
                     .password("")
                     .role(Role.MEMBER)
                     .loginType(LoginType.KAKAO)
+                    .isAuth(AuthType.NOTYET)
                     .build();
 
             userRepository.save(user);
@@ -177,7 +179,6 @@ public class KakaoAuthService {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        //redisService.setValueWithTTL(user.getId().toString(), oauthToken, 50L, TimeUnit.DAYS); 오류..
 
         JwtTokenDto jwtTokenDto = tokenProvider.generateToken(user);
         redisService.setValueWithTTL(jwtTokenDto.getRefreshToken(), user.getId().toString(), 7L, TimeUnit.DAYS);
@@ -185,9 +186,13 @@ public class KakaoAuthService {
         return jwtTokenDto;
     }
 
-    public void kakaoLogout(PrincipalDetails principalDetails){
+    public void kakaoLogout(PrincipalDetails principalDetails) throws JsonProcessingException {
         User user = principalDetails.getUser();
-        OauthToken oauthToken = getOauthToken(user.getId());
+        Object storedValue = redisService.getValue(user.getId().toString());
+
+        String storedString = (String) storedValue;
+        ObjectMapper objectMapper = new ObjectMapper();
+        OauthToken oauthToken = objectMapper.readValue(storedString, OauthToken.class);
 
         RestTemplate rt = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -202,9 +207,7 @@ public class KakaoAuthService {
                     logoutRequest,
                     String.class
             );
-
             redisService.deleteValue(user.getId().toString());
-            System.out.println("삭제 완료");
 
         } catch (Exception e) {
             throw new CustomException(ErrorCode.AUTH_EXPIRED_ACCESS_TOKEN);

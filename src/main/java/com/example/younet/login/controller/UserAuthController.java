@@ -10,6 +10,7 @@ import com.example.younet.login.dto.*;
 import com.example.younet.login.service.AuthService;
 import com.example.younet.login.service.GeneralAuthService;
 import com.example.younet.login.service.KakaoAuthService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -128,7 +129,7 @@ public class UserAuthController {
     // 카카오 로그아웃 (JwtToken, OauthToken 만료하기)
     @PostMapping("/kakao/logout")
     public ApplicationResponse<String> serviceLogout(@AuthenticationPrincipal PrincipalDetails principalDetails,
-                                                     @RequestBody JwtTokenDto jwtTokenDto) {
+                                                     @RequestBody JwtTokenDto jwtTokenDto) throws JsonProcessingException {
         // JwtToken 만료 & OauthToken 만료
         authService.deprecateTokens(jwtTokenDto);
         kakaoAuthService.kakaoLogout(principalDetails);

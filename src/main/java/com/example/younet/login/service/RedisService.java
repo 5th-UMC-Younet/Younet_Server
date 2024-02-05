@@ -36,7 +36,6 @@ public class RedisService {
 
     // key값으로 value 삭제
     public void deleteValue(String key) {
-        ValueOperations<String, Object> valueOperations = redisTemplate.opsForValue();
-        valueOperations.getAndDelete(key);
+        redisTemplate.delete(key);
     }
 }
