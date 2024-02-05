@@ -2,9 +2,13 @@ package com.example.younet.alarm.repository.CustomRepository;
 
 import com.example.younet.alarm.dto.AlarmResponseDTO;
 import com.example.younet.domain.QChatAlarm;
+import com.example.younet.domain.QChatRequest;
 import com.example.younet.domain.QCommonAlarm;
+import com.example.younet.domain.enums.Profile;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.CaseBuilder;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -22,6 +26,7 @@ public class CommonAlarmRepositoryCustomImpl implements CommonAlarmRepositoryCus
 
     QCommonAlarm commonAlarm=QCommonAlarm.commonAlarm;
     QChatAlarm chatAlarm=QChatAlarm.chatAlarm;
+    QChatRequest chatRequest=QChatRequest.chatRequest;
     @Override
     public Slice<AlarmResponseDTO.commonAlarmListResultDTO> getCommonAlarmList(Long lastAlarmId, Long receiverId, Pageable pageable){
         LocalDateTime date=null;
@@ -58,7 +63,13 @@ public class CommonAlarmRepositoryCustomImpl implements CommonAlarmRepositoryCus
         List<AlarmResponseDTO.chatAlarmListResultDTO> content=queryFactory.select(
                 Projections.fields(AlarmResponseDTO.chatAlarmListResultDTO.class,
                         chatAlarm.id.as("chatAlarmId"),
-                        chatAlarm.requesterId.as("requesterId"),
+                        Expressions.as(
+                                new CaseBuilder()
+                                        .when(chatRequest.profile.eq(Profile.REALNAME))
+                                            .then(chatRequest.requester.name)
+                                        .otherwise(chatRequest.requester.nickname),
+                                "requesterName"
+                        ),
                         chatAlarm.createdAt.as("createdAt")
                         ))
                 .from(chatAlarm)
