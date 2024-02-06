@@ -1,10 +1,9 @@
 package com.example.younet.profileauth.service;
 
+import com.example.younet.aws.AmazonS3Manager;
 import com.example.younet.domain.Auth;
 import com.example.younet.domain.User;
 import com.example.younet.domain.enums.AuthType;
-import com.example.younet.global.errorException.CustomException;
-import com.example.younet.global.errorException.ErrorCode;
 import com.example.younet.global.jwt.PrincipalDetails;
 import com.example.younet.profileauth.converter.ProfileAuthConverter;
 import com.example.younet.profileauth.dto.ProfileAuthRequestDto;
@@ -13,6 +12,7 @@ import com.example.younet.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @Transactional
@@ -21,6 +21,7 @@ public class ProfileAuthService {
 
     private final UserRepository userRepository;
     private final AuthRepository authRepository;
+    private final AmazonS3Manager s3Manager;
 
     public int getIsProfileAuth(PrincipalDetails principalDetails) {
         User user = principalDetails.getUser();
@@ -34,14 +35,14 @@ public class ProfileAuthService {
         }
     }
 
-    // 본인 인증 요청
-    public void requestProfileAuth(PrincipalDetails principalDetails, ProfileAuthRequestDto profileAuthRequestDto) {
+    public void postProfileAuth(PrincipalDetails principalDetails, ProfileAuthRequestDto profileAuthRequestDto, MultipartFile file) {
         User user = principalDetails.getUser();
 
+        String imageUrl = s3Manager.uploadFile(user.getId().toString(), file);
         Auth auth = ProfileAuthConverter.toAuth(profileAuthRequestDto);
-        auth.setImgUrl(profileAuthRequestDto.getImgUrl());
         auth.setUser(user);
         auth.setIsAuth(AuthType.PROGRESS);
+        auth.setImgUrl(imageUrl);
         user.setIsAuth(AuthType.PROGRESS);
         user.setMainSkl(profileAuthRequestDto.getMainSchool());
 
