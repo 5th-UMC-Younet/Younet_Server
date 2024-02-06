@@ -31,14 +31,14 @@ public class UserAuthController {
     // 일반 로그인
     @PostMapping("/user/login")
     public ApplicationResponse<JwtTokenDto> generalSignIn(@RequestBody UserSigninRequestDto requestDto) {
-        JwtTokenDto jwtTokenDto = generalAuthService.signInAndGetToken(requestDto);
+        JwtTokenDto jwtTokenDto = generalAuthService.postGeneralSignIn(requestDto);
         return ApplicationResponse.ok(ErrorCode.SUCCESS_OK, jwtTokenDto);
     }
 
     // 아이디 찾기
     @GetMapping("/user/findId")
-    public ApplicationResponse<String> findId(@RequestParam(name = "name") String name, @RequestParam(name = "email") String email) {
-        String findUserId = generalAuthService.findId(name, email);
+    public ApplicationResponse<String> findId(@RequestBody FindIdRequestDto findIdRequestDto) {
+        String findUserId = generalAuthService.getFindId(findIdRequestDto);
         return ApplicationResponse.ok(ErrorCode.SUCCESS_OK, findUserId);
     }
 

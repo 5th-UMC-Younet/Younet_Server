@@ -8,10 +8,7 @@ import com.example.younet.global.errorException.ErrorCode;
 import com.example.younet.global.jwt.JwtTokenDto;
 import com.example.younet.global.jwt.JwtTokenProvider;
 import com.example.younet.global.jwt.PrincipalDetails;
-import com.example.younet.login.dto.PasswordEmailVerficationDto;
-import com.example.younet.login.dto.SignupEmailVerificationDto;
-import com.example.younet.login.dto.UserSigninRequestDto;
-import com.example.younet.login.dto.UserSignupRequestDto;
+import com.example.younet.login.dto.*;
 import com.example.younet.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -41,9 +38,7 @@ public class GeneralAuthService {
     private final RedisTemplate redisTemplate;
 
 
-    // userLoginId, password 검증 후 JWT 토큰 발급
-    // redis에 refresh token 저장하기
-    public JwtTokenDto signInAndGetToken(UserSigninRequestDto requestDto) {
+    public JwtTokenDto postGeneralSignIn(UserSigninRequestDto requestDto) {
         User user = userRepository.findByUserLoginId(requestDto.getUserId()).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_INVALID_LOGIN));
 
@@ -51,16 +46,13 @@ public class GeneralAuthService {
             throw new CustomException(ErrorCode.USER_INVALID_LOGIN);
         }
 
-        // JWT 토큰 생성 후, refreshToken을 redis에 저장
         JwtTokenDto jwtTokenDto = tokenProvider.generateToken(user);
         redisService.setValueWithTTL(jwtTokenDto.getRefreshToken(), user.getId().toString(), 7L, TimeUnit.DAYS);
-
         return jwtTokenDto;
     }
 
-    // name, email 검증 후 회원 ID 반환
-    public String findId(String name, String email) {
-        User user = userRepository.findByNameAndEmail(name, email).orElseThrow(
+    public String getFindId(FindIdRequestDto findIdRequestDto) {
+        User user = userRepository.findByNameAndEmail(findIdRequestDto.getName(), findIdRequestDto.getEmail()).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_INVALID_FIND_ID));
         return user.getUserLoginId();
     }
