@@ -32,7 +32,7 @@ public class ChatServiceTemp {
                 CommonAlarm.builder()
                         .alarmType(AlarmType.CHAT)
                         .isConfirmed(false)
-                        .receiver(communityProfileRepository.findById(chatAlarm.getRequesterId()).get())
+                        .receiver(communityProfileRepository.findByUserId(chatRequest.getRequester().getId()))
                         .actorId(chatAlarm.getReceiver().getId())
                         .build()
         );
