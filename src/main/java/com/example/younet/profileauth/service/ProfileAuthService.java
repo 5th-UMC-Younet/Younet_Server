@@ -1,6 +1,8 @@
 package com.example.younet.profileauth.service;
 
+import com.example.younet.aws.AmazonS3Manager;
 import com.example.younet.domain.Auth;
+import com.example.younet.domain.MainSchool;
 import com.example.younet.domain.User;
 import com.example.younet.domain.enums.AuthType;
 import com.example.younet.global.errorException.CustomException;
@@ -9,10 +11,12 @@ import com.example.younet.global.jwt.PrincipalDetails;
 import com.example.younet.profileauth.converter.ProfileAuthConverter;
 import com.example.younet.profileauth.dto.ProfileAuthRequestDto;
 import com.example.younet.repository.AuthRepository;
+import com.example.younet.repository.MainSchoolRepository;
 import com.example.younet.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @Transactional
@@ -21,28 +25,38 @@ public class ProfileAuthService {
 
     private final UserRepository userRepository;
     private final AuthRepository authRepository;
+    private final MainSchoolRepository mainSchoolRepository;
+    private final AmazonS3Manager s3Manager;
 
-    // 본인 인증 여부 확인
-    public void isProfileAuth(PrincipalDetails principalDetails) {
+    public int getIsProfileAuth(PrincipalDetails principalDetails) {
         User user = principalDetails.getUser();
         String isAuth = String.valueOf(user.getIsAuth());
         if(isAuth == "NOTYET"){
-            throw new CustomException(ErrorCode.USER_IS_AUTH_NOTYET);
+            return 0;
         } else if (isAuth == "PROGRESS"){
-            throw new CustomException(ErrorCode.USER_IS_AUTH_PROGRESS);
+            return 1;
         } else {
-            return;
+            return 2;
         }
     }
 
-    // 본인 인증 요청
-    public void requestProfileAuth(PrincipalDetails principalDetails, ProfileAuthRequestDto profileAuthRequestDto) {
+    public String getSearchMainSchool(String name) {
+        if (mainSchoolRepository.existsByName(name)){
+            MainSchool mainSchool = mainSchoolRepository.findByName(name);
+            return mainSchool.getName();
+        } else {
+            throw new CustomException(ErrorCode.USER_AUTH_INVALID_SCHOOL);
+        }
+    }
+
+    public void postProfileAuth(PrincipalDetails principalDetails, ProfileAuthRequestDto profileAuthRequestDto, MultipartFile file) {
         User user = principalDetails.getUser();
 
+        String imageUrl = s3Manager.uploadFile(user.getId().toString(), file);
         Auth auth = ProfileAuthConverter.toAuth(profileAuthRequestDto);
-        auth.setImgUrl(profileAuthRequestDto.getImgUrl());
         auth.setUser(user);
         auth.setIsAuth(AuthType.PROGRESS);
+        auth.setImgUrl(imageUrl);
         user.setIsAuth(AuthType.PROGRESS);
         user.setMainSkl(profileAuthRequestDto.getMainSchool());
 

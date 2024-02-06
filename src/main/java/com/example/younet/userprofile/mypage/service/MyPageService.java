@@ -1,20 +1,20 @@
 package com.example.younet.userprofile.mypage.service;
 
+import com.example.younet.aws.AmazonS3Manager;
 import com.example.younet.comment.repository.CommentRepository;
-import com.example.younet.domain.CommunityProfile;
-import com.example.younet.domain.Post;
-import com.example.younet.domain.Scrap;
-import com.example.younet.domain.User;
+import com.example.younet.domain.*;
 import com.example.younet.global.errorException.CustomException;
 import com.example.younet.global.errorException.ErrorCode;
 import com.example.younet.global.jwt.PrincipalDetails;
 import com.example.younet.post.repository.CommunityProfileRepository;
+import com.example.younet.post.repository.CountryRepository;
 import com.example.younet.post.repository.PostRepository;
 import com.example.younet.scrap.repository.ScrapRepository;
 import com.example.younet.userprofile.mypage.dto.MyPageDto;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.awt.print.PrinterGraphics;
 import java.util.List;
@@ -29,8 +29,10 @@ public class MyPageService {
     private final CommentRepository commentRepository;
     private final CommunityProfileRepository communityProfileRepository;
     private final ScrapRepository scrapRepository;
+    private final CountryRepository countryRepository;
+    private final AmazonS3Manager s3Manager;
 
-    public MyPageDto.MyProfileDTO myPageInfo(PrincipalDetails principalDetails) {
+    public MyPageDto.MyProfileDTO getMyPageInfo(PrincipalDetails principalDetails) {
         User user = principalDetails.getUser();
         Long userId = user.getId();
 
@@ -70,7 +72,7 @@ public class MyPageService {
         return MyPageDto.MyProfileDTO.builder()
                 .userId(communityProfile.getUser().getId())
                 .profilePicture(communityProfile.getProfilePicture())
-                .name(communityProfile.getUser().getName())
+                .name(communityProfile.getName())
                 .likeCntr(communityProfile.getCountry().getName())
                 .profileText(communityProfile.getUser().getProfileText())
                 .posts(postDTOs)
@@ -78,22 +80,46 @@ public class MyPageService {
                 .build();
     }
 
-    public void myPageEdit(PrincipalDetails principalDetails, MyPageDto.MyProfileInfoDTO myProfileInfoDTO) {
+    public MyPageDto.MyProfileInfoDTO getMyPageInfoEdit(PrincipalDetails principalDetails) {
         User user = principalDetails.getUser();
         Long userId = user.getId();
 
         CommunityProfile communityProfile = communityProfileRepository.findById(userId).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_INVALID_FIND_ID));
         Long communityProfileId = communityProfile.getUser().getId();
+        return MyPageDto.MyProfileInfoDTO.builder()
+                .profilePicture(communityProfile.getProfilePicture())
+                .name(user.getName())
+                .nickname(user.getNickname())
+                .likeCntr(communityProfile.getCountry().getName())
+                .profileText(user.getProfileText())
+                .build();
+    }
 
-        communityProfile.getUser().setProfilePicture(myProfileInfoDTO.getProfilePicture());
-        communityProfile.getUser().setName(myProfileInfoDTO.getName());
-        communityProfile.getUser().setNickname(myProfileInfoDTO.getNickname());
-        communityProfile.getCountry().setName(myProfileInfoDTO.getLikeCntr());
-        communityProfile.getUser().setProfileText(myProfileInfoDTO.getProfileText());
+    public void patchEditMyPageInfo(PrincipalDetails principalDetails, MyPageDto.MyProfileEditDTO myProfileEditDTO, MultipartFile file) {
+        User user = principalDetails.getUser();
+        Long userId = user.getId();
+
+        String imageUrl = s3Manager.uploadFile(userId.toString(), file);
+
+        CommunityProfile communityProfile = communityProfileRepository.findById(userId).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_INVALID_FIND_ID));
+        Long communityProfileId = communityProfile.getUser().getId();
+
+        Country country = countryRepository.findByName(myProfileEditDTO.getLikeCntr());
+
+        // 유저 수정
+        communityProfile.getUser().setProfilePicture(imageUrl);
+        communityProfile.getUser().setName(myProfileEditDTO.getName());
+        communityProfile.getUser().setNickname(myProfileEditDTO.getNickname());
+        communityProfile.getCountry().setName(myProfileEditDTO.getLikeCntr());
+        communityProfile.getUser().setProfileText(myProfileEditDTO.getProfileText());
+        // 커뮤니티 프로필 수정
+        communityProfile.setProfilePicture(imageUrl);
+        communityProfile.setName(myProfileEditDTO.getNickname());
+        communityProfile.setCountry(country);
 
         communityProfileRepository.save(communityProfile);
-
         return ;
     }
 }

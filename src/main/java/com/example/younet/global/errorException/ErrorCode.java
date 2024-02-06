@@ -35,6 +35,7 @@ public enum ErrorCode {
     USER_EMAIL_AUTHENTICATION_STATUS_EXPIRED(HttpStatus.NOT_FOUND, "이메일 인증을 다시 해주세요.", 3007),
     USER_IS_AUTH_NOTYET(HttpStatus.BAD_REQUEST, "본인 인증 전에는 이용할 수 없습니다.", 3008),
     USER_IS_AUTH_PROGRESS(HttpStatus.BAD_REQUEST, "본인 인증이 진행 중입니다.", 3009),
+    USER_AUTH_INVALID_SCHOOL(HttpStatus.BAD_REQUEST, "해당 학교를 찾을 수 없습니다.", 3010),
 
     // Redis 관련
     REDIS_NOT_FOUND(HttpStatus.NOT_FOUND, "데이터를 찾을 수 없습니다.", 7001),

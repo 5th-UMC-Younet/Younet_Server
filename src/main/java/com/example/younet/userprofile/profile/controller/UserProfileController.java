@@ -16,10 +16,10 @@ public class UserProfileController {
 
     private final UserProfileService userProfileService;
 
-    // 커뮤니티 -> 유저 프로필 조회
+    // 커뮤니티 프로필 조회
     @GetMapping("/user/profile/{userId}")
-    public ApplicationResponse<UserProfileDto.UserResultDTO> getUserProfileInfo(@PathVariable Long userId) {
-        UserProfileDto.UserResultDTO userProfileDto = userProfileService.findUserInfo(userId);
+    public ApplicationResponse<UserProfileDto.UserResultDTO> userProfileInfo(@PathVariable Long userId) {
+        UserProfileDto.UserResultDTO userProfileDto = userProfileService.getUserProfileInfo(userId);
         return ApplicationResponse.ok(ErrorCode.SUCCESS_OK, userProfileDto);
     }
 }

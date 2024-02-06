@@ -1,6 +1,8 @@
 package com.example.younet.login.service;
 
+import com.example.younet.domain.CommunityProfile;
 import com.example.younet.domain.User;
+import com.example.younet.domain.enums.AuthType;
 import com.example.younet.domain.enums.LoginType;
 import com.example.younet.domain.enums.Role;
 import com.example.younet.global.errorException.CustomException;
@@ -8,10 +10,8 @@ import com.example.younet.global.errorException.ErrorCode;
 import com.example.younet.global.jwt.JwtTokenDto;
 import com.example.younet.global.jwt.JwtTokenProvider;
 import com.example.younet.global.jwt.PrincipalDetails;
-import com.example.younet.login.dto.PasswordEmailVerficationDto;
-import com.example.younet.login.dto.SignupEmailVerificationDto;
-import com.example.younet.login.dto.UserSigninRequestDto;
-import com.example.younet.login.dto.UserSignupRequestDto;
+import com.example.younet.login.dto.*;
+import com.example.younet.post.repository.CommunityProfileRepository;
 import com.example.younet.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -19,13 +19,9 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.MessagingException;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -35,15 +31,14 @@ public class GeneralAuthService {
 
     private final RedisService redisService;
     private final UserRepository userRepository;
+    private final CommunityProfileRepository communityProfileRepository;
     private final PasswordEncoder passwordEncoder;
     private final MailService mailService;
     private final JwtTokenProvider tokenProvider;
     private final RedisTemplate redisTemplate;
 
 
-    // userLoginId, password 검증 후 JWT 토큰 발급
-    // redis에 refresh token 저장하기
-    public JwtTokenDto signInAndGetToken(UserSigninRequestDto requestDto) {
+    public JwtTokenDto postGeneralSignIn(UserSigninRequestDto requestDto) {
         User user = userRepository.findByUserLoginId(requestDto.getUserId()).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_INVALID_LOGIN));
 
@@ -51,30 +46,24 @@ public class GeneralAuthService {
             throw new CustomException(ErrorCode.USER_INVALID_LOGIN);
         }
 
-        // JWT 토큰 생성 후, refreshToken을 redis에 저장
         JwtTokenDto jwtTokenDto = tokenProvider.generateToken(user);
         redisService.setValueWithTTL(jwtTokenDto.getRefreshToken(), user.getId().toString(), 7L, TimeUnit.DAYS);
-
         return jwtTokenDto;
     }
 
-    // name, email 검증 후 회원 ID 반환
-    public String findId(String name, String email) {
-        User user = userRepository.findByNameAndEmail(name, email).orElseThrow(
+    public String getFindId(FindIdRequestDto findIdRequestDto) {
+        User user = userRepository.findByNameAndEmail(findIdRequestDto.getName(), findIdRequestDto.getEmail()).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_INVALID_FIND_ID));
         return user.getUserLoginId();
     }
 
-    // 아이디 검증 후 존재하는 아이디인 경우
-    // 해당 메일로 인증 번호 발송
     @Async
     public void sendEmailAuthCodeForFindPassword(String userLoginId) {
 
         User user = userRepository.findByUserLoginId(userLoginId).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_INVALID_FIND_ID));
-
         String email = user.getEmail();
-
+        String loginId = user.getUserLoginId();
         String authCode = mailService.generateCode();
 
         String body = "";
@@ -89,34 +78,31 @@ public class GeneralAuthService {
         catch (MessagingException e) {
             e.printStackTrace();
         }
-
-        redisService.setValueWithTTL(email, authCode, 30L, TimeUnit.MINUTES);
+        redisService.setValueWithTTL(loginId, authCode, 30L, TimeUnit.MINUTES);
     }
 
-    // 비밀번호 찾기 - 이메일 인증 코드 검사
-    // 아이디, 인증 코드로 검사
-    public boolean findPasswordVerifyEmail(PasswordEmailVerficationDto passwordEmailVerficationDto) {
-        String authCode = (String) redisService.getValue(passwordEmailVerficationDto.getUserLoginId());
+    public FindPasswordEmailVerificationResponseDto postPasswordVerifyEmail(FindPasswordEmailVerficationRequestDto findPasswordEmailVerficationRequestDto) {
+        String authCode = (String) redisService.getValue(findPasswordEmailVerficationRequestDto.getLoginId());
 
-        if(!passwordEmailVerficationDto.getCode().equals(authCode)){
+        if(!findPasswordEmailVerficationRequestDto.getCode().equals(authCode)){
             throw new CustomException(ErrorCode.USER_INVALID_EMAIL_AUTH_CODE);
         }
         else {
-            redisService.setValueWithTTL(passwordEmailVerficationDto.getUserLoginId(), "verified", 10, TimeUnit.MINUTES);
-            return true;
+            redisService.setValueWithTTL(findPasswordEmailVerficationRequestDto.getLoginId(), "verified", 10, TimeUnit.MINUTES);
+            FindPasswordEmailVerificationResponseDto findPasswordEmailVerificationResponseDto = new FindPasswordEmailVerificationResponseDto();
+            findPasswordEmailVerificationResponseDto.setLoginId(findPasswordEmailVerficationRequestDto.getLoginId());
+            return findPasswordEmailVerificationResponseDto;
         }
     }
 
-    // 비밀번호 찾기 -> 비밀번호 재설정
-    public Long updatePassword(String email, String password) {
-        User user = userRepository.findByEmail(email).orElseThrow(
-                () -> new CustomException(ErrorCode.USER_INVALID_FIND_EMAIL));
-        user.updatePassword(passwordEncoder.encode(password));
-        return user.getId();
+    public void postResetPassword(NewPasswordRequestDto newPasswordRequestDto) {
+        User user = userRepository.findByUserLoginId(newPasswordRequestDto.getLoginId()).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_INVALID_FIND_ID));
+        user.updatePassword(passwordEncoder.encode(newPasswordRequestDto.getNewPassword()));
+        return;
     }
 
-    // 일반 자체 회원가입
-    public void signUp(UserSignupRequestDto requestDto) {
+    public void postGeneralSignUp(UserSignupRequestDto requestDto) {
         String state = (String) redisService.getValue(requestDto.getEmail());
         if(!"verified".equals(state)) throw new CustomException(ErrorCode.USER_EMAIL_AUTHENTICATION_STATUS_EXPIRED);
 
@@ -128,46 +114,36 @@ public class GeneralAuthService {
                 .password(passwordEncoder.encode(requestDto.getPassword()))
                 .loginType(LoginType.INAPP)
                 .role(Role.MEMBER)
+                .isAuth(AuthType.NOTYET)
                 .build();
-
         userRepository.save(user);
     }
 
-    // 이메일 중복 검사
     public boolean isDuplicatedEmail(String email) {
         if(userRepository.existsByEmail(email))
             throw new DuplicateKeyException(email);
         return true;
     }
 
-    // 이메일 인증 코드 전송
     @Async
     public void sendEmailAuthCode(String email) {
-
         String authCode = mailService.generateCode();
-        System.out.println(authCode);
-
         String body = "";
         body += "<h3>" + "안녕하세요, Younet 이메일 인증 코드입니다." + "</h3>";
         body += "<h3>" + "아래 인증코드를 입력하시면, 가입이 정상 완료됩니다." + "</h3>";
         body += "<h1>" + authCode + "</h1>";
         body += "<h3>" + "인증 코드는 10분간 유효합니다." + "</h3>";
-
         try {
             mailService.sendEmail(email, "[Younet] 이메일 주소를 인증해주세요.", body);
         }
         catch (MessagingException e) {
             e.printStackTrace();
         }
-
         redisService.setValueWithTTL(email, authCode, 30L, TimeUnit.MINUTES);
     }
 
-    // 회원가입 - 이메일 인증 코드 검사
-    // 이메일, 이메일 인증 코드로 검사
     public boolean signupVerifyEmail(SignupEmailVerificationDto emailVerificationDto) {
         String authCode = (String) redisService.getValue(emailVerificationDto.getUserEmail());
-
         if(!emailVerificationDto.getCode().equals(authCode)){
             throw new CustomException(ErrorCode.USER_INVALID_EMAIL_AUTH_CODE);
         }
@@ -177,22 +153,17 @@ public class GeneralAuthService {
         }
     }
 
-    // 일반 로그아웃
-    public void userLogout(PrincipalDetails principalDetails, String token){
+    public void postUserLogout(PrincipalDetails principalDetails, String token){
 
         User user = principalDetails.getUser();
         user.updateRefreshToken(null);
         userRepository.save(user);
-
-        // accessToken 유효시간을 BlackList로 저장
         Long expiration = tokenProvider.getExpiration(token);
         redisTemplate.opsForValue().set(token, "logout", expiration, TimeUnit.MILLISECONDS);
 
     }
 
-    // 일반 회원탈퇴
-    public void withdrawUser(PrincipalDetails principalDetails, String token) {
-
+    public void deleteUserWithdrawl(PrincipalDetails principalDetails) {
         User user = principalDetails.getUser();
         userRepository.delete(user);
     }
