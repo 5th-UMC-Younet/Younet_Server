@@ -102,9 +102,9 @@ public class UserAuthController {
     }
 
     // 일반 회원탈퇴
-    @DeleteMapping("/user/withdrawl")
+    @PatchMapping("/user/withdrawl")
     public ApplicationResponse<String> userWithdrawl(HttpServletRequest request, @AuthenticationPrincipal PrincipalDetails principalDetails) {
-        generalAuthService.deleteUserWithdrawl(principalDetails);
+        generalAuthService.patchUserWithdrawl(principalDetails);
         return ApplicationResponse.ok(ErrorCode.SUCCESS_OK, "회원 탈퇴가 완료되었습니다.");
     }
 

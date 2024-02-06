@@ -1,6 +1,5 @@
 package com.example.younet.login.service;
 
-import com.example.younet.domain.CommunityProfile;
 import com.example.younet.domain.User;
 import com.example.younet.domain.enums.AuthType;
 import com.example.younet.domain.enums.LoginType;
@@ -22,6 +21,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -163,8 +164,10 @@ public class GeneralAuthService {
 
     }
 
-    public void deleteUserWithdrawl(PrincipalDetails principalDetails) {
+    public void patchUserWithdrawl(PrincipalDetails principalDetails) {
         User user = principalDetails.getUser();
-        userRepository.delete(user);
+        user.setDel(true);
+        user.setInactiveDate(LocalDate.from(LocalDateTime.now()));
+        userRepository.save(user);
     }
 }
