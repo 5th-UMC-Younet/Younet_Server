@@ -30,7 +30,7 @@ public class MyPageService {
     private final CommunityProfileRepository communityProfileRepository;
     private final ScrapRepository scrapRepository;
 
-    public MyPageDto.MyProfileDTO myPageInfo(PrincipalDetails principalDetails) {
+    public MyPageDto.MyProfileDTO getMyPageInfo(PrincipalDetails principalDetails) {
         User user = principalDetails.getUser();
         Long userId = user.getId();
 
@@ -70,11 +70,27 @@ public class MyPageService {
         return MyPageDto.MyProfileDTO.builder()
                 .userId(communityProfile.getUser().getId())
                 .profilePicture(communityProfile.getProfilePicture())
-                .name(communityProfile.getUser().getName())
+                .name(communityProfile.getName())
                 .likeCntr(communityProfile.getCountry().getName())
                 .profileText(communityProfile.getUser().getProfileText())
                 .posts(postDTOs)
                 .scraps(scrapDTOs)
+                .build();
+    }
+
+    public MyPageDto.MyProfileInfoDTO getMyPageInfoEdit(PrincipalDetails principalDetails) {
+        User user = principalDetails.getUser();
+        Long userId = user.getId();
+
+        CommunityProfile communityProfile = communityProfileRepository.findById(userId).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_INVALID_FIND_ID));
+        Long communityProfileId = communityProfile.getUser().getId();
+        return MyPageDto.MyProfileInfoDTO.builder()
+                .profilePicture(communityProfile.getProfilePicture())
+                .name(user.getName())
+                .nickname(user.getNickname())
+                .likeCntr(communityProfile.getCountry().getName())
+                .profileText(user.getProfileText())
                 .build();
     }
 
