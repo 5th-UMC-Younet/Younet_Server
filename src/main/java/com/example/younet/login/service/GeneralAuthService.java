@@ -16,13 +16,9 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.MessagingException;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -57,16 +53,13 @@ public class GeneralAuthService {
         return user.getUserLoginId();
     }
 
-    // 아이디 검증 후 존재하는 아이디인 경우
-    // 해당 메일로 인증 번호 발송
     @Async
     public void sendEmailAuthCodeForFindPassword(String userLoginId) {
 
         User user = userRepository.findByUserLoginId(userLoginId).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_INVALID_FIND_ID));
-
         String email = user.getEmail();
-
+        String loginId = user.getUserLoginId();
         String authCode = mailService.generateCode();
 
         String body = "";
@@ -81,20 +74,17 @@ public class GeneralAuthService {
         catch (MessagingException e) {
             e.printStackTrace();
         }
-
-        redisService.setValueWithTTL(email, authCode, 30L, TimeUnit.MINUTES);
+        redisService.setValueWithTTL(loginId, authCode, 30L, TimeUnit.MINUTES);
     }
 
-    // 비밀번호 찾기 - 이메일 인증 코드 검사
-    // 아이디, 인증 코드로 검사
-    public boolean findPasswordVerifyEmail(PasswordEmailVerficationDto passwordEmailVerficationDto) {
-        String authCode = (String) redisService.getValue(passwordEmailVerficationDto.getUserLoginId());
+    public boolean postPasswordVerifyEmail(FindPasswordEmailVerficationRequestDto findPasswordEmailVerficationRequestDto) {
+        String authCode = (String) redisService.getValue(findPasswordEmailVerficationRequestDto.getLoginId());
 
-        if(!passwordEmailVerficationDto.getCode().equals(authCode)){
+        if(!findPasswordEmailVerficationRequestDto.getCode().equals(authCode)){
             throw new CustomException(ErrorCode.USER_INVALID_EMAIL_AUTH_CODE);
         }
         else {
-            redisService.setValueWithTTL(passwordEmailVerficationDto.getUserLoginId(), "verified", 10, TimeUnit.MINUTES);
+            redisService.setValueWithTTL(findPasswordEmailVerficationRequestDto.getLoginId(), "verified", 10, TimeUnit.MINUTES);
             return true;
         }
     }

@@ -44,15 +44,15 @@ public class UserAuthController {
 
     // 비밀번호 찾기 - 이메일 인증번호 전송
     @PostMapping("/user/findPassword/email")
-    public ResponseEntity<String> getEmailAuthCodeForFindPassword(@RequestParam(name = "userLoginId") String userLoginId) {
+    public ResponseEntity<String> getEmailAuthCodeForFindPassword(@RequestParam(name = "loginId") String userLoginId) {
         generalAuthService.sendEmailAuthCodeForFindPassword(userLoginId);
         return ResponseEntity.ok("가입 시 입력하신 이메일로 인증 번호가 발송되었습니다.");
     }
 
     // 비밀번호 찾기 - 이메일 인증 성공 여부 확인
     @PostMapping("/user/findPassword/email/verification")
-    public ResponseEntity<String> passwordVerifttEmail(@RequestBody PasswordEmailVerficationDto passwordEmailVerficationDto) {
-        boolean verificationResult = generalAuthService.findPasswordVerifyEmail(passwordEmailVerficationDto);
+    public ResponseEntity<String> passwordVerifyEmail(@RequestBody FindPasswordEmailVerficationRequestDto findPasswordEmailVerficationRequestDto) {
+        boolean verificationResult = generalAuthService.postPasswordVerifyEmail(findPasswordEmailVerficationRequestDto);
         if (verificationResult) {
             return ResponseEntity.ok("인증에 성공하였습니다.");
         } else {
