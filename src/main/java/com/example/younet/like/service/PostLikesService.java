@@ -45,7 +45,7 @@ public class PostLikesService {
                     .isConfirmed(false)
                     .postId(targetPost.getId())
                     .receiver(targetPost.getCommunityProfile())
-                    .actorId(targetCommuProfile.getId())
+                    .actorName(targetCommuProfile.getName())
                     .build();
             commonAlarmRepository.save(commonAlarm);
             return savedLike;

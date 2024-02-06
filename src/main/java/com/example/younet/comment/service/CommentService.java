@@ -63,7 +63,7 @@ public class CommentService {
                 .isConfirmed(false)
                 .postId(post.getId())
                 .receiver(post.getCommunityProfile())
-                .actorId(communityProfile.getId())
+                .actorName(communityProfile.getName())
                 .build();
         commonAlarmRepository.save(commentAlarm);
 

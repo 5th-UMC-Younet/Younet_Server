@@ -46,8 +46,14 @@ public class PostResponseDTO {
     @AllArgsConstructor
     public static class SelectedPostResultDTO{
         long postId;
+        String authorName;
         String postTitle;
         Long likesCount;
         List<SectionDTO.SectionResultDTO> sections;
+        // 작성자 이름
+        // 날짜
+        // commentsCount
+        LocalDateTime createdAt;
+        Long commentsCount;
     }
 }

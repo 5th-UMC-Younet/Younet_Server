@@ -37,7 +37,7 @@ public class CommonAlarmRepositoryCustomImpl implements CommonAlarmRepositoryCus
                         .select(Projections.fields(AlarmResponseDTO.commonAlarmListResultDTO.class,
                                 commonAlarm.id.as("alarmId"),
                                 commonAlarm.alarmType.as("alarmType"),
-                                commonAlarm.actorId.as("actorId"),
+                                commonAlarm.actorName.as("actorName"),
                                 commonAlarm.postId.as("postId"),
                                 commonAlarm.createdAt.as("createdAt")
                         ))

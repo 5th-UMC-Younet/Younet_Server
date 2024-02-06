@@ -26,8 +26,11 @@ public class CommonAlarm extends BaseEntity {
     @Column
     private Long postId;
 
+//    @Column
+//    private Long actorId;
+
     @Column
-    private Long actorId;
+    private String actorName;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="receiver_id")
