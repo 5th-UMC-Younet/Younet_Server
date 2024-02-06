@@ -84,7 +84,7 @@ public class ReplyService {
                 .isConfirmed(false)
                 .postId(comment.getId())
                 .receiver(comment.getCommunityProfile())
-                .actorId(communityProfile.getId())
+                .actorName(communityProfile.getName())
                 .build();
         commonAlarmRepository.save(replyAlarm);
 

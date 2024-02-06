@@ -1,6 +1,7 @@
 package com.example.younet.post.service;
 
 import com.example.younet.aws.AmazonS3Manager;
+import com.example.younet.comment.repository.CommentRepository;
 import com.example.younet.domain.*;
 import com.example.younet.post.converter.ImageConverter;
 import com.example.younet.post.converter.PostConverter;
@@ -32,6 +33,7 @@ public class PostCommandService {
     private final CommunityProfileRepository communityProfileRepository;
     private final CountryRepository countryRepository;
     private final CategoryRepository categoryRepository;
+    private final CommentRepository commentRepository;
 
     public Slice<PostResponseDTO.postListResultDTO> getPostListByDates
             (Long lastPostId, Long categoryId, Long countryId){
@@ -129,7 +131,9 @@ public class PostCommandService {
 
     public PostResponseDTO.SelectedPostResultDTO getAllOfPostContentById(Long postId){
         Post post = postRepository.findById(postId).orElseThrow(() -> new RuntimeException("Post not found"));
+        String authorName=post.getCommunityProfile().getName();
+        long commentsCount=commentRepository.countCommentsByPostId(post.getId());
         post.getSections().forEach(Section::getImages);
-        return PostConverter.of(post);
+        return PostConverter.of(post,authorName,commentsCount);
     }
 }

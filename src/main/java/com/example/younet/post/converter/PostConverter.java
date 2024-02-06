@@ -28,7 +28,7 @@ public class PostConverter {
                 .build();
     }
 
-    public static PostResponseDTO.SelectedPostResultDTO of(Post post){
+    public static PostResponseDTO.SelectedPostResultDTO of(Post post, String authorName,long commentsCount){
         List<SectionDTO.SectionResultDTO> sectionResultDTOs=post.getSections().stream()
                 .map(section -> {
                     List<ImageResponseDTO.ImageResultDTO> imageResultDTOs= section.getImages().stream()
@@ -38,9 +38,12 @@ public class PostConverter {
                 }).collect(Collectors.toList());
         return PostResponseDTO.SelectedPostResultDTO.builder()
                 .postId(post.getId())
+                .authorName(authorName)
                 .postTitle(post.getTitle())
                 .likesCount(post.getLikesCount())
                 .sections(sectionResultDTOs)
+                .commentsCount(commentsCount)
+                .createdAt(post.getCreatedAt())
                 .build();
     }
 }
