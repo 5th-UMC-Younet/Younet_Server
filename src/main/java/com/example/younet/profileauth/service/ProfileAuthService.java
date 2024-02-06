@@ -2,12 +2,16 @@ package com.example.younet.profileauth.service;
 
 import com.example.younet.aws.AmazonS3Manager;
 import com.example.younet.domain.Auth;
+import com.example.younet.domain.MainSchool;
 import com.example.younet.domain.User;
 import com.example.younet.domain.enums.AuthType;
+import com.example.younet.global.errorException.CustomException;
+import com.example.younet.global.errorException.ErrorCode;
 import com.example.younet.global.jwt.PrincipalDetails;
 import com.example.younet.profileauth.converter.ProfileAuthConverter;
 import com.example.younet.profileauth.dto.ProfileAuthRequestDto;
 import com.example.younet.repository.AuthRepository;
+import com.example.younet.repository.MainSchoolRepository;
 import com.example.younet.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +25,7 @@ public class ProfileAuthService {
 
     private final UserRepository userRepository;
     private final AuthRepository authRepository;
+    private final MainSchoolRepository mainSchoolRepository;
     private final AmazonS3Manager s3Manager;
 
     public int getIsProfileAuth(PrincipalDetails principalDetails) {
@@ -32,6 +37,15 @@ public class ProfileAuthService {
             return 1;
         } else {
             return 2;
+        }
+    }
+
+    public String getSearchMainSchool(String name) {
+        if (mainSchoolRepository.existsByName(name)){
+            MainSchool mainSchool = mainSchoolRepository.findByName(name);
+            return mainSchool.getName();
+        } else {
+            throw new CustomException(ErrorCode.USER_AUTH_INVALID_SCHOOL);
         }
     }
 

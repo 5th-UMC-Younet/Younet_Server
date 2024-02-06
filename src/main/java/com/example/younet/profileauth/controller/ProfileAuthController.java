@@ -26,6 +26,12 @@ public class ProfileAuthController {
         return ApplicationResponse.ok(ErrorCode.SUCCESS_OK, profileAuthService.getIsProfileAuth(principalDetails));
     }
 
+    // 본교 목록 검색
+    @GetMapping("/profile/auth/searchSchool")
+    public ApplicationResponse<String> searchMainSchool(@RequestParam String name) {
+        return ApplicationResponse.ok(ErrorCode.SUCCESS_OK, profileAuthService.getSearchMainSchool(name));
+    }
+
     // 본인 인증 요청
     @PostMapping("/profile/auth")
     public ApplicationResponse<String> profileAuth(@AuthenticationPrincipal PrincipalDetails principalDetails,
