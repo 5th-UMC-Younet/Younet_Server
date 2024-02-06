@@ -18,9 +18,8 @@ public class ProfileAuthController {
 
     // 본인 인증 여부 확인
     @GetMapping("/profile/auth")
-    public ResponseEntity<String> getIsProfileAuth(@AuthenticationPrincipal PrincipalDetails principalDetails) {
-        profileAuthService.isProfileAuth(principalDetails);
-        return ResponseEntity.ok("본인인증된 계정입니다.");
+    public ApplicationResponse<Integer> isProfileAuth(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        return ApplicationResponse.ok(ErrorCode.SUCCESS_OK, profileAuthService.getIsProfileAuth(principalDetails));
     }
 
     // 본인 인증 요청

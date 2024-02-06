@@ -22,16 +22,15 @@ public class ProfileAuthService {
     private final UserRepository userRepository;
     private final AuthRepository authRepository;
 
-    // 본인 인증 여부 확인
-    public void isProfileAuth(PrincipalDetails principalDetails) {
+    public int getIsProfileAuth(PrincipalDetails principalDetails) {
         User user = principalDetails.getUser();
         String isAuth = String.valueOf(user.getIsAuth());
         if(isAuth == "NOTYET"){
-            throw new CustomException(ErrorCode.USER_IS_AUTH_NOTYET);
+            return 0;
         } else if (isAuth == "PROGRESS"){
-            throw new CustomException(ErrorCode.USER_IS_AUTH_PROGRESS);
+            return 1;
         } else {
-            return;
+            return 2;
         }
     }
 
