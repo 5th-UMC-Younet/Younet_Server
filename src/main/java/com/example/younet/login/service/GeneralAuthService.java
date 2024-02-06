@@ -1,5 +1,6 @@
 package com.example.younet.login.service;
 
+import com.example.younet.domain.CommunityProfile;
 import com.example.younet.domain.User;
 import com.example.younet.domain.enums.AuthType;
 import com.example.younet.domain.enums.LoginType;
@@ -10,6 +11,7 @@ import com.example.younet.global.jwt.JwtTokenDto;
 import com.example.younet.global.jwt.JwtTokenProvider;
 import com.example.younet.global.jwt.PrincipalDetails;
 import com.example.younet.login.dto.*;
+import com.example.younet.post.repository.CommunityProfileRepository;
 import com.example.younet.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +31,7 @@ public class GeneralAuthService {
 
     private final RedisService redisService;
     private final UserRepository userRepository;
+    private final CommunityProfileRepository communityProfileRepository;
     private final PasswordEncoder passwordEncoder;
     private final MailService mailService;
     private final JwtTokenProvider tokenProvider;
@@ -99,7 +102,7 @@ public class GeneralAuthService {
         return;
     }
 
-    public void signUp(UserSignupRequestDto requestDto) {
+    public void postGeneralSignUp(UserSignupRequestDto requestDto) {
         String state = (String) redisService.getValue(requestDto.getEmail());
         if(!"verified".equals(state)) throw new CustomException(ErrorCode.USER_EMAIL_AUTHENTICATION_STATUS_EXPIRED);
 
@@ -124,14 +127,12 @@ public class GeneralAuthService {
 
     @Async
     public void sendEmailAuthCode(String email) {
-
         String authCode = mailService.generateCode();
         String body = "";
         body += "<h3>" + "안녕하세요, Younet 이메일 인증 코드입니다." + "</h3>";
         body += "<h3>" + "아래 인증코드를 입력하시면, 가입이 정상 완료됩니다." + "</h3>";
         body += "<h1>" + authCode + "</h1>";
         body += "<h3>" + "인증 코드는 10분간 유효합니다." + "</h3>";
-
         try {
             mailService.sendEmail(email, "[Younet] 이메일 주소를 인증해주세요.", body);
         }
@@ -152,22 +153,17 @@ public class GeneralAuthService {
         }
     }
 
-    // 일반 로그아웃
-    public void userLogout(PrincipalDetails principalDetails, String token){
+    public void postUserLogout(PrincipalDetails principalDetails, String token){
 
         User user = principalDetails.getUser();
         user.updateRefreshToken(null);
         userRepository.save(user);
-
-        // accessToken 유효시간을 BlackList로 저장
         Long expiration = tokenProvider.getExpiration(token);
         redisTemplate.opsForValue().set(token, "logout", expiration, TimeUnit.MILLISECONDS);
 
     }
 
-    // 일반 회원탈퇴
-    public void withdrawUser(PrincipalDetails principalDetails, String token) {
-
+    public void deleteUserWithdrawl(PrincipalDetails principalDetails) {
         User user = principalDetails.getUser();
         userRepository.delete(user);
     }

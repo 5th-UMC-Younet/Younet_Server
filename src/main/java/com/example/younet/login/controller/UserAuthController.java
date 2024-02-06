@@ -88,7 +88,7 @@ public class UserAuthController {
     @PostMapping("/user/signup")
     public ApplicationResponse<String> generalSignUp(@RequestBody UserSignupRequestDto requestDto) {
         if(generalAuthService.isDuplicatedEmail(requestDto.getEmail())) {
-            generalAuthService.signUp(requestDto);
+            generalAuthService.postGeneralSignUp(requestDto);
         }
         return ApplicationResponse.ok(ErrorCode.SUCCESS_CREATED, "회원가입이 완료되었습니다.");
     }
@@ -96,36 +96,29 @@ public class UserAuthController {
     // 일반 로그아웃
     @PostMapping("/user/logout")
     public ApplicationResponse<String> userLogout(HttpServletRequest request, @AuthenticationPrincipal PrincipalDetails principalDetails) {
-
         String token = jwtTokenProvider.resolveAccessToken(request);
-        generalAuthService.userLogout(principalDetails, token);
+        generalAuthService.postUserLogout(principalDetails, token);
         return ApplicationResponse.ok(ErrorCode.SUCCESS_OK, "일반 로그아웃 되었습니다.");
     }
 
     // 일반 회원탈퇴
-    @PostMapping("user/withdrawl")
-    public ApplicationResponse<String> userWithdraw(HttpServletRequest request, @AuthenticationPrincipal PrincipalDetails principalDetails) {
-
-        String token = jwtTokenProvider.resolveAccessToken(request);
-        generalAuthService.withdrawUser(principalDetails, token);
+    @DeleteMapping("/user/withdrawl")
+    public ApplicationResponse<String> userWithdrawl(HttpServletRequest request, @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        generalAuthService.deleteUserWithdrawl(principalDetails);
         return ApplicationResponse.ok(ErrorCode.SUCCESS_OK, "회원 탈퇴가 완료되었습니다.");
     }
 
-    // 카카오 로그인 - OauthToken 발급 후 회원 정보 DB저장/JWT생성
+    // 카카오 로그인
     @GetMapping("/oauth2/kakao")
     public ApplicationResponse<JwtTokenDto> Login(@RequestParam("code") String code) {
-
         OauthToken oauthToken = kakaoAuthService.getKakaoAccessToken(code);
         JwtTokenDto jwtTokenDto = kakaoAuthService.saveUserAndGetToken(oauthToken);
-
         return ApplicationResponse.ok(ErrorCode.SUCCESS_CREATED, jwtTokenDto);
     }
 
-    // 카카오 로그아웃 (JwtToken, OauthToken 만료하기)
+    // 카카오 로그아웃
     @PostMapping("/kakao/logout")
-    public ApplicationResponse<String> serviceLogout(@AuthenticationPrincipal PrincipalDetails principalDetails,
-                                                     @RequestBody JwtTokenDto jwtTokenDto) throws JsonProcessingException {
-        // JwtToken 만료 & OauthToken 만료
+    public ApplicationResponse<String> serviceLogout(@AuthenticationPrincipal PrincipalDetails principalDetails, @RequestBody JwtTokenDto jwtTokenDto) throws JsonProcessingException {
         authService.deprecateTokens(jwtTokenDto);
         kakaoAuthService.kakaoLogout(principalDetails);
         return ApplicationResponse.ok(ErrorCode.SUCCESS_OK, "카카오 로그아웃 되었습니다.");
@@ -135,11 +128,10 @@ public class UserAuthController {
     @PostMapping("/auth/reissue")
     public ApplicationResponse<JwtTokenDto> reissue(@RequestBody ReissueRequestDto reissueRequestDto) {
         JwtTokenDto jwtTokenDto = authService.reissue(reissueRequestDto.getRefreshToken());
-
         return ApplicationResponse.ok(ErrorCode.SUCCESS_OK, jwtTokenDto);
     }
 
-    // JWT 토큰 디코딩 -> json 형식으로 반환
+    // JWT 토큰 디코딩 (json 형식 변환)
     @PostMapping("/decodeToken")
     public String decodeToken(HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
