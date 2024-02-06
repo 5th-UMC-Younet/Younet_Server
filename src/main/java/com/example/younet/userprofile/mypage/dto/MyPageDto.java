@@ -41,6 +41,17 @@ public class MyPageDto {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
+    public static class MyProfileEditDTO {
+        String name;
+        String nickname;
+        String likeCntr;
+        String profileText;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class MyProfilePostDTO{
         String imageSampleUrl;
         String title;

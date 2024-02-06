@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,10 +31,12 @@ public class MyPageController {
         return ApplicationResponse.ok(ErrorCode.SUCCESS_OK, myProfileInfoDTO);
     }
 
-    // 커뮤니티 -> 유저 프로필 수정
+    // 마이페이지 수정
     @PatchMapping("/mypage/edit")
-    public ResponseEntity<String> editMyPageInfo(@AuthenticationPrincipal PrincipalDetails principalDetails, @RequestBody MyPageDto.MyProfileInfoDTO myProfileInfoDTO) {
-        myPageService.myPageEdit(principalDetails, myProfileInfoDTO);
+    public ResponseEntity<String> editMyPageInfo(@AuthenticationPrincipal PrincipalDetails principalDetails,
+                                                 @RequestPart("editMypage") MyPageDto.MyProfileEditDTO myProfileEditDTO,
+                                                 @RequestPart("file")MultipartFile file) {
+        myPageService.patchEditMyPageInfo(principalDetails, myProfileEditDTO, file);
         return ResponseEntity.ok("프로필이 수정되었습니다.");
     }
 }
