@@ -1,6 +1,7 @@
 package com.example.younet.login.dto;
 
 import com.example.younet.domain.User;
+import com.example.younet.domain.enums.AuthType;
 import com.example.younet.domain.enums.LoginType;
 import com.example.younet.domain.enums.Role;
 import lombok.*;
@@ -17,6 +18,7 @@ public class UserSignupRequestDto {
     private String password;
     private LoginType loginType;
     private Role role;
+    private AuthType authType;
 
     @Builder
     public User toEntity() {
@@ -28,6 +30,7 @@ public class UserSignupRequestDto {
                 .password(password)
                 .role(Role.MEMBER)
                 .loginType(LoginType.INAPP)
+                .isAuth(AuthType.NOTYET)
                 .build();
     }
 }

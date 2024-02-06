@@ -64,18 +64,18 @@ public class UserAuthController {
 
     // 회원가입 - 이메일 인증 코드 전송
     @PostMapping("/user/signup/email")
-    public ResponseEntity<String> getEmailAuthCode(@RequestParam(name = "email") String email) {
+    public ResponseEntity<String> getEmailAuthCodeForSignUp(@RequestParam(name = "email") String email) {
         if (generalAuthService.isDuplicatedEmail(email)) {
             generalAuthService.sendEmailAuthCode(email);
-            return ResponseEntity.ok("인증 코드가 전송되었습니다.");
+            return ResponseEntity.ok("입력하신 이메일로 인증 번호가 발송되었습니다.");
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("중복된 이메일입니다.");
         }
     }
 
     // 회원가입 - 이메일 인증 성공 여부 확인
-    @PostMapping("/user/email/verification")
-    public ResponseEntity<String> verifyEmail(@RequestBody SignupEmailVerificationDto signupEmailVerificationDto) {
+    @PostMapping("/user/signup/email/verification")
+    public ResponseEntity<String> signUpVerifyEmail(@RequestBody SignupEmailVerificationDto signupEmailVerificationDto) {
         boolean verificationResult = generalAuthService.signupVerifyEmail(signupEmailVerificationDto);
         if (verificationResult) {
             return ResponseEntity.ok("인증에 성공하였습니다.");

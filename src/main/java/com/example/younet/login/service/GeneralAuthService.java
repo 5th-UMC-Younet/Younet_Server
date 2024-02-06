@@ -1,6 +1,7 @@
 package com.example.younet.login.service;
 
 import com.example.younet.domain.User;
+import com.example.younet.domain.enums.AuthType;
 import com.example.younet.domain.enums.LoginType;
 import com.example.younet.domain.enums.Role;
 import com.example.younet.global.errorException.CustomException;
@@ -98,7 +99,6 @@ public class GeneralAuthService {
         return;
     }
 
-    // 일반 자체 회원가입
     public void signUp(UserSignupRequestDto requestDto) {
         String state = (String) redisService.getValue(requestDto.getEmail());
         if(!"verified".equals(state)) throw new CustomException(ErrorCode.USER_EMAIL_AUTHENTICATION_STATUS_EXPIRED);
@@ -111,25 +111,21 @@ public class GeneralAuthService {
                 .password(passwordEncoder.encode(requestDto.getPassword()))
                 .loginType(LoginType.INAPP)
                 .role(Role.MEMBER)
+                .isAuth(AuthType.NOTYET)
                 .build();
-
         userRepository.save(user);
     }
 
-    // 이메일 중복 검사
     public boolean isDuplicatedEmail(String email) {
         if(userRepository.existsByEmail(email))
             throw new DuplicateKeyException(email);
         return true;
     }
 
-    // 이메일 인증 코드 전송
     @Async
     public void sendEmailAuthCode(String email) {
 
         String authCode = mailService.generateCode();
-        System.out.println(authCode);
-
         String body = "";
         body += "<h3>" + "안녕하세요, Younet 이메일 인증 코드입니다." + "</h3>";
         body += "<h3>" + "아래 인증코드를 입력하시면, 가입이 정상 완료됩니다." + "</h3>";
@@ -142,15 +138,11 @@ public class GeneralAuthService {
         catch (MessagingException e) {
             e.printStackTrace();
         }
-
         redisService.setValueWithTTL(email, authCode, 30L, TimeUnit.MINUTES);
     }
 
-    // 회원가입 - 이메일 인증 코드 검사
-    // 이메일, 이메일 인증 코드로 검사
     public boolean signupVerifyEmail(SignupEmailVerificationDto emailVerificationDto) {
         String authCode = (String) redisService.getValue(emailVerificationDto.getUserEmail());
-
         if(!emailVerificationDto.getCode().equals(authCode)){
             throw new CustomException(ErrorCode.USER_INVALID_EMAIL_AUTH_CODE);
         }
