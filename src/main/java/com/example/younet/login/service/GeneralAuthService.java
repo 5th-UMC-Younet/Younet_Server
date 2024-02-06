@@ -77,7 +77,7 @@ public class GeneralAuthService {
         redisService.setValueWithTTL(loginId, authCode, 30L, TimeUnit.MINUTES);
     }
 
-    public boolean postPasswordVerifyEmail(FindPasswordEmailVerficationRequestDto findPasswordEmailVerficationRequestDto) {
+    public FindPasswordEmailVerificationResponseDto postPasswordVerifyEmail(FindPasswordEmailVerficationRequestDto findPasswordEmailVerficationRequestDto) {
         String authCode = (String) redisService.getValue(findPasswordEmailVerficationRequestDto.getLoginId());
 
         if(!findPasswordEmailVerficationRequestDto.getCode().equals(authCode)){
@@ -85,16 +85,17 @@ public class GeneralAuthService {
         }
         else {
             redisService.setValueWithTTL(findPasswordEmailVerficationRequestDto.getLoginId(), "verified", 10, TimeUnit.MINUTES);
-            return true;
+            FindPasswordEmailVerificationResponseDto findPasswordEmailVerificationResponseDto = new FindPasswordEmailVerificationResponseDto();
+            findPasswordEmailVerificationResponseDto.setLoginId(findPasswordEmailVerficationRequestDto.getLoginId());
+            return findPasswordEmailVerificationResponseDto;
         }
     }
 
-    // 비밀번호 찾기 -> 비밀번호 재설정
-    public Long updatePassword(String email, String password) {
-        User user = userRepository.findByEmail(email).orElseThrow(
-                () -> new CustomException(ErrorCode.USER_INVALID_FIND_EMAIL));
-        user.updatePassword(passwordEncoder.encode(password));
-        return user.getId();
+    public void postResetPassword(NewPasswordRequestDto newPasswordRequestDto) {
+        User user = userRepository.findByUserLoginId(newPasswordRequestDto.getLoginId()).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_INVALID_FIND_ID));
+        user.updatePassword(passwordEncoder.encode(newPasswordRequestDto.getNewPassword()));
+        return;
     }
 
     // 일반 자체 회원가입

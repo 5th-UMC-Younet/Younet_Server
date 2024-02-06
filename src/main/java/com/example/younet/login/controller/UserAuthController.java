@@ -51,19 +51,14 @@ public class UserAuthController {
 
     // 비밀번호 찾기 - 이메일 인증 성공 여부 확인
     @PostMapping("/user/findPassword/email/verification")
-    public ResponseEntity<String> passwordVerifyEmail(@RequestBody FindPasswordEmailVerficationRequestDto findPasswordEmailVerficationRequestDto) {
-        boolean verificationResult = generalAuthService.postPasswordVerifyEmail(findPasswordEmailVerficationRequestDto);
-        if (verificationResult) {
-            return ResponseEntity.ok("인증에 성공하였습니다.");
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("인증에 실패하였습니다.");
-        }
+    public ApplicationResponse<FindPasswordEmailVerificationResponseDto> passwordVerifyEmail(@RequestBody FindPasswordEmailVerficationRequestDto findPasswordEmailVerficationRequestDto) {
+        return ApplicationResponse.ok(ErrorCode.SUCCESS_OK, generalAuthService.postPasswordVerifyEmail(findPasswordEmailVerficationRequestDto));
     }
 
-    // 비밀번호 재설정 - 비밀번호만 입력받음
+    // 비밀번호 재설정
     @PostMapping("/user/resetPassword")
-    public ResponseEntity<String> resetPassword(@RequestBody UserSignupRequestDto requestDto) {
-        generalAuthService.updatePassword(requestDto.getEmail(), requestDto.getPassword());
+    public ResponseEntity<String> resetPassword(@RequestBody NewPasswordRequestDto newPasswordRequestDto) {
+        generalAuthService.postResetPassword(newPasswordRequestDto);
         return ResponseEntity.ok("비밀번호가 재설정되었습니다.");
     }
 
