@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3 
       - name: ssh to ec2
-        uses: appleboy/ssh-action@master y
+        uses: appleboy/ssh-action@master
         with:
           key: ${{ secrets.SSH_PRIVATE_KEY }}   
           host: ${{ secrets.HOST }}   
