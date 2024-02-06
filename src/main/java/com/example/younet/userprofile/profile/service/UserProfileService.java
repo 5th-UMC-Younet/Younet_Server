@@ -25,7 +25,7 @@ public class UserProfileService {
     private final CommentRepository commentRepository;
     private final CommunityProfileRepository communityProfileRepository;
 
-    public UserProfileDto.UserResultDTO findUserInfo(Long userId) {
+    public UserProfileDto.UserResultDTO getUserProfileInfo(Long userId) {
         CommunityProfile communityProfile = communityProfileRepository.findById(userId).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_INVALID_FIND_ID));
 
