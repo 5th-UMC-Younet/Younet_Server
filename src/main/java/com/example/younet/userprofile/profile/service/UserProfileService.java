@@ -28,8 +28,9 @@ public class UserProfileService {
     public UserProfileDto.UserResultDTO getUserProfileInfo(Long userId) {
         CommunityProfile communityProfile = communityProfileRepository.findById(userId).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_INVALID_FIND_ID));
+        Long communityProfileId = communityProfile.getUser().getId();
 
-        List<Post> posts = postRepository.findByUserIdOrderByCreatedAtDesc(userId);
+        List<Post> posts = postRepository.findAllByCommunityProfile_Id(communityProfileId);
 
         List<UserProfileDto.userProfilePostDTO> postDTOs = posts.stream()
                 .map(post -> new UserProfileDto.userProfilePostDTO(

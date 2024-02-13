@@ -40,7 +40,7 @@ public class MyPageService {
                 () -> new CustomException(ErrorCode.USER_INVALID_FIND_ID));
         Long communityProfileId = communityProfile.getUser().getId();
 
-        List<Post> myPosts = postRepository.findByUserIdOrderByCreatedAtDesc(userId);
+        List<Post> myPosts = postRepository.findAllByCommunityProfile_Id(communityProfileId);
         List<Scrap> scrapLists = scrapRepository.findAllByCommunityProfile_Id(communityProfileId);
         List<Long> postIds = scrapLists.stream()
                 .map(scrap -> scrap.getPost().getId())
