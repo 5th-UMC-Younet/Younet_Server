@@ -8,6 +8,7 @@ import com.example.younet.global.errorException.ErrorCode;
 import com.example.younet.global.jwt.PrincipalDetails;
 import com.example.younet.post.repository.CommunityProfileRepository;
 import com.example.younet.post.repository.CountryRepository;
+import com.example.younet.post.repository.ImageRepository;
 import com.example.younet.post.repository.PostRepository;
 import com.example.younet.scrap.repository.ScrapRepository;
 import com.example.younet.userprofile.mypage.dto.MyPageDto;
@@ -30,6 +31,7 @@ public class MyPageService {
     private final CommunityProfileRepository communityProfileRepository;
     private final ScrapRepository scrapRepository;
     private final CountryRepository countryRepository;
+    private final ImageRepository imageRepository;
     private final AmazonS3Manager s3Manager;
 
     public MyPageDto.MyProfileDTO getMyPageInfo(PrincipalDetails principalDetails) {
@@ -48,25 +50,33 @@ public class MyPageService {
         List<Post> scrapPosts = postRepository.findByIdInOrderByCreatedAtDesc(postIds);
 
         List<MyPageDto.MyProfilePostDTO> postDTOs = myPosts.stream()
-                .map(post -> new MyPageDto.MyProfilePostDTO(
-                        post.getRepresentativeImage(),
-                        post.getTitle(),
-                        post.getIntroduction(),
-                        post.getCreatedAt(),
-                        post.getLikesCount(),
-                        commentRepository.countCommentsByPostId(post.getId())
-                ))
+                .map(post -> {
+                    Image representativeImage = imageRepository.findByName(post.getRepresentativeImage());
+                    String imageUrl = representativeImage.getImageUrl();
+                    return new MyPageDto.MyProfilePostDTO(
+                            imageUrl,
+                            post.getTitle(),
+                            post.getIntroduction(),
+                            post.getCreatedAt(),
+                            post.getLikesCount(),
+                            commentRepository.countCommentsByPostId(post.getId())
+                    );
+                })
                 .collect(Collectors.toList());
 
         List<MyPageDto.MyProfilePostDTO> scrapDTOs = scrapPosts.stream()
-                .map(post -> new MyPageDto.MyProfilePostDTO(
-                        post.getRepresentativeImage(),
-                        post.getTitle(),
-                        post.getIntroduction(),
-                        post.getCreatedAt(),
-                        post.getLikesCount(),
-                        commentRepository.countCommentsByPostId(post.getId())
-                ))
+                .map(post -> {
+                    Image representativeImage = imageRepository.findByName(post.getRepresentativeImage());
+                    String imageUrl = representativeImage.getImageUrl();
+                    return new MyPageDto.MyProfilePostDTO(
+                            imageUrl,
+                            post.getTitle(),
+                            post.getIntroduction(),
+                            post.getCreatedAt(),
+                            post.getLikesCount(),
+                            commentRepository.countCommentsByPostId(post.getId())
+                    );
+                })
                 .collect(Collectors.toList());
 
         return MyPageDto.MyProfileDTO.builder()

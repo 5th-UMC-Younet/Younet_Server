@@ -2,10 +2,12 @@ package com.example.younet.userprofile.profile.service;
 
 import com.example.younet.comment.repository.CommentRepository;
 import com.example.younet.domain.CommunityProfile;
+import com.example.younet.domain.Image;
 import com.example.younet.domain.Post;
 import com.example.younet.global.errorException.CustomException;
 import com.example.younet.global.errorException.ErrorCode;
 import com.example.younet.post.repository.CommunityProfileRepository;
+import com.example.younet.post.repository.ImageRepository;
 import com.example.younet.post.repository.PostRepository;
 import com.example.younet.userprofile.profile.dto.UserProfileDto;
 import jakarta.transaction.Transactional;
@@ -24,6 +26,7 @@ public class UserProfileService {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
     private final CommunityProfileRepository communityProfileRepository;
+    private final ImageRepository imageRepository;
 
     public UserProfileDto.UserResultDTO getUserProfileInfo(Long userId) {
         CommunityProfile communityProfile = communityProfileRepository.findById(userId).orElseThrow(
@@ -33,14 +36,18 @@ public class UserProfileService {
         List<Post> posts = postRepository.findAllByCommunityProfile_Id(communityProfileId);
 
         List<UserProfileDto.userProfilePostDTO> postDTOs = posts.stream()
-                .map(post -> new UserProfileDto.userProfilePostDTO(
-                        post.getRepresentativeImage(),
-                        post.getTitle(),
-                        post.getIntroduction(),
-                        post.getCreatedAt(),
-                        post.getLikesCount(),
-                        commentRepository.countCommentsByPostId(post.getId())
-                ))
+                .map(post -> {
+                    Image representativeImage = imageRepository.findByName(post.getRepresentativeImage());
+                    String imageUrl = representativeImage.getImageUrl();
+                    return new UserProfileDto.userProfilePostDTO(
+                            imageUrl,
+                            post.getTitle(),
+                            post.getIntroduction(),
+                            post.getCreatedAt(),
+                            post.getLikesCount(),
+                            commentRepository.countCommentsByPostId(post.getId())
+                    );
+                })
                 .collect(Collectors.toList());
 
         return UserProfileDto.UserResultDTO.builder()
