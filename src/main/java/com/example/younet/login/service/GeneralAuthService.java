@@ -52,8 +52,8 @@ public class GeneralAuthService {
         return jwtTokenDto;
     }
 
-    public String getFindId(FindIdRequestDto findIdRequestDto) {
-        User user = userRepository.findByNameAndEmail(findIdRequestDto.getName(), findIdRequestDto.getEmail()).orElseThrow(
+    public String getFindId(String name, String email) {
+        User user = userRepository.findByNameAndEmail(name, email).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_INVALID_FIND_ID));
         return user.getUserLoginId();
     }
