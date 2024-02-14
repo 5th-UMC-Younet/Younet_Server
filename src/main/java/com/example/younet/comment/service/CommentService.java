@@ -49,7 +49,7 @@ public class CommentService {
 
         CommunityProfile communityProfile = communityProfileRepository.findById(requestDto.getCommunityProfileId())
                 .orElseThrow(() -> new IllegalArgumentException("커뮤니티 프로필을 찾을 수 없습니다."));
-        Post post = postRepository.findById(requestDto.getCommunityProfileId())
+        Post post = postRepository.findById(requestDto.getPostId())
                 .orElseThrow(() -> new IllegalArgumentException("댓글을 달 게시글 ID를 찾을 수 없습니다."));
 
         Comment newComment = Comment.builder()
