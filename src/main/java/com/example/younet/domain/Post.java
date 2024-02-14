@@ -44,6 +44,9 @@ public class Post extends BaseEntity {
     private CommunityProfile communityProfile;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     private Country country;
 
     @ManyToOne(fetch = FetchType.LAZY)
