@@ -53,6 +53,8 @@ public class MyPageDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class MyProfilePostDTO{
+        Long postId;
+        Long categoryId;
         String imageSampleUrl;
         String title;
         String bodySample;

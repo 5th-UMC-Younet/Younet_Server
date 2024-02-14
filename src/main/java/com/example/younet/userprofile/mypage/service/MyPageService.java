@@ -54,6 +54,8 @@ public class MyPageService {
                     Image representativeImage = imageRepository.findByName(post.getRepresentativeImage());
                     String imageUrl = representativeImage.getImageUrl();
                     return new MyPageDto.MyProfilePostDTO(
+                            post.getId(),
+                            post.getCategory().getId(),
                             imageUrl,
                             post.getTitle(),
                             post.getIntroduction(),
@@ -69,6 +71,8 @@ public class MyPageService {
                     Image representativeImage = imageRepository.findByName(post.getRepresentativeImage());
                     String imageUrl = representativeImage.getImageUrl();
                     return new MyPageDto.MyProfilePostDTO(
+                            post.getId(),
+                            post.getCategory().getId(),
                             imageUrl,
                             post.getTitle(),
                             post.getIntroduction(),

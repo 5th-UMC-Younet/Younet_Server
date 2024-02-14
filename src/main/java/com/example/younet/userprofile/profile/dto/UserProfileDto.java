@@ -25,6 +25,8 @@ public class UserProfileDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class userProfilePostDTO{
+        Long postId;
+        Long categoryId;
         String imageSampleUrl;
         String title;
         String bodySample;

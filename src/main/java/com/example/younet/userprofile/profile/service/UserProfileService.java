@@ -40,6 +40,8 @@ public class UserProfileService {
                     Image representativeImage = imageRepository.findByName(post.getRepresentativeImage());
                     String imageUrl = representativeImage.getImageUrl();
                     return new UserProfileDto.userProfilePostDTO(
+                            post.getId(),
+                            post.getCategory().getId(),
                             imageUrl,
                             post.getTitle(),
                             post.getIntroduction(),
