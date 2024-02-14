@@ -17,6 +17,7 @@ public class AlarmResponseDTO {
         Long alarmId;
         AlarmType alarmType;
         Long postId;
+        String postTitle;
         String actorName;
         LocalDateTime createdAt;
     }
