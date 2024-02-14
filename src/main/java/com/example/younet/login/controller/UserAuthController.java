@@ -37,8 +37,8 @@ public class UserAuthController {
 
     // 아이디 찾기
     @GetMapping("/user/findId")
-    public ApplicationResponse<String> findId(@RequestBody FindIdRequestDto findIdRequestDto) {
-        String findUserId = generalAuthService.getFindId(findIdRequestDto);
+    public ApplicationResponse<String> findId(@RequestParam(name = "name") String name, @RequestParam(name = "email") String email) {
+        String findUserId = generalAuthService.getFindId(name, email);
         return ApplicationResponse.ok(ErrorCode.SUCCESS_OK, findUserId);
     }
 
