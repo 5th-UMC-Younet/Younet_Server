@@ -25,7 +25,7 @@ public class ScrapController {
     }
 
     @GetMapping("post")
-    public ApiResponse<Slice<PostResponseDTO.postListResultDTO>> getScrappedPostsWithSlice(@RequestBody ScrapRequestDTO.GetScrappedPosts requestDto) {
+    public ApiResponse<Slice<PostResponseDTO.postListResultDTO>> getScrappedPostsWithSlice(@ModelAttribute ScrapRequestDTO.GetScrappedPosts requestDto) {
 
         Slice<PostResponseDTO.postListResultDTO> response = scrapService.getScrappedPostsWithSlice(requestDto)
             .map((element) -> PostResponseDTO.postListResultDTO.builder()
