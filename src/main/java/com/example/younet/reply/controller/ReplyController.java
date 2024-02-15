@@ -9,14 +9,7 @@ import com.example.younet.reply.dto.ReplyResponseDTO;
 import com.example.younet.reply.service.ReplyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
@@ -26,19 +19,19 @@ public class ReplyController {
     private final ReplyService replyService;
 
     @GetMapping("comment")
-    public Slice<ReplyResponseDTO.Reply> getRepliesByPostIdWithPaging(@RequestBody ReplyRequestDTO.GetByCommentIdWithPaging requestDto) {
+    public Slice<ReplyResponseDTO.Reply> getRepliesByPostIdWithPaging(@ModelAttribute ReplyRequestDTO.GetByCommentIdWithPaging requestDto) {
         return replyService.getReplySliceByCommentId(requestDto);
 
     }
 
     @GetMapping("post")
-    public Slice<ReplyResponseDTO.Reply> getRepliesByPostIdWithPaging(@RequestBody ReplyRequestDTO.GetByPostIdWithPaging requestDto) {
+    public Slice<ReplyResponseDTO.Reply> getRepliesByPostIdWithPaging(@ModelAttribute ReplyRequestDTO.GetByPostIdWithPaging requestDto) {
         return replyService.getReplySliceByPostId(requestDto);
 
     }
 
     @GetMapping("community-profile")
-    public Slice<ReplyResponseDTO.Reply> getRepliesByCommunityProfileIdWithPaging(@RequestBody ReplyRequestDTO.GetByCommunityProfileIdWithPaging requestDto) {
+    public Slice<ReplyResponseDTO.Reply> getRepliesByCommunityProfileIdWithPaging(@ModelAttribute ReplyRequestDTO.GetByCommunityProfileIdWithPaging requestDto) {
         return replyService.getReplySliceByCommunityProfileId(requestDto);
     }
 
