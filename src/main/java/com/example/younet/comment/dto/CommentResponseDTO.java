@@ -23,6 +23,7 @@ public class CommentResponseDTO {
             this.commentId = comment.getId();
             this.postId = comment.getPostId();
             this.communityProfileId = comment.getCommunityProfileId();
+            this.authorName = comment.getCommunityProfile().getName();
             this.body = comment.getBody();
             this.replyList = comment.getReplyList().stream()
                     .map(element -> new ReplyResponseDTO.Reply(element))
@@ -35,6 +36,7 @@ public class CommentResponseDTO {
         private final Long postId;
         private final Long communityProfileId;
         private final String body;
+        private final String authorName;
         private final List<ReplyResponseDTO.Reply> replyList;
         private final LocalDateTime createdAt;
         private final LocalDateTime updatedAt;
