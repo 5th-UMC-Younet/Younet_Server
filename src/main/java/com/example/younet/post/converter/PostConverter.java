@@ -38,6 +38,7 @@ public class PostConverter {
                 }).collect(Collectors.toList());
         return PostResponseDTO.SelectedPostResultDTO.builder()
                 .postId(post.getId())
+                .authorCommuProfId(post.getCommunityProfile().getId())
                 .authorName(authorName)
                 .postTitle(post.getTitle())
                 .likesCount(post.getLikesCount())
