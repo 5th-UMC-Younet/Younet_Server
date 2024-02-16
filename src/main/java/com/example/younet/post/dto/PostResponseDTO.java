@@ -46,6 +46,7 @@ public class PostResponseDTO {
     @AllArgsConstructor
     public static class SelectedPostResultDTO{
         long postId;
+        Long authorCommuProfId;
         String authorName;
         String postTitle;
         Long likesCount;
