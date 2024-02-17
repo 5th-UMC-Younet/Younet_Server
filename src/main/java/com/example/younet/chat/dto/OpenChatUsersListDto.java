@@ -16,6 +16,7 @@ public class OpenChatUsersListDto {
     Long loginUserId; //현재 로그인된 유저 id
     List<userListDTO> userListDTOList; //유저 목록
     boolean isNoti; //(현재 로그인된 유저의) 채팅방 알림 설정 여부
+    String profile; //채팅방 익명/실명 여부
 
     @Builder
     @Getter

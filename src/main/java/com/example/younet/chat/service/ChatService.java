@@ -304,6 +304,7 @@ public class ChatService {
                 .build();
         joinOpenChatRepository.save(joinOpenChat);
         return new ResponseEntity<>(HttpStatus.OK);
+        //TODO: 이미 참여중인 경우 bad_request 반환하게끔!
     }
 
     //오픈채팅방 신규 생성
@@ -346,7 +347,9 @@ public class ChatService {
                         .userId(joinOpenChats.get(i).getUser().getId())
                         .thumbnail(joinOpenChats.get(i).getUser().getProfilePicture())
                         .name(joinOpenChats.get(i).getUser().getName())
-                        .build());}}
+                        .build());}
+
+        }
         else //닉네임 오픈채팅방(커뮤니티 프로필 활용)
         {
             for (int i=0; i<joinOpenChats.size(); i++) {
@@ -357,6 +360,7 @@ public class ChatService {
                         .name(communityProfile.getName())
                         .build());
             }
+
         }
 
         JoinOpenChat loginUserJoinOpenChat = joinOpenChatRepository.findByOpenChatroomIdAndUserId(chat_room_id, principalDetails.getUser().getId());
@@ -366,6 +370,7 @@ public class ChatService {
                 .loginUserId(principalDetails.getUser().getId())
                 .userListDTOList(result)
                 .isNoti(loginUserJoinOpenChat.isNoti())
+                .profile(openChatRoom.get().getProfile().toString())
                 .build();
 
         return openChatUsersListDto;
