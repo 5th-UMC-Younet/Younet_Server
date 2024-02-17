@@ -1,15 +1,15 @@
 package com.example.younet.chat.service;
 
-import com.example.younet.chat.dto.MessageListDto;
-import com.example.younet.chat.dto.OneToOneChatListDto;
-import com.example.younet.chat.dto.ReadAllMessageDto;
+import com.example.younet.chat.dto.*;
 import com.example.younet.domain.*;
-import com.example.younet.domain.enums.AlarmType;
 import com.example.younet.domain.enums.Profile;
+import com.example.younet.domain.enums.ReportReason;
 import com.example.younet.global.jwt.PrincipalDetails;
 
 import com.example.younet.post.repository.CommunityProfileRepository;
 import com.example.younet.repository.*;
+import com.example.younet.userprofile.profile.dto.UserProfileDto;
+import com.example.younet.userprofile.profile.service.UserProfileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -17,12 +17,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,6 +36,11 @@ public class ChatService {
     private final CommunityProfileRepository communityProfileRepository;
     private final MessageRepository messageRepository;
     private final ChatAlarmRepository chatAlarmRepository;
+    private final OpenChatRoomRepository openChatRoomRepository;
+    private final UserProfileService userProfileService;
+    private final JoinOpenChatRepository joinOpenChatRepository;
+    private final ReportRepository reportRepository;
+    private final OpenMessageRepository openMessageRepository;
 
     //커뮤니티 프로필: [1:1 채팅] 요청
     @Transactional
@@ -46,7 +50,7 @@ public class ChatService {
                 .orElseThrow(() -> new IllegalArgumentException("수락자 ID 오류" + user_id));
 
         // 이미 요청했는지 체크
-        if(chatRequestRepository.existsByRequesterAndReceiver(requester, receiver))
+        if(chatRequestRepository.existsByRequesterAndReceiverAndProfile(requester, receiver, Profile.NICKNAME))
         {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -161,32 +165,42 @@ public class ChatService {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    //채팅방 입장: 소켓 연결
-
-
-    //채팅 전송하기
-
-
-
-    //참여중인 오픈채팅 목록 조회
-
-
-    //오픈채팅방 생성
-
-    //오픈채팅방: 개별 채팅방 내 메세지 목록 불러오기
-
-    //오픈채팅방 -> 참여중인 유저 목록 조회
-
-    //오픈채팅방 -> 사용자 프로필 개별조회 (실명채팅방, 닉네임채팅방)
-
-    //오픈 프로필: [1:1 채팅] 요청
+    //[1:1 채팅]에서 유저 프로필 조회하는 API
     @Transactional
-    public ResponseEntity<?> createOpenChatRequest(Long user_id, @AuthenticationPrincipal PrincipalDetails principalDetails){
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<?> getOneToOneUserProfile(Long chat_room_id, @AuthenticationPrincipal PrincipalDetails principalDetails)
+    {
+        Optional<ChatRoom> chatRoom = chatRoomRepository.findById(chat_room_id);
+        User loginUser = principalDetails.getUser(); //로그인된 유저
+        User otherUser = joinChatRepository.findJoinChatByAnotherUser(chat_room_id, loginUser.getId()).getUser(); //1:1 채팅 상대방
+
+        if (chatRoom.get().getProfile() == Profile.NICKNAME)
+        {
+            //커뮤니티 프로필 [1:1 채팅]인 경우
+            UserProfileDto.UserResultDTO userResultDTO = userProfileService.getUserProfileInfo(otherUser.getId());
+            return ResponseEntity.ok(userResultDTO);
+        }
+
+        //실명 프로필 [1:1 채팅]인 경우
+        return ResponseEntity.ok(getUserRealNameProfile(otherUser.getId()));
     }
 
-    //오픈채팅방 나가기 (JoinChat 테이블에서 삭제 or isDel 컬럼 추가)
+    //실명프로필 조회 API (함수화)
+    @Transactional
+    public ResponseEntity<?> getUserRealNameProfile(Long user_id)
+    {
+        User user = userRepository.findById(user_id)
+                .orElseThrow(() -> new IllegalArgumentException("user_id 오류" + user_id));
 
-    //1:1 채팅 나가기
+        UserRealProfileDto userRealProfileDto = UserRealProfileDto.builder()
+                .userId(user.getId())
+                .name(user.getName())
+                .profilePicture(user.getProfilePicture())
+                .mainSkl(user.getMainSkl())
+                .hostContr(user.getHostContr())
+                .hostSkl(user.getHostSkl())
+                .profileText(user.getProfileText())
+                .build();
+        return ResponseEntity.ok(userRealProfileDto);
+    }
 
 }
