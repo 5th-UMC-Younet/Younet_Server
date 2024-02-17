@@ -72,4 +72,12 @@ public class ChatController {
         return chatService.joinOpenChatRoom(chat_room_id, principalDetails);
     }
 
+    //오픈채팅방 신규 생성
+    @PostMapping("/open")
+    public ResponseEntity<?> createOpenChatRoom(@RequestBody CreateOpenChatRoomDto createOpenChatRoomDto, @AuthenticationPrincipal PrincipalDetails principalDetails)
+    {
+        return chatService.createOpenChatRoom(createOpenChatRoomDto, principalDetails);
+    }
+
+
 }

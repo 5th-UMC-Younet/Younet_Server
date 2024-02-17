@@ -303,4 +303,29 @@ public class ChatService {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    //오픈채팅방 신규 생성
+    @Transactional
+    public ResponseEntity<?> createOpenChatRoom(CreateOpenChatRoomDto createOpenChatRoomDto, @AuthenticationPrincipal PrincipalDetails principalDetails)
+    {
+        User loginUser = principalDetails.getUser();
+        OpenChatRoom openChatRoom = OpenChatRoom.builder()
+                .title(createOpenChatRoomDto.getTitle())
+                .description(createOpenChatRoomDto.getDescription())
+                .thumbnail(createOpenChatRoomDto.getThumbnail())
+                .mainSchool(createOpenChatRoomDto.getMainSkl())
+                .country(createOpenChatRoomDto.getHostContr())
+                .hostSchool(createOpenChatRoomDto.getHostSkl())
+                .profile(Profile.valueOf(createOpenChatRoomDto.getProfile()))
+                .representer(loginUser)
+                .build();
+
+        JoinOpenChat joinOpenChat = JoinOpenChat.builder()
+                .openChatRoom(openChatRoomRepository.save(openChatRoom))
+                .user(loginUser)
+                .build();
+        joinOpenChatRepository.save(joinOpenChat);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }
