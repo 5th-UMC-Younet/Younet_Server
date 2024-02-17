@@ -79,5 +79,11 @@ public class ChatController {
         return chatService.createOpenChatRoom(createOpenChatRoomDto, principalDetails);
     }
 
+    //실명프로필 조회 API (함수화)
+    @GetMapping("/{user_id}/realProfile")
+    public ResponseEntity<?> getUserRealNameProfile(@PathVariable Long user_id)
+    {
+        return chatService.getUserRealNameProfile(user_id);
+    }
 
 }
