@@ -288,4 +288,19 @@ public class ChatService {
 
         return openChatRoomDetailDto;
     }
+
+    //참여 버튼 눌렀을때: 오픈채팅방 입장(참여) API
+    @Transactional
+    public ResponseEntity<?> joinOpenChatRoom(Long chat_room_id, @AuthenticationPrincipal PrincipalDetails principalDetails)
+    {
+        OpenChatRoom openChatRoom = openChatRoomRepository.findById(chat_room_id)
+                .orElseThrow(() -> new IllegalArgumentException("오픈 채팅방 id 오류" + chat_room_id));
+        JoinOpenChat joinOpenChat = JoinOpenChat.builder()
+                .openChatRoom(openChatRoom)
+                .user(principalDetails.getUser())
+                .build();
+        joinOpenChatRepository.save(joinOpenChat);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }

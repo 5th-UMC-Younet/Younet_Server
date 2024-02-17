@@ -65,4 +65,11 @@ public class ChatController {
         return chatService.getOpenChatRoomInfo(chat_room_id, principalDetails);
     }
 
+    //참여 버튼 눌렀을때: 오픈채팅방 입장(참여) API
+    @PostMapping("/join/{chat_room_id}")
+    public ResponseEntity<?> joinOpenChatRoom(@PathVariable Long chat_room_id, @AuthenticationPrincipal PrincipalDetails principalDetails)
+    {
+        return chatService.joinOpenChatRoom(chat_room_id, principalDetails);
+    }
+
 }
