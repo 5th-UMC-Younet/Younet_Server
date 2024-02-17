@@ -1,5 +1,6 @@
 package com.example.younet.login.service;
 
+import com.example.younet.domain.CommunityProfile;
 import com.example.younet.domain.User;
 import com.example.younet.domain.enums.AuthType;
 import com.example.younet.domain.enums.LoginType;
@@ -118,6 +119,10 @@ public class GeneralAuthService {
                 .isAuth(AuthType.NOTYET)
                 .build();
         userRepository.save(user);
+        CommunityProfile communityProfile = CommunityProfile.builder()
+                .name(requestDto.getNickname())
+                .build();
+        communityProfileRepository.save(communityProfile);
     }
 
     public boolean isDuplicatedEmail(String email) {
