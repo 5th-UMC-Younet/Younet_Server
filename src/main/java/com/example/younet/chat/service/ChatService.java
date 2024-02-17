@@ -88,8 +88,10 @@ public class ChatService {
 
         if (!joinChatList.isEmpty()) {
             for (int i = 0; i < joinChatList.size(); i++) {
-                ChatRoom chatRoom = chatRoomRepository.findById(joinChatList.get(i).getChatRoom().getId())
-                        .orElseThrow(() -> new IllegalArgumentException("chatroom_id를 찾을 수 없습니다."));
+                JoinChat joinChat = joinChatList.get(i);
+                if (joinChat != null && joinChat.getChatRoom() != null) {
+                    ChatRoom chatRoom = chatRoomRepository.findById(joinChat.getChatRoom().getId())
+                            .orElseThrow(() -> new IllegalArgumentException("chatroom_id를 찾을 수 없습니다."));
 
                 User otheruser = joinChatRepository.findJoinChatByAnotherUser(chatRoom.getId(), loginUser.getId()).getUser();
                 String name, img, message;
@@ -125,6 +127,7 @@ public class ChatService {
                         .createdAt(createdAt)
                         .profile(profile)
                         .build());
+                }
             }
             //TODO: 안읽은 메세지 수 카운트하는 로직 추가
         }
