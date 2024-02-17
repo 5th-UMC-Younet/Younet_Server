@@ -17,5 +17,6 @@ public class OneToOneChatListDto{
     private String profilePicture; //채팅에 참여하는 상대방 프로필 이미지
     private String message; //가장 최근 메세지 내용(message)
     private LocalDateTime createdAt; // 가장 최근에 해당하는 메세지 생성 시각(created_at)
+    private boolean profile; // 익명/실명 채팅 여부 (0: 익명(닉네임), 1: 실명)
 }
 

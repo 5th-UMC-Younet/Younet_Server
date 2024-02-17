@@ -93,6 +93,7 @@ public class ChatService {
             String name, img, message;
             LocalDateTime createdAt;
             Long chatRoomId = chatRoomList.get(i).getId();
+            boolean profile = false;
 
             Message lastestMessage = messageRepository.findLatestMessage(chatRoomList.get(i).getId());
             message = lastestMessage.getMessage(); // 가장 최근 메세지 내용
@@ -101,6 +102,7 @@ public class ChatService {
             if (chatRoomList.get(i).getProfile() == Profile.REALNAME) { // 실명 프로필
                 name = otheruser.getName();
                 img = otheruser.getProfilePicture();
+                profile = true;
             } else { // 닉네임 프로필
                 CommunityProfile communityProfile = communityProfileRepository.findByUserId(otheruser.getId());
                 name = communityProfile.getName(); // 닉네임
@@ -112,6 +114,7 @@ public class ChatService {
                     .profilePicture(img)
                     .message(message)
                     .createdAt(createdAt)
+                    .profile(profile)
                     .build());
         }
             //TODO: 안읽은 메세지 수 카운트하는 로직 추가
