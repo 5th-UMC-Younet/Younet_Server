@@ -86,7 +86,7 @@ public class ChatService {
 
         List<OneToOneChatListDto> result = new ArrayList<>();
 
-        if (joinChatList.size()!=0) {
+        if (!joinChatList.isEmpty()) {
             for (int i = 0; i < joinChatList.size(); i++) {
                 ChatRoom chatRoom = chatRoomRepository.findById(joinChatList.get(i).getChatRoom().getId())
                         .orElseThrow(() -> new IllegalArgumentException("chatroom_id를 찾을 수 없습니다."));
