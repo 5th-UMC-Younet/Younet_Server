@@ -89,7 +89,7 @@ public class ChatService {
         for (int i=0; i<joinChatList.size(); i++)
         {
             ChatRoom chatRoom = chatRoomRepository.findById(joinChatList.get(i).getChatRoom().getId())
-                    .orElseThrow();
+                    .orElseThrow(() -> new IllegalArgumentException("chatroom_id를 찾을 수 없습니다."));
 
             User otheruser = joinChatRepository.findJoinChatByAnotherUser(chatRoom.getId(), loginUser.getId()).getUser();
             String name, img, message;
