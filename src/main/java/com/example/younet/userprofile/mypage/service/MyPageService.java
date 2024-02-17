@@ -126,7 +126,7 @@ public class MyPageService {
         communityProfile.getUser().setProfilePicture(imageUrl);
         communityProfile.getUser().setName(myProfileEditDTO.getName());
         communityProfile.getUser().setNickname(myProfileEditDTO.getNickname());
-        communityProfile.getCountry().setName(myProfileEditDTO.getLikeCntr());
+        //communityProfile.getCountry().setName(myProfileEditDTO.getLikeCntr());
         communityProfile.getUser().setProfileText(myProfileEditDTO.getProfileText());
         // 커뮤니티 프로필 수정
         communityProfile.setProfilePicture(imageUrl);
