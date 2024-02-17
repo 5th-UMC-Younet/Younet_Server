@@ -383,4 +383,32 @@ public class ChatService {
         }
     }
 
+    //현재 로그인된 유저가 참여중인 오픈채팅 목록 조회
+    @Transactional
+    public List<OpenChatListDto> readOpenChatList(@AuthenticationPrincipal PrincipalDetails principalDetails){
+        User loginUser = principalDetails.getUser(); //현재 로그인된 유저
+        List<JoinOpenChat> joinOpenChatList = joinOpenChatRepository.findByUserId(loginUser.getId());
+        List<OpenChatListDto> result = new ArrayList<>();
+
+        for (int i=0; i<joinOpenChatList.size(); i++)
+        {
+            OpenChatRoom openChatRoom = openChatRoomRepository.findById(joinOpenChatList.get(i).getOpenChatRoom().getId())
+                    .orElseThrow(() -> new IllegalArgumentException("오픈채팅방을 찾을 수 없습니다."));
+
+            OpenMessage latestMessage = openMessageRepository.findLatestMessage(openChatRoom.getId());
+
+            result.add(OpenChatListDto.builder()
+                    .chatRoomId(openChatRoom.getId())
+                    .title(openChatRoom.getTitle())
+                    .thumbnail(openChatRoom.getThumbnail())
+                    .message(latestMessage.getMessage())
+                    .createdAt(latestMessage.getCreatedAt())
+                    .build());
+        }
+
+        //TODO: 안읽은 메세지 수 카운트하는 로직 추가
+
+        return result;
+    }
+
 }

@@ -102,4 +102,11 @@ public class ChatController {
         return chatService.getOpenUserProfile(chat_room_id, user_id);
     }
 
+    //현재 로그인된 유저가 참여중인 오픈채팅 목록
+    @GetMapping("/list/open")
+    public List<OpenChatListDto> readOpenChatList (@AuthenticationPrincipal PrincipalDetails principalDetails)
+    {
+        return chatService.readOpenChatList(principalDetails);
+    }
+
 }
