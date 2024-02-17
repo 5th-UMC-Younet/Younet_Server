@@ -53,6 +53,7 @@ public class UserProfileService {
                 .collect(Collectors.toList());
 
         return UserProfileDto.UserResultDTO.builder()
+                .communityProfileId(communityProfile.getId())
                 .userId(communityProfile.getUser().getId())
                 .profilePicture(communityProfile.getProfilePicture())
                 .name(communityProfile.getUser().getName())

@@ -13,6 +13,7 @@ public class UserProfileDto {
     @AllArgsConstructor
     public static class UserResultDTO {
         Long userId;
+        Long communityProfileId;
         String profilePicture;
         String name;
         String likeCntr;
