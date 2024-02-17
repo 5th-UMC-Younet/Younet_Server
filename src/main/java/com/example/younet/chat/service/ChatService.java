@@ -66,7 +66,7 @@ public class ChatService {
                 ChatAlarm.builder()
                         .isConfirmed(false)
 //                        .requesterId(communityProfileRepository.findByUserId(requester.getId()).getId())
-//                        .receiver(communityProfileRepository.findByUserId(receiver.getId()))
+                        .receiver(communityProfileRepository.findByUserId(receiver.getId()))
                         .chatRequest(chatRequestRepository.save(chatRequest))
                         .build()
         );
@@ -422,6 +422,7 @@ public class ChatService {
         User user = userRepository.findById(user_id)
                 .orElseThrow(() -> new IllegalArgumentException("피신고자 ID 오류" + user_id));
 
+        //TODO: reportFile DTO에서 받아오는 거 말고, 업로드 함수 활용하는 것으로 로직 수정!
         Report report = Report.builder()
                 .reporter(loginUser)
                 .reported(user)
