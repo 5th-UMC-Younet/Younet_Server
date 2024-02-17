@@ -1,9 +1,6 @@
 package com.example.younet.chat.dto;
 
-import com.example.younet.domain.Message;
-import com.example.younet.domain.OpenMessage;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import com.example.younet.domain.ChatMessage;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -19,14 +16,14 @@ public class MessageListDto{
     private String message; //메세지 내용(message)
     private LocalDateTime createdAt; // 가장 최근에 해당하는 메세지 생성 시각(created_at)
 
-    public MessageListDto(Message message)
+    public MessageListDto(ChatMessage chatMessage)
     {
-        this.messageId = message.getId();
-        this.userId = message.getUser().getId();
-        this.isRead = message.isRead();
-        this.isFile = message.isFile();
-        this.message = message.getMessage();
-        this.createdAt = message.getCreatedAt();
+        this.messageId = chatMessage.getId();
+        this.userId = chatMessage.getUser().getId();
+        this.isRead = chatMessage.isRead();
+        this.isFile = chatMessage.isFile();
+        this.message = chatMessage.getMessage();
+        this.createdAt = chatMessage.getCreatedAt();
     }
 }
 
