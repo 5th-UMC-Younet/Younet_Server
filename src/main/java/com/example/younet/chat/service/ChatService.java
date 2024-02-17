@@ -18,11 +18,11 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
+
+import static com.example.younet.domain.QChatRoom.chatRoom;
 
 @Service
 @Slf4j
@@ -82,24 +82,34 @@ public class ChatService {
         //로직: JoinChat 테이블에서 (회원ID = 현재 로그인된 유저 객체의 ID) 인 리스트 조회
         List<JoinChat> joinChatList = joinChatRepository.findByUserId(loginUser.getId());
 
+        //TODO: JoinChat 리스트에 나온 채팅방 ID를 사용하여 채팅방 목록 중복없이 조회 (조회시 메세지 최신순 정렬)
+
         List<OneToOneChatListDto> result = new ArrayList<>();
 
         for (int i=0; i<joinChatList.size(); i++)
         {
-            // 조회한 JoinChat 리스트에 나온 채팅방 ID를 사용하여 채팅방 목록 중복없이 조회 (조회시 메세지 최신순 정렬)
-            List<ChatRoom> chatRoomList = chatRoomRepository.findByChatroomIdOrderByMessageCreatedAtDesc(joinChatList.get(i).getChatRoom().getId());
+            ChatRoom chatRoom = chatRoomRepository.findById(joinChatList.get(i).getChatRoom().getId())
+                    .orElseThrow();
 
-            User otheruser = joinChatRepository.findJoinChatByAnotherUser(chatRoomList.get(i).getId(), loginUser.getId()).getUser();
+            User otheruser = joinChatRepository.findJoinChatByAnotherUser(chatRoom.getId(), loginUser.getId()).getUser();
             String name, img, message;
             LocalDateTime createdAt;
-            Long chatRoomId = chatRoomList.get(i).getId();
+            Long chatRoomId = chatRoom.getId();
             boolean profile = false;
 
-            Message lastestMessage = messageRepository.findLatestMessage(chatRoomList.get(i).getId());
-            message = lastestMessage.getMessage(); // 가장 최근 메세지 내용
-            createdAt = lastestMessage.getCreatedAt(); // 메세지 생성 시각(created_at)
+            ChatMessage lastestChatMessage = messageRepository.findLatestMessage(chatRoomId);
 
-            if (chatRoomList.get(i).getProfile() == Profile.REALNAME) { // 실명 프로필
+            if (lastestChatMessage == null)
+            {
+                message = null;
+                createdAt = null;
+            } else
+            {
+                message = lastestChatMessage.getMessage(); // 가장 최근 메세지 내용
+                createdAt = lastestChatMessage.getCreatedAt(); // 메세지 생성 시각(created_at)
+            }
+
+            if (chatRoom.getProfile() == Profile.REALNAME) { // 실명 프로필
                 name = otheruser.getName();
                 img = otheruser.getProfilePicture();
                 profile = true;
@@ -108,6 +118,7 @@ public class ChatService {
                 name = communityProfile.getName(); // 닉네임
                 img = communityProfile.getProfilePicture();
             }
+
             result.add(OneToOneChatListDto.builder()
                     .chatRoomId(chatRoomId)
                     .name(name)

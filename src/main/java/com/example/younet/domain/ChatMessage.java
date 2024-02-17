@@ -14,7 +14,7 @@ import org.hibernate.annotations.ColumnDefault;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Message extends BaseEntity { // [1:1 채팅] 메세지 엔티티
+public class ChatMessage extends BaseEntity { // [1:1 채팅] 메세지 엔티티
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
