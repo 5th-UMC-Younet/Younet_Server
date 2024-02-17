@@ -2,6 +2,7 @@ package com.example.younet.userprofile.profile.service;
 
 import com.example.younet.comment.repository.CommentRepository;
 import com.example.younet.domain.CommunityProfile;
+import com.example.younet.domain.Country;
 import com.example.younet.domain.Image;
 import com.example.younet.domain.Post;
 import com.example.younet.global.errorException.CustomException;
@@ -52,12 +53,18 @@ public class UserProfileService {
                 })
                 .collect(Collectors.toList());
 
+        String likeCntr = null;
+        Country country = communityProfile.getCountry();
+        if (country != null) {
+            likeCntr = country.getName();
+        }
+
         return UserProfileDto.UserResultDTO.builder()
                 .communityProfileId(communityProfile.getId())
                 .userId(communityProfile.getUser().getId())
                 .profilePicture(communityProfile.getProfilePicture())
                 .name(communityProfile.getUser().getName())
-                .likeCntr(communityProfile.getCountry().getName())
+                .likeCntr(likeCntr)
                 .profileText(communityProfile.getUser().getProfileText())
                 .posts(postDTOs)
                 .build();

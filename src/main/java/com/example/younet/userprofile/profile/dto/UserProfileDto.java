@@ -1,5 +1,6 @@
 package com.example.younet.userprofile.profile.dto;
 
+import io.micrometer.common.lang.Nullable;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -16,6 +17,7 @@ public class UserProfileDto {
         Long communityProfileId;
         String profilePicture;
         String name;
+        @Nullable
         String likeCntr;
         String profileText;
         List<userProfilePostDTO> posts;

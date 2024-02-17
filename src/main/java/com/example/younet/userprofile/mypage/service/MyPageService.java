@@ -83,11 +83,17 @@ public class MyPageService {
                 })
                 .collect(Collectors.toList());
 
+        String likeCntr = null;
+        Country country = communityProfile.getCountry();
+        if (country != null) {
+            likeCntr = country.getName();
+        }
+
         return MyPageDto.MyProfileDTO.builder()
                 .userId(communityProfile.getUser().getId())
                 .profilePicture(communityProfile.getProfilePicture())
                 .name(communityProfile.getName())
-                .likeCntr(communityProfile.getCountry().getName())
+                .likeCntr(likeCntr)
                 .profileText(communityProfile.getUser().getProfileText())
                 .posts(postDTOs)
                 .scraps(scrapDTOs)
@@ -101,11 +107,18 @@ public class MyPageService {
         CommunityProfile communityProfile = communityProfileRepository.findById(userId).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_INVALID_FIND_ID));
         Long communityProfileId = communityProfile.getUser().getId();
+
+        String likeCntr = null;
+        Country country = communityProfile.getCountry();
+        if (country != null) {
+            likeCntr = country.getName();
+        }
+
         return MyPageDto.MyProfileInfoDTO.builder()
                 .profilePicture(communityProfile.getProfilePicture())
                 .name(user.getName())
                 .nickname(user.getNickname())
-                .likeCntr(communityProfile.getCountry().getName())
+                .likeCntr(likeCntr)
                 .profileText(user.getProfileText())
                 .build();
     }

@@ -1,6 +1,7 @@
 package com.example.younet.userprofile.mypage.dto;
 
 import com.example.younet.userprofile.profile.dto.UserProfileDto;
+import io.micrometer.common.lang.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,6 +20,7 @@ public class MyPageDto {
         Long userId;
         String profilePicture;
         String name;
+        @Nullable
         String likeCntr;
         String profileText;
         List<MyProfilePostDTO> posts;
@@ -33,6 +35,7 @@ public class MyPageDto {
         String profilePicture;
         String name;
         String nickname;
+        @Nullable
         String likeCntr;
         String profileText;
     }
@@ -44,6 +47,7 @@ public class MyPageDto {
     public static class MyProfileEditDTO {
         String name;
         String nickname;
+        @Nullable
         String likeCntr;
         String profileText;
     }
