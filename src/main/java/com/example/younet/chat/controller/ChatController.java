@@ -116,4 +116,19 @@ public class ChatController {
         return chatService.reportUser(user_id, reportRequestDto, principalDetails);
     }
 
+    //전체 오픈채팅 목록 조회
+    @GetMapping("/all/open")
+    public List<OpenChatListDto> readAllOpenChatList()
+    {
+        return chatService.readAllOpenChatList();
+    }
+
+
+    //TODO: 오픈채팅방-개별 채팅방 내 메세지 목록 불러오기
+
+    //TODO: 채팅방 입장(소켓 연결)
+
+    //TODO: 채팅 메세지 전송 API
+
+
 }

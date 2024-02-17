@@ -392,6 +392,7 @@ public class ChatService {
     }
 
     //현재 로그인된 유저가 참여중인 오픈채팅 목록 조회
+    //TODO: 메세지가 최신순인 순서대로 정렬되지 않는 문제 해결하기
     @Transactional
     public List<OpenChatListDto> readOpenChatList(@AuthenticationPrincipal PrincipalDetails principalDetails){
         User loginUser = principalDetails.getUser(); //현재 로그인된 유저
@@ -416,6 +417,31 @@ public class ChatService {
 
         //TODO: 안읽은 메세지 수 카운트하는 로직 추가
 
+        return result;
+    }
+
+    //전체 오픈채팅 목록 조회
+    //TODO: 정렬 기준 설정하기
+    @Transactional
+    public List<OpenChatListDto> readAllOpenChatList(){
+        List<OpenChatListDto> result = new ArrayList<>();
+        List<OpenChatRoom> openChatRooms = openChatRoomRepository.findAll();
+
+        for (int i=0; i<openChatRooms.size(); i++)
+        {
+            OpenChatRoom openChatRoom = openChatRoomRepository.findById(openChatRooms.get(i).getId())
+                    .orElseThrow(() -> new IllegalArgumentException("오픈채팅방을 찾을 수 없습니다."));
+
+            OpenMessage latestMessage = openMessageRepository.findLatestMessage(openChatRoom.getId());
+
+            result.add(OpenChatListDto.builder()
+                    .chatRoomId(openChatRoom.getId())
+                    .title(openChatRoom.getTitle())
+                    .thumbnail(openChatRoom.getThumbnail())
+                    .message(latestMessage.getMessage())
+                    .createdAt(latestMessage.getCreatedAt())
+                    .build());
+        }
         return result;
     }
 
