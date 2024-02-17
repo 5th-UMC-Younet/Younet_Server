@@ -121,6 +121,7 @@ public class GeneralAuthService {
         userRepository.save(user);
         CommunityProfile communityProfile = CommunityProfile.builder()
                 .name(requestDto.getNickname())
+                .user(user)
                 .build();
         communityProfileRepository.save(communityProfile);
     }
