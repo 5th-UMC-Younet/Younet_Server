@@ -58,4 +58,11 @@ public class ChatController {
         return chatService.createOpenChatRequest(open_chatroom_id, user_id, principalDetails);
     }
 
+    //오픈채팅방 상세정보 및 유저참여가능여부 GET
+    @GetMapping("/{chat_room_id}/info")
+    public OpenChatRoomDetailDto getOpenChatRoomInfo(@PathVariable Long chat_room_id, @AuthenticationPrincipal PrincipalDetails principalDetails)
+    {
+        return chatService.getOpenChatRoomInfo(chat_room_id, principalDetails);
+    }
+
 }

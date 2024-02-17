@@ -203,7 +203,6 @@ public class ChatService {
         return ResponseEntity.ok(userRealProfileDto);
     }
 
-
     //오픈 채팅방: [1:1 채팅] 요청 -> 닉네임채팅방 / 실명채팅방
     @Transactional
     public ResponseEntity<?> createOpenChatRequest(Long open_chatroom_id, Long user_id, @AuthenticationPrincipal PrincipalDetails principalDetails){
@@ -242,5 +241,51 @@ public class ChatService {
         }
     }
 
+    //오픈채팅방 상세정보 및 유저참여가능여부 GET
+    @Transactional
+    public OpenChatRoomDetailDto getOpenChatRoomInfo(Long chat_room_id, @AuthenticationPrincipal PrincipalDetails principalDetails)
+    {
+        boolean isJoin = true;
+        Optional<OpenChatRoom> openChatRoom = openChatRoomRepository.findById(chat_room_id);
 
+        if (openChatRoom.get().getMainSchool() != null) //본교가 상관없음이 아닐 경우,
+        {
+            if (openChatRoom.get().getMainSchool() == principalDetails.getUser().getMainSkl()) //본교가 같은 경우
+            {
+                if (openChatRoom.get().getCountry() != null) //유학국이 상관없음이 아닐 경우
+                {
+                    if (openChatRoom.get().getCountry() == principalDetails.getUser().getHostContr()) //유학국이 같은 경우
+                    {
+                        if(openChatRoom.get().getHostSchool() != null && openChatRoom.get().getHostSchool() != principalDetails.getUser().getHostSkl())
+                        //파견교가 상관없음이 아닌데, 파견교가 다를 경우
+                        {
+                            isJoin = false;
+                        }
+                    }
+                    else //유학국이 다를 경우
+                    {
+                        isJoin = false;
+                    }
+                }
+            } else //본교가 같지 않은 경우
+            {
+                isJoin = false;
+            }
+        }
+
+        OpenChatRoomDetailDto openChatRoomDetailDto = OpenChatRoomDetailDto.builder()
+                .openChatRoomId(openChatRoom.get().getId())
+                .profile(openChatRoom.get().getProfile().toString())
+                .thumbnail(openChatRoom.get().getThumbnail())
+                .title(openChatRoom.get().getTitle())
+                .description(openChatRoom.get().getDescription())
+                .mainSkl(openChatRoom.get().getMainSchool())
+                .hostContr(openChatRoom.get().getCountry())
+                .hostSkl(openChatRoom.get().getHostSchool())
+                .userId(principalDetails.getUser().getId())
+                .isJoin(isJoin)
+                .build();
+
+        return openChatRoomDetailDto;
+    }
 }
