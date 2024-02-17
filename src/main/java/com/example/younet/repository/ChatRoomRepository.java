@@ -26,10 +26,10 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
 
 
     @Query("SELECT DISTINCT cr FROM ChatRoom cr " +
-            "JOIN Message m ON m.chatRoom.id = cr.id " +
+            "JOIN ChatMessage m ON m.chatRoom.id = cr.id " +
             "WHERE cr.id IN " +
-            "(SELECT m.chatRoom.id FROM Message m GROUP BY m.chatRoom.id HAVING MAX(m.createdAt) IS NOT NULL) " +
-            "ORDER BY (SELECT MAX(msg.createdAt) FROM Message msg WHERE msg.chatRoom.id = cr.id) DESC")
+            "(SELECT m.chatRoom.id FROM ChatMessage m GROUP BY m.chatRoom.id HAVING MAX(m.createdAt) IS NOT NULL) " +
+            "ORDER BY (SELECT MAX(msg.createdAt) FROM ChatMessage msg WHERE msg.chatRoom.id = cr.id) DESC")
     List<ChatRoom> findByChatroomIdOrderByMessageCreatedAtDesc(@Param("chatRoomId") Long chatRoomId);
 
 }
