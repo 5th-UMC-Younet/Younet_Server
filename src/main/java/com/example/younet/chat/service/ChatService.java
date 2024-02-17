@@ -328,4 +328,44 @@ public class ChatService {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    //[오픈채팅방] 참여중인 유저 목록 조회 및 알림 여부 조회
+    @GetMapping("/{chat_room_id}/users")
+    public OpenChatUsersListDto getOpenChatUsersList (Long chat_room_id, @AuthenticationPrincipal PrincipalDetails principalDetails)
+    {
+        Optional<OpenChatRoom> openChatRoom = openChatRoomRepository.findById(chat_room_id);
+        List<JoinOpenChat> joinOpenChats = joinOpenChatRepository.findJoinOpenChatsById(chat_room_id);
+
+        List<OpenChatUsersListDto.userListDTO> result = new ArrayList<>();
+
+        if (openChatRoom.get().getProfile() == Profile.REALNAME){ //실명 오픈채팅방(실명 프로필 활용)
+            for (int i=0; i<joinOpenChats.size(); i++) {
+                result.add(OpenChatUsersListDto.userListDTO.builder()
+                        .userId(joinOpenChats.get(i).getUser().getId())
+                        .thumbnail(joinOpenChats.get(i).getUser().getProfilePicture())
+                        .name(joinOpenChats.get(i).getUser().getName())
+                        .build());}}
+        else //닉네임 오픈채팅방(커뮤니티 프로필 활용)
+        {
+            for (int i=0; i<joinOpenChats.size(); i++) {
+                CommunityProfile communityProfile = communityProfileRepository.findByUserId(joinOpenChats.get(i).getUser().getId());
+                result.add(OpenChatUsersListDto.userListDTO.builder()
+                        .userId(communityProfile.getUser().getId())
+                        .thumbnail(communityProfile.getProfilePicture())
+                        .name(communityProfile.getName())
+                        .build());
+            }
+        }
+
+        JoinOpenChat loginUserJoinOpenChat = joinOpenChatRepository.findByOpenChatroomIdAndUserId(chat_room_id, principalDetails.getUser().getId());
+
+        OpenChatUsersListDto openChatUsersListDto = OpenChatUsersListDto.builder()
+                .representerId(openChatRoom.get().getRepresenter().getId())
+                .loginUserId(principalDetails.getUser().getId())
+                .userListDTOList(result)
+                .isNoti(loginUserJoinOpenChat.isNoti())
+                .build();
+
+        return openChatUsersListDto;
+    }
+
 }

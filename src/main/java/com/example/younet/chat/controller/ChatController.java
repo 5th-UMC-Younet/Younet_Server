@@ -44,6 +44,13 @@ public class ChatController {
         return chatService.acceptChatRequest(chatAlarmId, principalDetails);
     }
 
+    //실명프로필 조회 API (함수화)
+    @GetMapping("/{user_id}/realProfile")
+    public ResponseEntity<?> getUserRealNameProfile(@PathVariable Long user_id)
+    {
+        return chatService.getUserRealNameProfile(user_id);
+    }
+
     //[1:1 채팅]에서 유저 프로필 조회하는 API
     @GetMapping("/{chat_room_id}/profile")
     public ResponseEntity<?> getOneToOneUserProfile(@PathVariable Long chat_room_id, @AuthenticationPrincipal PrincipalDetails principalDetails)
@@ -79,11 +86,11 @@ public class ChatController {
         return chatService.createOpenChatRoom(createOpenChatRoomDto, principalDetails);
     }
 
-    //실명프로필 조회 API (함수화)
-    @GetMapping("/{user_id}/realProfile")
-    public ResponseEntity<?> getUserRealNameProfile(@PathVariable Long user_id)
+    //[오픈채팅방] 참여중인 유저 목록 조회 및 알림 여부 조회
+    @GetMapping("/{chat_room_id}/users")
+    public OpenChatUsersListDto getOpenChatUsersList (@PathVariable Long chat_room_id, @AuthenticationPrincipal PrincipalDetails principalDetails)
     {
-        return chatService.getUserRealNameProfile(user_id);
+        return chatService.getOpenChatUsersList(chat_room_id, principalDetails);
     }
 
 }
