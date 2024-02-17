@@ -86,49 +86,48 @@ public class ChatService {
 
         List<OneToOneChatListDto> result = new ArrayList<>();
 
-        for (int i=0; i<joinChatList.size(); i++)
-        {
-            ChatRoom chatRoom = chatRoomRepository.findById(joinChatList.get(i).getChatRoom().getId())
-                    .orElseThrow(() -> new IllegalArgumentException("chatroom_id를 찾을 수 없습니다."));
+        if (joinChatList.size()!=0) {
+            for (int i = 0; i < joinChatList.size(); i++) {
+                ChatRoom chatRoom = chatRoomRepository.findById(joinChatList.get(i).getChatRoom().getId())
+                        .orElseThrow(() -> new IllegalArgumentException("chatroom_id를 찾을 수 없습니다."));
 
-            User otheruser = joinChatRepository.findJoinChatByAnotherUser(chatRoom.getId(), loginUser.getId()).getUser();
-            String name, img, message;
-            LocalDateTime createdAt;
-            Long chatRoomId = chatRoom.getId();
-            boolean profile = false;
+                User otheruser = joinChatRepository.findJoinChatByAnotherUser(chatRoom.getId(), loginUser.getId()).getUser();
+                String name, img, message;
+                LocalDateTime createdAt;
+                Long chatRoomId = chatRoom.getId();
+                boolean profile = false;
 
-            ChatMessage lastestChatMessage = messageRepository.findLatestMessage(chatRoomId);
+                ChatMessage lastestChatMessage = messageRepository.findLatestMessage(chatRoomId);
 
-            if (lastestChatMessage == null)
-            {
-                message = null;
-                createdAt = null;
-            } else
-            {
-                message = lastestChatMessage.getMessage(); // 가장 최근 메세지 내용
-                createdAt = lastestChatMessage.getCreatedAt(); // 메세지 생성 시각(created_at)
+                if (lastestChatMessage == null) {
+                    message = null;
+                    createdAt = null;
+                } else {
+                    message = lastestChatMessage.getMessage(); // 가장 최근 메세지 내용
+                    createdAt = lastestChatMessage.getCreatedAt(); // 메세지 생성 시각(created_at)
+                }
+
+                if (chatRoom.getProfile() == Profile.REALNAME) { // 실명 프로필
+                    name = otheruser.getName();
+                    img = otheruser.getProfilePicture();
+                    profile = true;
+                } else { // 닉네임 프로필
+                    CommunityProfile communityProfile = communityProfileRepository.findByUserId(otheruser.getId());
+                    name = communityProfile.getName(); // 닉네임
+                    img = communityProfile.getProfilePicture();
+                }
+
+                result.add(OneToOneChatListDto.builder()
+                        .chatRoomId(chatRoomId)
+                        .name(name)
+                        .profilePicture(img)
+                        .message(message)
+                        .createdAt(createdAt)
+                        .profile(profile)
+                        .build());
             }
-
-            if (chatRoom.getProfile() == Profile.REALNAME) { // 실명 프로필
-                name = otheruser.getName();
-                img = otheruser.getProfilePicture();
-                profile = true;
-            } else { // 닉네임 프로필
-                CommunityProfile communityProfile = communityProfileRepository.findByUserId(otheruser.getId());
-                name = communityProfile.getName(); // 닉네임
-                img = communityProfile.getProfilePicture();
-            }
-
-            result.add(OneToOneChatListDto.builder()
-                    .chatRoomId(chatRoomId)
-                    .name(name)
-                    .profilePicture(img)
-                    .message(message)
-                    .createdAt(createdAt)
-                    .profile(profile)
-                    .build());
-        }
             //TODO: 안읽은 메세지 수 카운트하는 로직 추가
+        }
 
         return result;
     }
