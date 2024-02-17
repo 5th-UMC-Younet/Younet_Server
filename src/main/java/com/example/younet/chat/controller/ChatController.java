@@ -123,8 +123,12 @@ public class ChatController {
         return chatService.readAllOpenChatList();
     }
 
-
-    //TODO: 오픈채팅방-개별 채팅방 내 메세지 목록 불러오기
+    //오픈채팅방: 개별 채팅방 내 메세지 목록 불러오기
+    @GetMapping("/open/{chat_room_id}/message")
+    public ReadAllOpenMessageDto readAllOpenMessages(@PathVariable Long chat_room_id, @AuthenticationPrincipal PrincipalDetails principalDetails)
+    {
+        return chatService.readAllOpenMessages(chat_room_id, principalDetails);
+    }
 
     //TODO: 채팅방 입장(소켓 연결)
 
