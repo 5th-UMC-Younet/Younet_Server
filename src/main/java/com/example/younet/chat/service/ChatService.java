@@ -203,4 +203,44 @@ public class ChatService {
         return ResponseEntity.ok(userRealProfileDto);
     }
 
+
+    //오픈 채팅방: [1:1 채팅] 요청 -> 닉네임채팅방 / 실명채팅방
+    @Transactional
+    public ResponseEntity<?> createOpenChatRequest(Long open_chatroom_id, Long user_id, @AuthenticationPrincipal PrincipalDetails principalDetails){
+        User requester = principalDetails.getUser(); //채팅 요청자
+        User receiver = userRepository.findById(user_id)
+                .orElseThrow(() -> new IllegalArgumentException("수락자 ID 오류" + user_id));
+
+        Optional<OpenChatRoom> openChatRoom = openChatRoomRepository.findById(open_chatroom_id);
+
+        if (openChatRoom.get().getProfile() == Profile.NICKNAME) //닉네임 채팅방인 경우
+        {
+            return ResponseEntity.ok(createNicknameChatRequest(user_id, principalDetails));
+        }
+        else //실명프로필로 요청하는 경우
+        {
+            //이미 요청이 있는지 확인
+            if(chatRequestRepository.existsByRequesterAndReceiverAndProfile(requester, receiver, Profile.REALNAME))
+            {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+
+            //요청이 없다면
+            ChatRequest chatRequest = ChatRequest.builder()
+                    .requester(requester)
+                    .receiver(receiver)
+                    .profile(Profile.REALNAME) //실명프로필로 요청
+                    .build();
+
+            chatAlarmRepository.save(
+                    ChatAlarm.builder()
+                            .isConfirmed(false)
+                            .chatRequest(chatRequestRepository.save(chatRequest))
+                            .build()
+            );
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+    }
+
+
 }

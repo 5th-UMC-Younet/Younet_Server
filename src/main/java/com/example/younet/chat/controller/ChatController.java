@@ -51,4 +51,11 @@ public class ChatController {
         return chatService.getOneToOneUserProfile(chat_room_id, principalDetails);
     }
 
+    //오픈채팅방 -> [1:1 채팅] 요청
+    @PostMapping("/{open_chatroom_id}/{user_id}/request")
+    public ResponseEntity<?> createOpenChatRequest(@PathVariable Long open_chatroom_id, @PathVariable Long user_id, @AuthenticationPrincipal PrincipalDetails principalDetails)
+    {
+        return chatService.createOpenChatRequest(open_chatroom_id, user_id, principalDetails);
+    }
+
 }
