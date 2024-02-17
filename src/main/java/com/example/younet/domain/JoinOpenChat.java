@@ -10,7 +10,7 @@ import org.hibernate.annotations.ColumnDefault;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class JoinChat { // [1:1 채팅] 참여
+public class JoinOpenChat { // [오픈 채팅] 참여
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
@@ -18,7 +18,7 @@ public class JoinChat { // [1:1 채팅] 참여
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn
-    private ChatRoom chatRoom;
+    private OpenChatRoom openChatRoom;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id", referencedColumnName = "user_id")
@@ -26,8 +26,5 @@ public class JoinChat { // [1:1 채팅] 참여
 
     @ColumnDefault("1")
     private boolean isNoti; //알림 설정 여부
-
-    @ColumnDefault("0")
-    private boolean isDel; //채팅방 삭제 여부
 
 }
