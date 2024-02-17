@@ -328,7 +328,7 @@ public class ChatService {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    //[오픈채팅방] 참여중인 유저 목록 조회 및 알림 여부 조회
+    //[오픈채팅방] 참여중인 유저 목록 및 알림 여부 조회
     @GetMapping("/{chat_room_id}/users")
     public OpenChatUsersListDto getOpenChatUsersList (Long chat_room_id, @AuthenticationPrincipal PrincipalDetails principalDetails)
     {
@@ -366,6 +366,21 @@ public class ChatService {
                 .build();
 
         return openChatUsersListDto;
+    }
+
+    //[오픈채팅방] 유저 개별 프로필 조회 API (실명채팅방/닉네임채팅방)
+    @Transactional
+    public ResponseEntity<?> getOpenUserProfile(Long chat_room_id, Long user_id)
+    {
+        Optional<OpenChatRoom> openChatRoom = openChatRoomRepository.findById(chat_room_id);
+        if (openChatRoom.get().getProfile() == Profile.REALNAME) //실명채팅방
+        {
+            return ResponseEntity.ok(getUserRealNameProfile(user_id));
+        }
+        else //닉네임채팅방
+        {
+            return ResponseEntity.ok(userProfileService.getUserProfileInfo(user_id));
+        }
     }
 
 }

@@ -7,9 +7,11 @@ import com.example.younet.global.jwt.PrincipalDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequestMapping("/chat")
 @RestController
@@ -86,11 +88,18 @@ public class ChatController {
         return chatService.createOpenChatRoom(createOpenChatRoomDto, principalDetails);
     }
 
-    //[오픈채팅방] 참여중인 유저 목록 조회 및 알림 여부 조회
+    //[오픈채팅방] 참여중인 유저 목록 및 알림 여부 조회
     @GetMapping("/{chat_room_id}/users")
     public OpenChatUsersListDto getOpenChatUsersList (@PathVariable Long chat_room_id, @AuthenticationPrincipal PrincipalDetails principalDetails)
     {
         return chatService.getOpenChatUsersList(chat_room_id, principalDetails);
+    }
+
+    //[오픈채팅방] 유저 개별 프로필 조회 API
+    @GetMapping("/{chat_room_id}/{user_id}")
+    public ResponseEntity<?> getOpenUserProfile (@PathVariable Long chat_room_id, @PathVariable Long user_id)
+    {
+        return chatService.getOpenUserProfile(chat_room_id, user_id);
     }
 
 }
