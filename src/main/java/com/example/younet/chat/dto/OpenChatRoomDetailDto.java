@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class OpenChatRoomDetailDto {
     private Long openChatRoomId; //채팅방 id
     private String profile; //닉네임/실명 채팅방 여부
-    //private Long participate; //TODO: 참여중인 인원
+    private int participants; //참여자수
 
     private String thumbnail; //썸네일 이미지
     private String title; //제목

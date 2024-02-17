@@ -138,7 +138,7 @@ public class ChatService {
         return allMessageDto;
     }
 
-    //TODO: 채팅방 메세지 불러오기 (오픈채팅)
+    //채팅방 메세지 불러오기 (오픈채팅)
     @Transactional
     public ReadAllOpenMessageDto readAllOpenMessages(Long chat_room_id, @AuthenticationPrincipal PrincipalDetails principalDetails)
     {
@@ -266,6 +266,8 @@ public class ChatService {
         boolean isJoin = true;
         Optional<OpenChatRoom> openChatRoom = openChatRoomRepository.findById(chat_room_id);
 
+        List<JoinOpenChat> joinOpenChats = joinOpenChatRepository.findJoinOpenChatsById(openChatRoom.get().getId());
+
         if (openChatRoom.get().getMainSchool() != null) //본교가 상관없음이 아닐 경우,
         {
             if (openChatRoom.get().getMainSchool() == principalDetails.getUser().getMainSkl()) //본교가 같은 경우
@@ -302,6 +304,7 @@ public class ChatService {
                 .hostSkl(openChatRoom.get().getHostSchool())
                 .userId(principalDetails.getUser().getId())
                 .isJoin(isJoin)
+                .participants(joinOpenChats.size())
                 .build();
 
         return openChatRoomDetailDto;
@@ -354,6 +357,8 @@ public class ChatService {
         Optional<OpenChatRoom> openChatRoom = openChatRoomRepository.findById(chat_room_id);
         List<JoinOpenChat> joinOpenChats = joinOpenChatRepository.findJoinOpenChatsById(chat_room_id);
 
+        int participants = joinOpenChats.size(); //참여자수
+
         List<OpenChatUsersListDto.userListDTO> result = new ArrayList<>();
 
         if (openChatRoom.get().getProfile() == Profile.REALNAME){ //실명 오픈채팅방(실명 프로필 활용)
@@ -386,6 +391,7 @@ public class ChatService {
                 .userListDTOList(result)
                 .isNoti(loginUserJoinOpenChat.isNoti())
                 .profile(openChatRoom.get().getProfile().toString())
+                .participants(participants)
                 .build();
 
         return openChatUsersListDto;
@@ -421,12 +427,15 @@ public class ChatService {
 
             OpenMessage latestMessage = openMessageRepository.findLatestMessage(openChatRoom.getId());
 
+            List<JoinOpenChat> joinOpenChats = joinOpenChatRepository.findJoinOpenChatsById(openChatRoom.getId());
+
             result.add(OpenChatListDto.builder()
                     .chatRoomId(openChatRoom.getId())
                     .title(openChatRoom.getTitle())
                     .thumbnail(openChatRoom.getThumbnail())
                     .message(latestMessage.getMessage())
                     .createdAt(latestMessage.getCreatedAt())
+                    .participants(joinOpenChats.size())
                     .build());
         }
 
@@ -447,6 +456,8 @@ public class ChatService {
             OpenChatRoom openChatRoom = openChatRoomRepository.findById(openChatRooms.get(i).getId())
                     .orElseThrow(() -> new IllegalArgumentException("오픈채팅방을 찾을 수 없습니다."));
 
+            List<JoinOpenChat> joinOpenChats = joinOpenChatRepository.findJoinOpenChatsById(openChatRoom.getId());
+
             OpenMessage latestMessage = openMessageRepository.findLatestMessage(openChatRoom.getId());
 
             result.add(OpenChatListDto.builder()
@@ -455,6 +466,7 @@ public class ChatService {
                     .thumbnail(openChatRoom.getThumbnail())
                     .message(latestMessage.getMessage())
                     .createdAt(latestMessage.getCreatedAt())
+                    .participants(joinOpenChats.size())
                     .build());
         }
         return result;
