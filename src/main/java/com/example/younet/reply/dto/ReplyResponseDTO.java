@@ -19,6 +19,7 @@ public class ReplyResponseDTO {
             this.commentId = reply.getCommentId();
             this.postId = reply.getPostId();
             this.communityProfileId = reply.getCommunityProfileId();
+            this.authorName = reply.getCommunityProfile().getName();
             this.body = reply.getBody();
             this.createdAt = reply.getCreatedAt();
             this.updatedAt = reply.getUpdatedAt();
@@ -28,6 +29,7 @@ public class ReplyResponseDTO {
         private final Long commentId;
         private final Long postId;
         private final Long communityProfileId;
+        private final String authorName;
         private final String body;
         private final LocalDateTime createdAt;
         private final LocalDateTime updatedAt;

@@ -19,13 +19,13 @@ public class CommentController {
     private final CommentService commentService;
 
     @GetMapping("post")
-    public Slice<CommentResponseDTO.Comment> getCommentsByPostIdWithPaging(@RequestBody CommentRequestDTO.GetByPostIdWithPaging requestDto) {
+    public Slice<CommentResponseDTO.Comment> getCommentsByPostIdWithPaging(@ModelAttribute CommentRequestDTO.GetByPostIdWithPaging requestDto) {
         return commentService.getCommentSliceByPostId(requestDto);
 
     }
 
     @GetMapping("community-profile")
-    public Slice<CommentResponseDTO.Comment> getCommentsByCommunityProfileIdWithPaging(@RequestBody CommentRequestDTO.GetByCommunityProfileIdWithPaging requestDto) {
+    public Slice<CommentResponseDTO.Comment> getCommentsByCommunityProfileIdWithPaging(@ModelAttribute CommentRequestDTO.GetByCommunityProfileIdWithPaging requestDto) {
         return commentService.getCommentSliceByCommunityProfileId(requestDto);
     }
 

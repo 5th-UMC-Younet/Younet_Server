@@ -4,11 +4,13 @@ import com.example.younet.alarm.dto.AlarmResponseDTO;
 import com.example.younet.domain.QChatAlarm;
 import com.example.younet.domain.QChatRequest;
 import com.example.younet.domain.QCommonAlarm;
+import com.example.younet.domain.QPost;
 import com.example.younet.domain.enums.Profile;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +29,7 @@ public class CommonAlarmRepositoryCustomImpl implements CommonAlarmRepositoryCus
     QCommonAlarm commonAlarm=QCommonAlarm.commonAlarm;
     QChatAlarm chatAlarm=QChatAlarm.chatAlarm;
     QChatRequest chatRequest=QChatRequest.chatRequest;
+    QPost post=QPost.post;
     @Override
     public Slice<AlarmResponseDTO.commonAlarmListResultDTO> getCommonAlarmList(Long lastAlarmId, Long receiverId, Pageable pageable){
         LocalDateTime date=null;
@@ -39,7 +42,15 @@ public class CommonAlarmRepositoryCustomImpl implements CommonAlarmRepositoryCus
                                 commonAlarm.alarmType.as("alarmType"),
                                 commonAlarm.actorName.as("actorName"),
                                 commonAlarm.postId.as("postId"),
-                                commonAlarm.createdAt.as("createdAt")
+                                commonAlarm.createdAt.as("createdAt"),
+                                Expressions.cases()
+                                        .when(commonAlarm.postId.isNotNull())
+                                            .then(
+                                                    JPAExpressions.select(post.title)
+                                                            .from(post)
+                                                            .where(post.id.eq(commonAlarm.postId))
+                                            )
+                                        .otherwise((String) null).as("postTitle")
                         ))
                         .from(commonAlarm)
                         .where(

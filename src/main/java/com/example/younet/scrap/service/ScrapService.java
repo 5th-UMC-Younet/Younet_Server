@@ -17,6 +17,8 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @RequiredArgsConstructor
 @Service
 public class ScrapService {
@@ -31,6 +33,11 @@ public class ScrapService {
                 .orElseThrow(() -> new IllegalArgumentException("Post ID를 찾을 수 없습니다."));
         CommunityProfile targetCommuProfile = communityProfileRepository.findById(requestDto.getCommunityProfileId())
                 .orElseThrow(() -> new IllegalArgumentException("커뮤니티 프로필 ID를 찾을 수 없습니다."));
+
+        Optional<Scrap> existScrap = scrapRepository.findByPost_IdAndCommunityProfile_Id(targetPost.getId(), targetCommuProfile.getId());
+        if(existScrap.isPresent()) {
+            return existScrap.get();
+        }
 
         Scrap newScrap = Scrap.builder()
                 .post(targetPost)
