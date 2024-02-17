@@ -411,4 +411,22 @@ public class ChatService {
         return result;
     }
 
+    //신고하기(POST) API
+    @Transactional
+    public ResponseEntity<?> reportUser(Long user_id, ReportRequestDto reportRequestDto, @AuthenticationPrincipal PrincipalDetails principalDetails)
+    {
+        User loginUser = principalDetails.getUser();
+        User user = userRepository.findById(user_id)
+                .orElseThrow(() -> new IllegalArgumentException("피신고자 ID 오류" + user_id));
+
+        Report report = Report.builder()
+                .reporter(loginUser)
+                .reported(user)
+                .reportReason(ReportReason.valueOf(reportRequestDto.getReportReason()))
+                .reportFile(reportRequestDto.getReportFile())
+                .build();
+
+        return ResponseEntity.ok(reportRepository.save(report));
+    }
+
 }

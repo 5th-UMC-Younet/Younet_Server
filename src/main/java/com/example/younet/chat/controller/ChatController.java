@@ -109,4 +109,11 @@ public class ChatController {
         return chatService.readOpenChatList(principalDetails);
     }
 
+    //신고하기 API (POST)
+    @PostMapping("/report/{user_id}")
+    public ResponseEntity<?> reportUser(@PathVariable Long user_id, @RequestBody ReportRequestDto reportRequestDto, @AuthenticationPrincipal PrincipalDetails principalDetails)
+    {
+        return chatService.reportUser(user_id, reportRequestDto, principalDetails);
+    }
+
 }
