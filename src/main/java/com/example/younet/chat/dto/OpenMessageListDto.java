@@ -1,6 +1,5 @@
 package com.example.younet.chat.dto;
 
-import com.example.younet.domain.Message;
 import com.example.younet.domain.OpenMessage;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,22 +10,20 @@ import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor
-public class MessageListDto{
+public class OpenMessageListDto{
     private Long messageId;
     private Long userId;
-    private boolean isRead; //확인 여부
     private boolean isFile; //0: 텍스트메세지, 1: 파일메세지
     private String message; //메세지 내용(message)
     private LocalDateTime createdAt; // 가장 최근에 해당하는 메세지 생성 시각(created_at)
 
-    public MessageListDto(Message message)
+    public OpenMessageListDto(OpenMessage openMessage)
     {
-        this.messageId = message.getId();
-        this.userId = message.getUser().getId();
-        this.isRead = message.isRead();
-        this.isFile = message.isFile();
-        this.message = message.getMessage();
-        this.createdAt = message.getCreatedAt();
+        this.messageId = openMessage.getId();
+        this.userId = openMessage.getUser().getId();
+        this.isFile = openMessage.isFile();
+        this.message = openMessage.getMessage();
+        this.createdAt = openMessage.getCreatedAt();
     }
 }
 

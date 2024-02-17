@@ -32,8 +32,8 @@ public class OpenMessage extends BaseEntity { // [1:1 채팅] 메세지 엔티�
     @Column(columnDefinition = "LONGTEXT")
     private String message; // 파일(isFile=1)인 경우, 파일 링크가 여기 들어감
 
-    @ColumnDefault("0")
-    private boolean isRead;
+//    @ColumnDefault("0")
+//    private boolean isRead;
 
     @ColumnDefault("0")
     private boolean isFile; //0: 텍스트메세지, 1: 파일메세지

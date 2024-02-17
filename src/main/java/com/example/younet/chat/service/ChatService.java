@@ -138,6 +138,21 @@ public class ChatService {
         return allMessageDto;
     }
 
+    //TODO: 채팅방 메세지 불러오기 (오픈채팅)
+    @Transactional
+    public ReadAllOpenMessageDto readAllOpenMessages(Long chat_room_id, @AuthenticationPrincipal PrincipalDetails principalDetails)
+    {
+        User loginUser = principalDetails.getUser(); //현재 로그인된 유저 객체
+        List<OpenMessageListDto> messageListDtos = openMessageRepository.findById(chat_room_id)
+                .stream().map(OpenMessageListDto::new).toList();
+
+        ReadAllOpenMessageDto allMessageDto = ReadAllOpenMessageDto.builder()
+                .loginUserId(loginUser.getId())
+                .messageListDtoList(messageListDtos)
+                .build();
+        return allMessageDto;
+    }
+
     //[1:1 채팅] 요청 수락 및 채팅방 생성 API
     @Transactional
     public ResponseEntity<?> acceptChatRequest(Long chatAlarmId, @AuthenticationPrincipal PrincipalDetails principalDetails)
