@@ -81,11 +81,7 @@ public class UserProfileService {
         String imageUrl = s3Manager.uploadFile(userId.toString(), file);
 
         user.setProfilePicture(imageUrl);
-        user.setName(userProfileEditDTO.getName());
         user.setProfileText(userProfileEditDTO.getProfileText());
-        user.setMainSkl(userProfileEditDTO.getMainSkl());
-        user.setHostContr(userProfileEditDTO.getHostCntr());
-        user.setHostSkl(userProfileEditDTO.getHostSkl());
         userRepository.save(user);
         return;
     }
