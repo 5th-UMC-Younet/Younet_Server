@@ -135,8 +135,7 @@ public class MyPageService {
 
         Country country = countryRepository.findByName(myProfileEditDTO.getLikeCntr());
 
-        // 유저 수정
-        communityProfile.getUser().setProfilePicture(imageUrl);
+        // 유저 수정i
         communityProfile.getUser().setName(myProfileEditDTO.getName());
         communityProfile.getUser().setNickname(myProfileEditDTO.getNickname());
         communityProfile.getUser().setProfileText(myProfileEditDTO.getProfileText());

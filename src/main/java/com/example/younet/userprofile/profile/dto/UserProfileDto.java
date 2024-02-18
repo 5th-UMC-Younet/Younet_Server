@@ -37,4 +37,12 @@ public class UserProfileDto {
         Long likesCount;
         Long commentsCount;
     }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UserProfileEditDTO {
+        String profileText;
+    }
 }
