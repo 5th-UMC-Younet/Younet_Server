@@ -42,8 +42,11 @@ public class UserProfileService {
 
         List<UserProfileDto.userProfilePostDTO> postDTOs = posts.stream()
                 .map(post -> {
+                    String imageUrl = null;
                     Image representativeImage = imageRepository.findByName(post.getRepresentativeImage());
-                    String imageUrl = representativeImage.getImageUrl();
+                    if (representativeImage.getImageUrl() != null) {
+                        imageUrl = representativeImage.getImageUrl();
+                    }
                     return new UserProfileDto.userProfilePostDTO(
                             post.getId(),
                             post.getCategory().getId(),
