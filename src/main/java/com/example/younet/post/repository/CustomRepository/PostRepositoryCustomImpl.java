@@ -5,6 +5,7 @@ import com.example.younet.post.dto.PostResponseDTO;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -25,6 +26,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom{
     QPost post= QPost.post;
     QImage image=QImage.image;
     QComment comment=QComment.comment;
+    QReply reply=QReply.reply;
     QSection section=QSection.section;
     @Override
     public Slice<PostResponseDTO.postListResultDTO> getPostListByDates(Long lastPostId, Long categoryId, Long countryId, Pageable pageable) {
@@ -130,7 +132,13 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom{
                         ExpressionUtils.as(JPAExpressions.select(image.imageUrl)
                                 .from(image)
                                 .where(image.name.eq(post.representativeImage)), "imageSampleUrl"),
-                        ExpressionUtils.as(JPAExpressions.select(comment.count()).from(comment).where(comment.post.id.eq(post.id)),"commentsCount")
+//                        ExpressionUtils.as(JPAExpressions.select(comment.count()).from(comment).where(comment.post.id.eq(post.id)),"commentsCount")
+                        ExpressionUtils.as(
+                                JPAExpressions.select(comment.countDistinct().add(reply.countDistinct()))
+                                        .from(comment)
+                                        .leftJoin(reply).on(reply.comment.eq(comment))
+                                        .where(comment.post.eq(post)),
+                                "commentsCount")
                 ))
                 .from(post)
                 .where(
