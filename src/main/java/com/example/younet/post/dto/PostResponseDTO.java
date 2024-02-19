@@ -1,5 +1,6 @@
 package com.example.younet.post.dto;
 
+import com.example.younet.domain.Post;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -56,5 +57,19 @@ public class PostResponseDTO {
         // commentsCount
         LocalDateTime createdAt;
         Long commentsCount;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SelectedPostCommentAndReplyCntDTO{
+        public SelectedPostCommentAndReplyCntDTO(Post post) {
+            postId = post.getId();
+            commentAndReplyCnt = post.getCommentAndReplyCnt();
+        }
+
+        private Long postId;
+        private Long commentAndReplyCnt;
     }
 }

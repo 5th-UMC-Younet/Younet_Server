@@ -136,4 +136,10 @@ public class PostCommandService {
         post.getSections().forEach(Section::getImages);
         return PostConverter.of(post,authorName,commentsCount);
     }
+
+    public PostResponseDTO.SelectedPostCommentAndReplyCntDTO getCommentAndReplyList(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+        return new PostResponseDTO.SelectedPostCommentAndReplyCntDTO(post);
+    }
 }
