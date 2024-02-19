@@ -34,6 +34,12 @@ public class Post extends BaseEntity {
     @Column(columnDefinition = "VARCHAR(20)")
     private String introduction; // 서두
 
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    private List<Comment> commentList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    private List<Reply> replyList = new ArrayList<>();
+
     @OneToMany(mappedBy = "post",cascade = CascadeType.ALL)
     private List<PostLikes> likesList=new ArrayList<>();
 
@@ -75,5 +81,9 @@ public class Post extends BaseEntity {
 
     public void removeLike() {
         this.likesCount--;
+    }
+
+    public Long getCommentAndReplyCnt() {
+        return (long) (commentList.size() + replyList.size());
     }
 }

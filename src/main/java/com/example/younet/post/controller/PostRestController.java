@@ -51,4 +51,9 @@ public class PostRestController {
     public ApiResponse<PostResponseDTO.SelectedPostResultDTO> getAllOfPostContentsById(@PathVariable Long postId){
         return ApiResponse.onSuccess(HttpStatus.OK, postCommandService.getAllOfPostContentById(postId));
     }
+
+    @GetMapping("{postId}/comment_reply_cnt")
+    public ApiResponse<PostResponseDTO.SelectedPostCommentAndReplyCntDTO> getCommentAndReplyCnt(@PathVariable Long postId){
+        return ApiResponse.onSuccess(HttpStatus.OK, postCommandService.getCommentAndReplyList(postId));
+    }
 }
