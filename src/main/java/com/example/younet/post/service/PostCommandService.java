@@ -132,7 +132,7 @@ public class PostCommandService {
     public PostResponseDTO.SelectedPostResultDTO getAllOfPostContentById(Long postId){
         Post post = postRepository.findById(postId).orElseThrow(() -> new RuntimeException("Post not found"));
         String authorName=post.getCommunityProfile().getName();
-        long commentsCount=commentRepository.countCommentsByPostId(post.getId());
+        long commentsCount=post.getCommentAndReplyCnt();
         post.getSections().forEach(Section::getImages);
         return PostConverter.of(post,authorName,commentsCount);
     }
