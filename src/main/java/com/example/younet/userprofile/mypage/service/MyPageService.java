@@ -53,9 +53,11 @@ public class MyPageService {
                 .map(post -> {
                     Image representativeImage = imageRepository.findByName(post.getRepresentativeImage());
                     String imageUrl = null;
-                    if(representativeImage.getImageUrl() != null) {
-                       imageUrl = representativeImage.getImageUrl();
+
+                    if (representativeImage != null && representativeImage.getImageUrl() != null) {
+                        imageUrl = representativeImage.getImageUrl();
                     }
+
                     return new MyPageDto.MyProfilePostDTO(
                             post.getId(),
                             post.getCategory().getId(),
@@ -73,9 +75,11 @@ public class MyPageService {
                 .map(post -> {
                     Image representativeImage = imageRepository.findByName(post.getRepresentativeImage());
                     String imageUrl = null;
-                    if(representativeImage.getImageUrl() != null) {
+
+                    if (representativeImage != null) {
                         imageUrl = representativeImage.getImageUrl();
                     }
+
                     return new MyPageDto.MyProfilePostDTO(
                             post.getId(),
                             post.getCategory().getId(),

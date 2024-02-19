@@ -44,9 +44,10 @@ public class UserProfileService {
                 .map(post -> {
                     String imageUrl = null;
                     Image representativeImage = imageRepository.findByName(post.getRepresentativeImage());
-                    if (representativeImage.getImageUrl() != null) {
+                    if (representativeImage != null && representativeImage.getImageUrl() != null) {
                         imageUrl = representativeImage.getImageUrl();
                     }
+
                     return new UserProfileDto.userProfilePostDTO(
                             post.getId(),
                             post.getCategory().getId(),
