@@ -52,7 +52,10 @@ public class MyPageService {
         List<MyPageDto.MyProfilePostDTO> postDTOs = myPosts.stream()
                 .map(post -> {
                     Image representativeImage = imageRepository.findByName(post.getRepresentativeImage());
-                    String imageUrl = representativeImage.getImageUrl();
+                    String imageUrl = null;
+                    if(representativeImage.getImageUrl() != null) {
+                       imageUrl = representativeImage.getImageUrl();
+                    }
                     return new MyPageDto.MyProfilePostDTO(
                             post.getId(),
                             post.getCategory().getId(),
@@ -69,7 +72,10 @@ public class MyPageService {
         List<MyPageDto.MyProfilePostDTO> scrapDTOs = scrapPosts.stream()
                 .map(post -> {
                     Image representativeImage = imageRepository.findByName(post.getRepresentativeImage());
-                    String imageUrl = representativeImage.getImageUrl();
+                    String imageUrl = null;
+                    if(representativeImage.getImageUrl() != null) {
+                        imageUrl = representativeImage.getImageUrl();
+                    }
                     return new MyPageDto.MyProfilePostDTO(
                             post.getId(),
                             post.getCategory().getId(),

@@ -59,6 +59,7 @@ public class MyPageDto {
     public static class MyProfilePostDTO{
         Long postId;
         Long categoryId;
+        @Nullable
         String imageSampleUrl;
         String title;
         String bodySample;

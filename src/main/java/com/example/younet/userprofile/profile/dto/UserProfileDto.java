@@ -30,6 +30,7 @@ public class UserProfileDto {
     public static class userProfilePostDTO{
         Long postId;
         Long categoryId;
+        @Nullable
         String imageSampleUrl;
         String title;
         String bodySample;
