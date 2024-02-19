@@ -76,7 +76,7 @@ public class MyPageService {
                     Image representativeImage = imageRepository.findByName(post.getRepresentativeImage());
                     String imageUrl = null;
 
-                    if (representativeImage != null) {
+                    if (representativeImage != null && representativeImage.getImageUrl() != null) {
                         imageUrl = representativeImage.getImageUrl();
                     }
 
