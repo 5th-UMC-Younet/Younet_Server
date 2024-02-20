@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -82,11 +83,17 @@ public class UserProfileService {
         User user = principalDetails.getUser();
         Long userId = user.getId();
 
-        String imageUrl = s3Manager.uploadFile(userId.toString(), file);
+        String imageUrl = s3Manager.uploadFile(generateUniqueFileName(userId.toString()), file);
 
         user.setProfilePicture(imageUrl);
         user.setProfileText(userProfileEditDTO.getProfileText());
         userRepository.save(user);
         return;
+    }
+
+    private String generateUniqueFileName(String userId) {
+        UUID uuid = UUID.randomUUID();
+        String uniqueFileName = userId + "_" + uuid.toString();
+        return uniqueFileName;
     }
 }
