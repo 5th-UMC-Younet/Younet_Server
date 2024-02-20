@@ -13,6 +13,9 @@ import com.example.younet.userprofile.profile.dto.UserProfileDto;
 import com.example.younet.userprofile.profile.service.UserProfileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -547,13 +550,16 @@ public class ChatService {
 
     // 전체 개설된 오픈채팅방 목록 검색
     @Transactional
-    public List<OpenChatSearchListDto> searchOpenChatRooms(String search){
-        List<OpenChatRoom> openChatRoomList= openChatRoomRepository.findByTitle(search);
+    public Page<OpenChatSearchListDto> searchOpenChatRooms(String search, Pageable pageable){
+        Page<OpenChatRoom> openChatRoomList= openChatRoomRepository.findByTitle(search, pageable);
         List<OpenChatSearchListDto> result = new ArrayList<>();
 
-        for (int i=0; i<openChatRoomList.size(); i++)
+//        Page<OpenChatSearchListDto> answer = new PageImpl<>(result, pageable, 0);
+
+//        for (int i=0; i<openChatRoomList.size(); i++)
+        for (OpenChatRoom chatRoom : openChatRoomList.getContent())
         {
-            OpenChatRoom chatRoom = openChatRoomList.get(i);
+//            OpenChatRoom chatRoom = openChatRoomList.get(i);
             List<JoinOpenChat> joinOpenChats = joinOpenChatRepository.findJoinOpenChatsById(chatRoom.getId());
 
             OpenChatSearchListDto searchListDto = OpenChatSearchListDto.builder()
@@ -567,8 +573,38 @@ public class ChatService {
             result.add(searchListDto);
         }
 
-        return result;
-    }
+//        Page<OpenChatSearchListDto> answer = new PageImpl<>(result, pageable, result.size());
+
+//        return answer;
+            return new PageImpl<>(result, pageable, openChatRoomList.getTotalElements());
+        }
+
+//    @Transactional
+//    public List<OpenChatSearchListDto> searchOpenChatRooms(String search){
+//        List<OpenChatRoom> openChatRoomList= openChatRoomRepository.findByTitle(search);
+//        List<OpenChatSearchListDto> result = new ArrayList<>();
+//
+////        Page<OpenChatSearchListDto> answer = new PageImpl<>(result, pageable, 0);
+//
+//        for (int i=0; i<openChatRoomList.size(); i++)
+//        {
+//            OpenChatRoom chatRoom = openChatRoomList.get(i);
+//            List<JoinOpenChat> joinOpenChats = joinOpenChatRepository.findJoinOpenChatsById(chatRoom.getId());
+//
+//            OpenChatSearchListDto searchListDto = OpenChatSearchListDto.builder()
+//                    .chatRoomId(chatRoom.getId())
+//                    .title(chatRoom.getTitle())
+//                    .thumbnail(chatRoom.getThumbnail())
+//                    .description(chatRoom.getDescription())
+//                    .participants(joinOpenChats.size())
+//                    .build();
+//
+//            result.add(searchListDto);
+//        }
+//
+//        return result;
+//    }
+
 
     // 1:1 채팅 메세지 검색
     @Transactional

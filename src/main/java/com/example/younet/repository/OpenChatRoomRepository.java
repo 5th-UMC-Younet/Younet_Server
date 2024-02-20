@@ -11,7 +11,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface OpenChatRoomRepository extends JpaRepository<OpenChatRoom, Long> {
+//    @Query("SELECT o FROM OpenChatRoom o " +
+//            "WHERE o.title LIKE CONCAT('%', :search, '%') ")
+//    List<OpenChatRoom> findByTitle(@Param("search") String search);
+
     @Query("SELECT o FROM OpenChatRoom o " +
             "WHERE o.title LIKE CONCAT('%', :search, '%') ")
-    List<OpenChatRoom> findByTitle(@Param("search") String search);
+    Page<OpenChatRoom> findByTitle(@Param("search") String search, Pageable pageable);
+
 }
