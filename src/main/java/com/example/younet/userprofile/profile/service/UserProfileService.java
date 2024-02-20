@@ -72,7 +72,7 @@ public class UserProfileService {
                 .communityProfileId(communityProfile.getId())
                 .userId(communityProfile.getUser().getId())
                 .profilePicture(communityProfile.getProfilePicture())
-                .name(communityProfile.getUser().getName())
+                .name(communityProfile.getName())
                 .likeCntr(likeCntr)
                 .profileText(communityProfile.getProfileText())
                 .posts(postDTOs)
