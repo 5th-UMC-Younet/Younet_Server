@@ -40,6 +40,7 @@ public class OpenChatRoom extends BaseEntity {
     private Profile profile; //실명여부
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private User representer; //방장
+    @JoinColumn
+    private User user; //방장
 
 }

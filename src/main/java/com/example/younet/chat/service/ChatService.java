@@ -18,8 +18,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
-import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,8 +25,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import java.time.LocalDateTime;
 import java.util.*;
-
-import static com.example.younet.domain.QChatRoom.chatRoom;
 
 @Service
 @Slf4j
@@ -357,7 +353,7 @@ public class ChatService {
                 .country(createOpenChatRoomDto.getHostContr())
                 .hostSchool(createOpenChatRoomDto.getHostSkl())
                 .profile(Profile.valueOf(createOpenChatRoomDto.getProfile()))
-                .representer(loginUser)
+                .user(loginUser)
                 .build();
 
         JoinOpenChat joinOpenChat = JoinOpenChat.builder()
@@ -405,7 +401,7 @@ public class ChatService {
         JoinOpenChat loginUserJoinOpenChat = joinOpenChatRepository.findByOpenChatroomIdAndUserId(chat_room_id, principalDetails.getUser().getId());
 
         OpenChatUsersListDto openChatUsersListDto = OpenChatUsersListDto.builder()
-                .representerId(openChatRoom.get().getRepresenter().getId())
+                .representerId(openChatRoom.get().getUser().getId())
                 .loginUserId(principalDetails.getUser().getId())
                 .userListDTOList(result)
                 .isNoti(loginUserJoinOpenChat.isNoti())

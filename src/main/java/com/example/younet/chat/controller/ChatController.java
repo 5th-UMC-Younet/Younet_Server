@@ -136,6 +136,21 @@ public class ChatController {
         return chatService.readAllOpenMessages(chat_room_id, principalDetails);
     }
 
+    // 전체 개설된 오픈채팅방 목록 검색
+    //TODO: participants
+    @GetMapping("/open/list")
+//  URL endpoint: /chat/open/list?search=${search}&pageNo=${pageNo}
+    public Page<OpenChatSearchListDto> searchOpenChatRooms(@RequestParam(name = "search", defaultValue = "") String search, @RequestParam(name = "pageNo", defaultValue = "1", required = true) int pageNo) {
+        Pageable pageable = PageRequest.of(pageNo - 1, 9);
+        return chatService.searchOpenChatRooms(search, pageable);
+    }
+
+//    @GetMapping("/open/list")
+////  URL endpoint: /chat/open/list?search=${search}&pageNo=${pageNo}
+//    public List<OpenChatSearchListDto> searchOpenChatRooms(@RequestParam(name = "search", defaultValue = "") String search) {
+//        return chatService.searchOpenChatRooms(search);
+//    }
+
     //(Temp) 1:1 채팅 메세지 전송
     @PostMapping("/{chat_room_id}/send")
     public ResponseEntity<?> sendChatMessage(@PathVariable Long chat_room_id, @RequestBody MessageDto messageDto, @AuthenticationPrincipal PrincipalDetails principalDetails)
@@ -150,32 +165,18 @@ public class ChatController {
         return chatService.sendOpenChatMessage(chat_room_id, messageDto, principalDetails);
     }
 
-    // 전체 개설된 오픈채팅방 목록 검색
-    @GetMapping("/open/list")
-//  URL endpoint: /chat/open/list?search={search}&pageNo=${pageNo}
-    public Page<OpenChatSearchListDto> searchOpenChatRooms(@RequestParam(name = "search", defaultValue = "") String search, @RequestParam(name = "pageNo", defaultValue = "1", required = true) int pageNo) {
-        Pageable pageable = PageRequest.of(pageNo - 1, 9);
-        return chatService.searchOpenChatRooms(search, pageable);
-    }
-//    @GetMapping("/open/list")
-////  URL endpoint: /chat/open/list?search={search}&pageNo=${pageNo}
-//    public List<OpenChatSearchListDto> searchOpenChatRooms(@RequestParam(name = "search", defaultValue = "") String search) {
-//        return chatService.searchOpenChatRooms(search);
-//    }
-
-    // 1:1 채팅 메세지 검색
-    @GetMapping("/{chat_room_id}/messageSearch")
-//  URL endpoint: /chat/message?search={search}
+    //TODO: test bug fix / 1:1 채팅 메세지 검색
+    @GetMapping("/{chatRoomId}/messageSearch")
+//  URL endpoint: /chat/messageSearch?search=${search}
     public List<ChatMessage> searchChatMessages(@PathVariable Long chatRoomId, @RequestParam("search") String search) {
         return chatService.searchChatMessages(chatRoomId, search);
     }
 
-    // 오픈 채팅 메세지 검색
-    @GetMapping("/openMessageSearch")
-//  URL endpoint: /chat/openMessage?search={search}
+    //TODO: test bug fix / 오픈 채팅 메세지 검색
+    @GetMapping("/{openChatRoomId}/openMessageSearch")
+//  URL endpoint: /chat/openMessageSearch?search=${search}
     public List<OpenMessage> searchOpenMessages(@PathVariable Long openChatRoomId, @RequestParam("search") String search) {
         return chatService.searchOpenMessages(openChatRoomId, search);
     }
-
 
 }
