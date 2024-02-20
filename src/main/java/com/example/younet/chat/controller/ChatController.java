@@ -157,14 +157,14 @@ public class ChatController {
     }
 
     // 1:1 채팅 메세지 검색
-    @GetMapping("/{chat_room_id}/message")
+    @GetMapping("/{chat_room_id}/messageSearch")
 //  URL endpoint: /chat/message?search={search}
     public List<ChatMessage> searchChatMessages(@PathVariable Long chatRoomId, @RequestParam("search") String search) {
         return chatService.searchChatMessages(chatRoomId, search);
     }
 
     // 오픈 채팅 메세지 검색
-    @GetMapping("/openMessage")
+    @GetMapping("/openMessageSearch")
 //  URL endpoint: /chat/openMessage?search={search}
     public List<OpenMessage> searchOpenMessages(@PathVariable Long openChatRoomId, @RequestParam("search") String search) {
         return chatService.searchOpenMessages(openChatRoomId, search);
