@@ -2,6 +2,7 @@ package com.example.younet.chat.service;
 
 import com.example.younet.chat.dto.*;
 import com.example.younet.domain.*;
+import com.example.younet.domain.enums.MessageType;
 import com.example.younet.domain.enums.Profile;
 import com.example.younet.domain.enums.ReportReason;
 import com.example.younet.global.jwt.PrincipalDetails;
@@ -14,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -502,6 +505,81 @@ public class ChatService {
                 .build();
 
         return ResponseEntity.ok(reportRepository.save(report));
+    }
+
+    //(Temp) 1:1 채팅 메세지 전송
+    @Transactional
+    public ResponseEntity<?> sendChatMessage(Long chat_room_id, MessageDto messageDto, @AuthenticationPrincipal PrincipalDetails principalDetails)
+    {
+        ChatRoom chatRoom = chatRoomRepository.findById(chat_room_id)
+                .orElseThrow(() -> new IllegalArgumentException(chat_room_id + "에 해당하는 채팅방을 찾을 수 없습니다."));
+
+        ChatMessage chatMessage =
+                ChatMessage.builder()
+                        .chatRoom(chatRoom)
+                        .user(principalDetails.getUser())
+                        .isFile(false)
+                        .message(messageDto.getMessage())
+                        .messageType(MessageType.valueOf("TALK"))
+                        .build();
+
+        return ResponseEntity.ok(messageRepository.save(chatMessage));
+    }
+
+    //(Temp) 오픈 채팅 메세지 전송
+    @Transactional
+    public ResponseEntity<?> sendOpenChatMessage(Long chat_room_id, MessageDto messageDto, @AuthenticationPrincipal PrincipalDetails principalDetails)
+    {
+        OpenChatRoom chatRoom = openChatRoomRepository.findById(chat_room_id)
+                .orElseThrow(() -> new IllegalArgumentException(chat_room_id + "에 해당하는 채팅방을 찾을 수 없습니다."));
+
+        OpenMessage chatMessage =
+                OpenMessage.builder()
+                        .openChatRoom(chatRoom)
+                        .user(principalDetails.getUser())
+                        .isFile(false)
+                        .message(messageDto.getMessage())
+                        .messageType(MessageType.valueOf("TALK"))
+                        .build();
+
+        return ResponseEntity.ok(openMessageRepository.save(chatMessage));
+    }
+
+    // 전체 개설된 오픈채팅방 목록 검색
+    @Transactional
+    public List<OpenChatSearchListDto> searchOpenChatRooms(String search){
+        List<OpenChatRoom> openChatRoomList= openChatRoomRepository.findByTitle(search);
+        List<OpenChatSearchListDto> result = new ArrayList<>();
+
+        for (int i=0; i<openChatRoomList.size(); i++)
+        {
+            OpenChatRoom chatRoom = openChatRoomList.get(i);
+            List<JoinOpenChat> joinOpenChats = joinOpenChatRepository.findJoinOpenChatsById(chatRoom.getId());
+
+            OpenChatSearchListDto searchListDto = OpenChatSearchListDto.builder()
+                    .chatRoomId(chatRoom.getId())
+                    .title(chatRoom.getTitle())
+                    .thumbnail(chatRoom.getThumbnail())
+                    .description(chatRoom.getDescription())
+                    .participants(joinOpenChats.size())
+                    .build();
+
+            result.add(searchListDto);
+        }
+
+        return result;
+    }
+
+    // 1:1 채팅 메세지 검색
+    @Transactional
+    public List<ChatMessage> searchChatMessages(Long chatRoomId, String search){
+        return messageRepository.findBySearch(chatRoomId, search);
+    }
+
+    //오픈 채팅 메세지 검색
+    @Transactional
+    public List<OpenMessage> searchOpenMessages(Long openChatRoomId, String search){
+        return openMessageRepository.findBySearch(openChatRoomId, search);
     }
 
 }

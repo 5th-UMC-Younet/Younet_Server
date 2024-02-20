@@ -14,7 +14,7 @@ import org.hibernate.annotations.ColumnDefault;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class OpenMessage extends BaseEntity { // [1:1 채팅] 메세지 엔티티
+public class OpenMessage extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
