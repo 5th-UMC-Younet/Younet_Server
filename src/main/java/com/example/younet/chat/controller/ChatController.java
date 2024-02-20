@@ -2,9 +2,14 @@ package com.example.younet.chat.controller;
 
 import com.example.younet.chat.dto.*;
 import com.example.younet.chat.service.ChatService;
+import com.example.younet.domain.ChatMessage;
+import com.example.younet.domain.OpenMessage;
 import com.example.younet.domain.enums.ReportReason;
 import com.example.younet.global.jwt.PrincipalDetails;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
@@ -130,9 +135,40 @@ public class ChatController {
         return chatService.readAllOpenMessages(chat_room_id, principalDetails);
     }
 
-    //TODO: 채팅방 입장(소켓 연결)
+    //(Temp) 1:1 채팅 메세지 전송
+    @PostMapping("/{chat_room_id}/send")
+    public ResponseEntity<?> sendChatMessage(@PathVariable Long chat_room_id, @RequestBody MessageDto messageDto, @AuthenticationPrincipal PrincipalDetails principalDetails)
+    {
+        return chatService.sendChatMessage(chat_room_id, messageDto, principalDetails);
+    }
 
-    //TODO: 채팅 메세지 전송 API
+    //(Temp) 오픈 채팅 메세지 전송
+    @PostMapping("/{chat_room_id}/open/send")
+    public ResponseEntity<?> sendOpenChatMessage(@PathVariable Long chat_room_id, @RequestBody MessageDto messageDto, @AuthenticationPrincipal PrincipalDetails principalDetails)
+    {
+        return chatService.sendOpenChatMessage(chat_room_id, messageDto, principalDetails);
+    }
+
+    // 전체 개설된 오픈채팅방 목록 검색
+    @GetMapping("/open/list")
+//  URL endpoint: /chat/open/list?search={search}
+    public List<OpenChatSearchListDto> searchOpenChatRooms(@RequestParam("search") String search) {
+        return chatService.searchOpenChatRooms(search);
+    }
+
+    // 1:1 채팅 메세지 검색
+    @GetMapping("/{chat_room_id}/message")
+//  URL endpoint: /chat/message?search={search}
+    public List<ChatMessage> searchChatMessages(@PathVariable Long chatRoomId, @RequestParam("search") String search) {
+        return chatService.searchChatMessages(chatRoomId, search);
+    }
+
+    // 오픈 채팅 메세지 검색
+    @GetMapping("/openMessage")
+//  URL endpoint: /chat/openMessage?search={search}
+    public List<OpenMessage> searchOpenMessages(@PathVariable Long openChatRoomId, @RequestParam("search") String search) {
+        return chatService.searchOpenMessages(openChatRoomId, search);
+    }
 
 
 }
