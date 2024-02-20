@@ -104,7 +104,7 @@ public class MyPageService {
                 .profilePicture(communityProfile.getProfilePicture())
                 .name(communityProfile.getName())
                 .likeCntr(likeCntr)
-                .profileText(communityProfile.getUser().getProfileText())
+                .profileText(communityProfile.getProfileText())
                 .posts(postDTOs)
                 .scraps(scrapDTOs)
                 .build();
@@ -129,7 +129,7 @@ public class MyPageService {
                 .name(user.getName())
                 .nickname(user.getNickname())
                 .likeCntr(likeCntr)
-                .profileText(user.getProfileText())
+                .profileText(communityProfile.getProfileText())
                 .build();
     }
 
@@ -145,11 +145,11 @@ public class MyPageService {
 
         Country country = countryRepository.findByName(myProfileEditDTO.getLikeCntr());
 
-        // 유저 수정i
+        // 유저 수정
         communityProfile.getUser().setName(myProfileEditDTO.getName());
         communityProfile.getUser().setNickname(myProfileEditDTO.getNickname());
-        communityProfile.getUser().setProfileText(myProfileEditDTO.getProfileText());
         // 커뮤니티 프로필 수정
+        communityProfile.setProfileText(myProfileEditDTO.getProfileText());
         communityProfile.setProfilePicture(imageUrl);
         communityProfile.setName(myProfileEditDTO.getNickname());
         communityProfile.setCountry(country);

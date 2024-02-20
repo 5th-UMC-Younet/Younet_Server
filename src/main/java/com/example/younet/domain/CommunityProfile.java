@@ -22,6 +22,9 @@ public class CommunityProfile extends BaseEntity {
     @Column(nullable = false,columnDefinition = "VARCHAR(15)")
     private String name;
 
+    @Column(length = 255)
+    private String profileText;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="country_id")
     private Country country;
