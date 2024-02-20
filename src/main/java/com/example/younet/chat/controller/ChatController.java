@@ -7,6 +7,7 @@ import com.example.younet.domain.OpenMessage;
 import com.example.younet.domain.enums.ReportReason;
 import com.example.younet.global.jwt.PrincipalDetails;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -151,10 +152,16 @@ public class ChatController {
 
     // 전체 개설된 오픈채팅방 목록 검색
     @GetMapping("/open/list")
-//  URL endpoint: /chat/open/list?search={search}
-    public List<OpenChatSearchListDto> searchOpenChatRooms(@RequestParam("search") String search) {
-        return chatService.searchOpenChatRooms(search);
+//  URL endpoint: /chat/open/list?search={search}&pageNo=${pageNo}
+    public Page<OpenChatSearchListDto> searchOpenChatRooms(@RequestParam(name = "search", defaultValue = "") String search, @RequestParam(name = "pageNo", defaultValue = "1", required = true) int pageNo) {
+        Pageable pageable = PageRequest.of(pageNo - 1, 9);
+        return chatService.searchOpenChatRooms(search, pageable);
     }
+//    @GetMapping("/open/list")
+////  URL endpoint: /chat/open/list?search={search}&pageNo=${pageNo}
+//    public List<OpenChatSearchListDto> searchOpenChatRooms(@RequestParam(name = "search", defaultValue = "") String search) {
+//        return chatService.searchOpenChatRooms(search);
+//    }
 
     // 1:1 채팅 메세지 검색
     @GetMapping("/{chat_room_id}/messageSearch")
