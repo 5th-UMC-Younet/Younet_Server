@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.awt.print.PrinterGraphics;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -137,7 +138,7 @@ public class MyPageService {
         User user = principalDetails.getUser();
         Long userId = user.getId();
 
-        String imageUrl = s3Manager.uploadFile(userId.toString(), file);
+        String imageUrl = s3Manager.uploadFile(generateUniqueFileName(userId.toString()), file);
 
         CommunityProfile communityProfile = communityProfileRepository.findById(userId).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_INVALID_FIND_ID));
@@ -156,5 +157,11 @@ public class MyPageService {
 
         communityProfileRepository.save(communityProfile);
         return ;
+    }
+
+    private String generateUniqueFileName(String userId) {
+        UUID uuid = UUID.randomUUID();
+        String uniqueFileName = userId + "_" + uuid.toString();
+        return uniqueFileName;
     }
 }
