@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.awt.print.PrinterGraphics;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -51,6 +52,7 @@ public class MyPageService {
         List<Post> scrapPosts = postRepository.findByIdInOrderByCreatedAtDesc(postIds);
 
         List<MyPageDto.MyProfilePostDTO> postDTOs = myPosts.stream()
+                .sorted(Comparator.comparing(Post::getCreatedAt).reversed())
                 .map(post -> {
                     Image representativeImage = imageRepository.findByName(post.getRepresentativeImage());
                     String imageUrl = null;
@@ -73,6 +75,7 @@ public class MyPageService {
                 .collect(Collectors.toList());
 
         List<MyPageDto.MyProfilePostDTO> scrapDTOs = scrapPosts.stream()
+                .sorted(Comparator.comparing(Post::getCreatedAt).reversed())
                 .map(post -> {
                     Image representativeImage = imageRepository.findByName(post.getRepresentativeImage());
                     String imageUrl = null;
